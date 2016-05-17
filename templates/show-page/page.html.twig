@@ -1,22 +1,26 @@
 {% extends 'base.html.twig' %}
 
 {% set page = {
-  title: "Ziekenbezoek voor "~info.name,
+  title: "Kraambezoek voor "~info.name,
   class: "show-page"
 } %}
 
 {% block contents %}
     <div id="info">
-        <h1><span class="text-light">Ziekenbezoek voor</span> {{ info.name }}</h1>
+        <h1><span class="text-light">Kraamvisite voor</span> {{ info.name }}</h1>
         
-        {{ info.description|linkify('http', [], 'all')|paragraph }}
+        <p>Geboren op {{ info.date_of_birth|localdate('full') }}</p>
+        
+        {{ info.description|paragraph|linkify('http', [], 'all') }}
+        
+        <p>&mdash; {{ info.parent_name }}</p>
         
         <h3>Bezoek</h3>
         <p>
             {% if info.date_from|date('Y-m-d') > 'now'|date('Y-m-d') %}
-                Vanaf {{ info.date_from|localdate('full') }} kan er dagelijks bezoek worden ontvangen
+                Vanaf {{ info.date_from|localdate('full') }} kan er dagelijks kraambezoek worden ontvangen
             {% else %}
-                Er kan dagelijks bezoek worden ontvangen
+                Er kan dagelijks kraambezoek worden ontvangen
             {% endif %}
             {% for time in info.calendar.visitingTimes %}{% if not loop.first %} {{ loop.last ? 'en' : ',' }}{% endif %} tussen {{ time.from }} en {{ time.to}}{% endfor %}.
         </p>
@@ -25,18 +29,18 @@
             <a class="btn btn-lg btn-primary" href="/page/{{ info.reference }}/calendar">Plan een bezoek</a>
         </div>
         
-        {% if info.location %}
-            <h4>Locatie</h4>
+        {% if info.street %}
+            <h4>Adres</h4>
             <p>
-                {% if info.locationAddress %}
-                    {{ info.location|preg_replace('/,.*/') }}
-                    <br>{{ info.locationAddress }}
-                {% else %}
-                    {{ info.location }}
-                {% endif %}
-                {% if info.floor or info.room %}<br>{% endif %}
-                {% if info.floor %}Afdeling {{ info.floor|preg_replace('/^afdeling\s+/i') }}{% endif %}{% if info.floor and info.room %}, {% endif %}
-                {% if info.room%}kamer {{ info.room|preg_replace('/^kamer\s+/i') }}{% endif %}
+                {{ info.street }}<br>
+                {{ info.postalcode }} {{ info.city }}
+            </p>
+        {% endif %}
+        
+        {% if info.wishes %}
+            <h4>Cadeauideëen en wensen</h4>
+            <p>
+                {{ info.wishes|paragraph|linkify('http', [], 'all') }}
             </p>
         {% endif %}
         
@@ -47,11 +51,11 @@
             </p>
         {% endif %}
         
-        {% if info.locationAddress %}
-            <a class="map" href="https://www.google.nl/maps?q={{ info.location|url_encode }}" target="_blank">
+        {% if info.street %}
+            <a class="map" href="https://www.google.nl/maps?q={{ (info.street~', '~info.city)|url_encode }}" target="_blank">
                 <img src="https://maps.googleapis.com/maps/api/staticmap
 ?zoom=14&size=640x180&scale=2&maptype=roadmap
-&markers=color:blue%7C{{ info.locationAddress|url_encode }}
+&markers=color:blue%7C{{ (info.street~', '~info.city)|url_encode }}
 &key={{ google_api_key }}"
                 >
             </a>

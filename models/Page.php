@@ -10,28 +10,29 @@ class Page extends ORM
     protected $_table_name = 'VisitingHoursPage';
     protected $_hash_key   = 'reference';
     protected $_schema = [
-        'reference'      => 'S',
-        'email'          => 'S',
-        'name'           => 'S',
-        'location'       => 'S',
-        'floor'          => 'S',
-        'room'           => 'S',
-        'description'    => 'S',
-        'contact'        => 'S',
-        'date_from'      => 'S',
-        'date_to'        => 'S',
-        'morning_from'   => 'S',
-        'morning_to'     => 'S',
-        'afternoon_from' => 'S',
-        'afternoon_to'   => 'S',
-        'evening_from'   => 'S',
-        'evening_to'     => 'S',
-        'duration'       => 'N',
-        'number_visits'  => 'N',
-        'visits'         => 'S'
+        'reference'          => 'S',
+        'email'              => 'S',
+        'name'               => 'S',
+        'date_of_birth'      => 'S',
+        'parent_name'        => 'S',
+        'street'             => 'S',
+        'postalcode'         => 'S',
+        'city'               => 'S',
+        'description'        => 'S',
+        'contact'            => 'S',
+        'date_from'          => 'S',
+        'date_to'            => 'S',
+        'morning_from'       => 'S',
+        'morning_to'         => 'S',
+        'morning_amount'     => 'N',
+        'afternoon_from'     => 'S',
+        'afternoon_to'       => 'S',
+        'afternoon_amount'   => 'S',
+        'evening_from'       => 'S',
+        'evening_to'         => 'S',
+        'duration'           => 'N',
+        'visits'             => 'S'
     ];
-    
-    protected $location_address;
     
     /**
      * Class constructor
@@ -49,7 +50,7 @@ class Page extends ORM
      * @param array $values
      * @return $this
      */
-    public function hydrate(array $values)
+    public function hydrate(array $values = [])
     {
         $this->sanitizeValues($values);
         return parent::hydrate($values);
@@ -100,21 +101,5 @@ class Page extends ORM
     public function getCalendar()
     {
         return new Calendar($this);
-    }
-    
-    
-    /**
-     * Get the address of the location
-     * 
-     * @return string
-     */
-    public function getLocationAddress()
-    {
-        if (!isset($this->location_address)) {
-            $hospitals = Hospitals::load();
-            $this->location_address = $hospitals->findAddress($this->location);
-        }
-        
-        return $this->location_address ?: null;
     }
 }

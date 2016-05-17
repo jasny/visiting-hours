@@ -23,12 +23,17 @@
 (function($, moment) {
     moment.locale('nl');
     
-    $('.date-from').datetimepicker({
+    $('input.date').datetimepicker({
+        format: 'DD-MM-YYYY',
+        useCurrent: false
+    });
+    
+    $('input.date-from').datetimepicker({
         format: 'DD-MM-YYYY',
         defaultDate: 'now',
         minDate: 'now'
     });
-    $('.date-to').datetimepicker({
+    $('input.date-to').datetimepicker({
         format: 'DD-MM-YYYY',
         minDate: 'now',
         useCurrent: false

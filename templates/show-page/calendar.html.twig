@@ -1,14 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% set page = {
-  title: "Ziekenbezoek voor "~info.name,
+  title: "Kraambezoek voor "~info.name~" | Bezoek inplannen",
   class: "show-page"
 } %}
 
 {% block contents %}
     <div id="info">
-        <h1><span class="text-light">Ziekenbezoek voor</span> {{ info.name }}</h1>
-        <p><i>Per dag kan {{ info.name }} maximaal {{ info.number_visits }} bezoeken van {% if info.duration >= 60 %}{{ (info.duration / 60)|round(0, 'floor') }} uur {% endif %}{% if info.duration % 60 != 0 %}{{ info.duration % 60 }} minuten{% endif %} ontvangen.</i></p>
+        <h1><span class="text-light">Kraambezoek voor</span> {{ info.name }}</h1>
         
         <h3>Plan je bezoek</h3>
         <table class="table table-bordered calendar">

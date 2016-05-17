@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% set page = {
-  title: "Pagina voor de zieke aanmaken (stap 1)",
+  title: "Pagina voor het kraambezoek aanmaken (stap 1)",
   class: "create-page"
 } %}
 
@@ -12,40 +12,46 @@
         
         <section id="basic-info">
             <div class="form-group">
-                <label for="inputName">Om wie gaat het?</label>
-                <input type="text" name="name" value="{{ info.name }}" class="form-control" id="inputName" required placeholder="Naam van de persoon">
+                <label for="inputName">Wat is de naam van de baby?</label>
+                <input type="text" name="name" value="{{ info.name }}" class="form-control" id="inputName" required placeholder="Naam van de baby">
             </div>
             <div class="form-group">
-                <label for="inputLocation">Waar is deze persoon opgenomen?</label>
-                <input type="text" name="location" value="{{ info.location }}" class="form-control" id="inputLocation" placeholder="Ziekenhuis of andere locatie" list="hospitals">
-                <datalist id="hospitals">
-                    {% for hospital in hospitals %}
-                        <option value="{{ hospital.name }}, {{ hospital.city }}">
-                    {% endfor %}
-                </datalist>
+                <label for="inputDateOfBirth">Wanneer is de baby geboren?</label>
+                <input type="text" name="date_of_birth" value="{{ info.date_of_birth }}" class="form-control date" id="inputDateOfBirth" placeholder="Geboortedatum (optioneel)" data-mask="00-00-0000">
             </div>
             <div class="form-group">
-                <label for="inputFloor">Op welke kamer ligt deze persoon?</label>
+                <label for="inputName">Wat is jouw/jullie naam?</label>
+                <input type="text" name="parent_name" value="{{ info.parent_name }}" class="form-control" id="inputName" required placeholder="Naam van de ouder(s)">
+            </div>
+            <div class="form-group">
+                <label for="inputStreet">Wat is het adres?</label>
                 <div class="row">
-                    <div class="col-sm-8">
-                        <input type="text" name="floor" value="{{ info.floor }}" class="form-control" id="inputFloor" placeholder="Afdeling">
+                    <div class="col-sm-6">
+                        <input type="text" name="street" value="{{ info.street }}" class="form-control" id="inputStreet" placeholder="Straat en huisnummer (optioneel)">
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" name="postalcode" value="{{ info.postalcode }}" class="form-control" id="inputPostalcode" placeholder="Postcode">
                     </div>
                     <div class="col-sm-4">
-                        <input type="text" name="room" value="{{ info.room }}" class="form-control" id="inputRoom" placeholder="Kamernummer">
+                        <input type="text" name="city" value="{{ info.city }}" class="form-control" id="inputCity" placeholder="Woonplaats">
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputDescription">Wat is er aan de hand?</label>
-                <textarea class="form-control" name="description" id="inputDescription" maxlength="1000" rows="6" required placeholder="Waarom is deze persoon opgenomen? Wat zijn andere belangrijke dingen die de familie moet weten? (max 1000 tekens)">{{ info.description }}</textarea>
+                <label for="inputDescription">Wat wil je vertellen aan het bezoek?</label>
+                <textarea class="form-control" name="description" id="inputDescription" maxlength="500" rows="6" required placeholder="Welkomsbericht (max 500 tekens)">{{ info.description }}</textarea>
             </div>
             <div class="form-group">
-                <label for="inputContact">Hoe kan de familie op de hoogte blijven?</label>
-                <textarea class="form-control" name="contact" id="inputContact" maxlength="250" rows="3" placeholder="Bijvoorbeeld via een facebookpagina of een ander familielid">{{ info.contact }}</textarea>
+                <label for="inputWishes">Wat zijn de wensen voor kraamcadeautjes?</label>
+                <textarea class="form-control" name="wishes" id="inputDescription" maxlength="500" rows="3" required placeholder="Cadeautips en ideëen">{{ info.wishes }}</textarea>
             </div>
             <div class="form-group">
-                <label for="inputEmail">Wat is uw e-mailadres?</label>
-                <input type="email" name="email" value="{{ info.email }}" class="form-control" id="inputEmail" required placeholder="Uw e-mailadres">
+                <label for="inputContact">Hoe kan het bezoek contact met jullie opnemen?</label>
+                <textarea class="form-control" name="contact" id="inputContact" maxlength="250" rows="3" placeholder="Bijvoorbeeld via een facebookpagina, jouw telefoonnummer of een ander familielid">{{ info.contact }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="inputEmail">Wat is jouw e-mailadres?</label>
+                <input type="email" name="email" value="{{ info.email }}" class="form-control" id="inputEmail" required placeholder="Jouw e-mailadres">
             </div>
         </section>
             
