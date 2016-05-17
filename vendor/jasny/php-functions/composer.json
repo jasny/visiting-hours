@@ -1,0 +1,33 @@
+{
+    "name": "jasny/php-functions",
+    "type": "library",
+    "description": "A set of useful PHP functions",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Arnold Daniels",
+            "email": "arnold@jasny.net",
+            "homepage": "http://www.jasny.net"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/jasny/php-functions/issues",
+        "source": "https://github.com/jasny/php-functions"
+    },
+    "require": {
+        "php": ">=5.5"
+    },
+    "require-dev": {
+        "jasny/php-code-quality": "^1.1"
+    },
+    "autoload": {
+        "files": [
+          "src/array_functions.php",
+          "src/case_functions.php",
+          "src/class_functions.php",          
+          "src/string_functions.php",
+          "src/server_functions.php",
+          "src/file_functions.php"
+        ]
+    }
+}

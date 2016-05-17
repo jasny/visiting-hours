@@ -1,0 +1,36 @@
+<?php
+
+use Jasny\MVC\Router;
+use Jasny\MVC\View\Twig as View;
+use Kettle\ORM;
+
+if (strpos($_SERVER['SERVER_SOFTWARE'], 'PHP') === 0 && pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_EXTENSION) !== 'php') {
+    return false;
+}
+
+require_once 'vendor/autoload.php';
+
+set_include_path(__DIR__ . '/controllers' . PATH_SEPARATOR . __DIR__ . '/models');
+
+ORM::configure("key",    'AKIAJTLSTHR4TKGFX5DQ');
+ORM::configure("secret", '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');
+ORM::configure("region", 'eu-west-1');
+
+Locale::setDefault("nl_NL");
+
+Jasny\MVC\View::$map['twig'] = 'Jasny\MVC\View\Twig';
+View::init('templates');
+
+$router = new Router([
+    '/ +GET'                  => (object)['controller' => 'default',  'action' => 'frontpage'],
+    '/add/step1'              => (object)['controller' => 'create-page', 'action' => 'basic-info'],
+    '/add/step2'              => (object)['controller' => 'create-page', 'action' => 'visiting'],
+    '/add/finish +POST'       => (object)['controller' => 'create-page', 'action' => 'finish'],
+    '/page/* +GET'            => (object)['controller' => 'show-page', 'action' => 'show', 'reference' => '$2'],
+    '/page/*/calendar +GET'   => (object)['controller' => 'show-page', 'action' => 'calendar', 'reference' => '$2'],
+    '/page/*/calendar +POST'  => (object)['controller' => 'show-page', 'action' => 'plan', 'reference' => '$2']
+]);
+
+session_start();
+
+$router->execute();

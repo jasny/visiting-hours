@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% set page = {
+    title: "ziekenbezoek",
+    class: "frontpage"
+} %}
+
+{% block contents %}
+    <div class="jumbotron">
+        <h1>Ziekenbezoek</h1>
+        <p>Houd de familie op de hoogte en organizeer eenvoudig het bezoek.</p>
+        <p><a class="btn btn-primary btn-lg" href="/add/step1" role="button">Start hier</a><br><small>(het is gratis)</small></p>
+    </div>
+{% endblock %}

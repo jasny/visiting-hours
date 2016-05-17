@@ -1,0 +1,142 @@
+{% extends 'base.html.twig' %}
+
+{% set page = {
+  title: "Pagina voor de zieke aanmaken (stap 2)",
+  class: "create-page"
+} %}
+
+{% block contents %}
+    <form method="post">
+        <h1>Pagina voor de zieke aanmaken</h1>
+        <p class="steps">Stap 2 van 2</p>
+        
+        <section id="visiting">
+            <div class="form-group">
+                <label>Welke periode kan men {{ info.name|default('de zieke') }} bezoeken?</label>
+                <div class="row">
+                    <div class='col-sm-6'>
+                        <div class="input-group date">
+                            <span class="input-group-addon">van</span>
+                            <input type="text" name="date_from" value="{{ info.date_from }}" class="form-control date-from" placeholder="datum" data-mask="00-00-0000">
+                        </div>
+                    </div>
+                    <div class='col-sm-6'>
+                        <div class='input-group date' id='datetimepicker7'>
+                            <span class="input-group-addon">tot</span>
+                            <input type="text" name="date_to" value="{{ info.date_to }}" class="form-control date-to" placeholder="datum" data-mask="00-00-0000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="visiting-hours">
+            <div class="form-group">
+                <label>Wordt er 's ochtends bezoek ontvangen?</label>
+                <div class="row row-toggle {{ info.morning == "yes" ? 'on' : '' }}">
+                    <div class="col-sm-2">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default {{ info.morning == "yes" ? 'active' : '' }}">
+                                <input type="radio" name="morning" value="yes" {{ info.morning == "yes" ? 'checked' : '' }} autocomplete="off" required> ja
+                            </label>
+                            <label class="btn btn-default {{ info.morning == "no" ? 'active' : '' }}">
+                                <input type="radio" name="morning" value="no" {{ info.morning == "no" ? 'checked' : '' }} autocomplete="off" required> nee
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-toggle">
+                        <div class="input-group">
+                            <span class="input-group-addon">van</span>
+                            <input type="text" class="form-control" name="morning_from" value="{{ info.morning_from }}" data-mask="00:00" placeholder="uu:mm" {{ info.morning == "yes" ? 'required' : '' }}>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-toggle">
+                        <div class="input-group">
+                            <span class="input-group-addon">tot</span>
+                            <input type="text" class="form-control" name="morning_to" value="{{ info.morning_to }}" data-mask="00:00" placeholder="uu:mm" {{ info.morning == "yes" ? 'required' : '' }}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Wordt er 's middags bezoek ontvangen?</label>
+                <div class="row row-toggle {{ info.afternoon == "yes" ? 'on' : '' }}">
+                    <div class="col-sm-2">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default {{ info.afternoon == "yes" ? 'active' : '' }}">
+                                <input type="radio" name="afternoon" value="yes" {{ info.afternoon == "yes" ? 'checked' : '' }} autocomplete="off" required> ja
+                            </label>
+                            <label class="btn btn-default {{ info.afternoon == "no" ? 'active' : '' }}">
+                                <input type="radio" name="afternoon" value="no" {{ info.afternoon == "no" ? 'checked' : '' }} autocomplete="off" required> nee
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-toggle">
+                        <div class="input-group">
+                            <span class="input-group-addon">van</span>
+                            <input type="text" class="form-control" name="afternoon_from" value="{{ info.afternoon_from }}" data-mask="00:00" placeholder="uu:mm" {{ info.afternoon == "yes" ? 'required' : '' }}>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-toggle">
+                        <div class="input-group">
+                            <span class="input-group-addon">tot</span>
+                            <input type="text" class="form-control" name="afternoon_to" value="{{ info.afternoon_to }}" data-mask="00:00" placeholder="uu:mm" {{ info.afternoon == "yes" ? 'required' : '' }}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Wordt er 's avonds bezoek ontvangen?</label>
+                <div class="row row-toggle {{ info.evening == "yes" ? 'on' : '' }}">
+                    <div class="col-sm-2">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default {{ info.evening == "yes" ? 'active' : '' }}">
+                                <input type="radio" name="evening" value="yes" {{ info.evening == "yes" ? 'checked' : '' }} autocomplete="off" required> ja
+                            </label>
+                            <label class="btn btn-default {{ info.evening == "no" ? 'active' : '' }}">
+                                <input type="radio" name="evening" value="no" {{ info.evening == "no" ? 'checked' : '' }} autocomplete="off" required> nee
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-toggle">
+                        <div class="input-group">
+                            <span class="input-group-addon">van</span>
+                            <input type="text" class="form-control" name="evening_from" value="{{ info.evening_from }}" data-mask="00:00" placeholder="uu:mm" {{ info.evening == "yes" ? 'required' : '' }}>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-toggle">
+                        <div class="input-group">
+                            <span class="input-group-addon">tot</span>
+                            <input type="text" class="form-control" name="evening_to" value="{{ info.evening_to }}" data-mask="00:00" placeholder="uu:mm" {{ info.evening == "yes" ? 'required' : '' }}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="duration">
+            <div class="form-group">
+                <label>Hoelang mag een bezoek duren?</label>
+                <div class="input-group input-time">
+                    <input type="text" class="form-control" name="duration[hours]" value="{{ info.duration.hours }}" data-mask="0">
+                    <span class="input-group-addon">uur</span>
+                    <input type="text" class="form-control" name="duration[minutes]" value="{{ info.duration.minutes }}" data-mask="00" pattern="[0-5]\d">
+                    <span class="input-group-addon">minuten</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label label="inputDuration">Hoeveel bezoek kan de zieke per dag ontvangen?</label>
+                <div class="input-group input-time">
+                    <span class="input-group-addon">maximaal</span>
+                    <input type="text" class="form-control" name="number_visits" value="{{ info.number_visits }}" placeholder="aantal" pattern="\d+">
+                    <span class="input-group-addon">bezoeken</span>
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <button type="submit" class="btn btn-default next pull-left previous" formaction="/add/step1">&laquo; Vorige</button>
+            <button type="submit" class="btn btn-primary btn-lg next pull-right" formaction="/add/finish">Voltooien</button>
+       </section>
+    </form>
+{% endblock %}
