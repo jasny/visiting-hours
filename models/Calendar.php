@@ -60,15 +60,24 @@ class Calendar
             $this->visiting_times = [];
 
             if ($this->page->morning_from) {
-                $this->visiting_times[] = ['from' => $this->page->morning_from, 'to' => $this->page->morning_to];
+                $this->visiting_times['morning'] = [
+                    'from' => $this->page->morning_from,
+                    'to' => $this->page->morning_to
+                ];
             }
 
             if ($this->page->afternoon_from) {
-                $this->visiting_times[] = ['from' => $this->page->afternoon_from, 'to' => $this->page->afternoon_to];
+                $this->visiting_times['afternoon'] = [
+                    'from' => $this->page->afternoon_from,
+                    'to' => $this->page->afternoon_to
+                ];
             }
 
             if ($this->page->evening_from) {
-                $this->visiting_times[] = ['from' => $this->page->evening_from, 'to' => $this->page->evening_to];
+                $this->visiting_times['evening'] = [
+                    'from' => $this->page->evening_from,
+                    'to' => $this->page->evening_to
+                ];
             }
         }
         
@@ -136,14 +145,35 @@ class Calendar
     }
     
     /**
+     * Get a period for a specific time
+     * 
+     * @param string $time
+     * @return string|null
+     */
+    protected function getPeriodForTime($time)
+    {
+        foreach ($this->getVisitingTimes() as $period => $times) {
+            if ($time >= $times['from'] && $time <= $times['to']) {
+                return $period;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
      * Check if the day has the max number of visits planned
      * 
      * @param string $date
+     * @param string $time   'morning', 'afternoon', 'evening'
      * @return boolean
      */
-    public function isDayFull($date)
+    public function isPeriodFull($date, $time)
     {
-        if (!$this->page->number_visits) return false;
+        $period = $this->getPeriodForTime($time);
+        $amount = $this->page->{$period . "_amount"};
+        
+        if (!$amount) return false;
         
         $count = 0;
         
@@ -151,7 +181,7 @@ class Calendar
             if ($visit->date === $date) $count++;
         }
         
-        return $count >= $this->page->number_visits;
+        return $count >= $amount;
     }
     
     /**
@@ -159,8 +189,9 @@ class Calendar
      * 
      * @param string $date
      * @param string $time
+     * @return object|null
      */
-    public function isSlotTaken($date, $time)
+    public function getSlotVisit($date, $time)
     {
         foreach ($this->getVisits() as $visit) {
             if (
@@ -168,11 +199,11 @@ class Calendar
                 $time >= $visit->time &&
                 $time < self::timeAddMinites($visit->time, $this->page->duration)
             ) {
-                return true;
+                return $visit;
             }
         }
         
-        return false;
+        return null;
     }
     
     /**
@@ -192,11 +223,10 @@ class Calendar
             return 'disabled';
         }
         
-        if ($this->isSlotTaken($date, $time)) return 'taken';
-        if ($this->isDayFull($date)) return 'full';
+        if ($this->getSlotVisit($date, $time)) return 'taken';
+        if ($this->isPeriodFull($date, $time)) return 'full';
         return 'available';
     }
-    
     
     /**
      * Get the visits

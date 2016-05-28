@@ -7,13 +7,15 @@
 
 {% block contents %}
     <div id="info">
+        <div style="background-image: url(/img/bg-beschuit.jpg);" class="top"></div>
+        
         <h1><span class="text-light">Kraambezoek voor</span> {{ info.name }}</h1>
         
         <h3>Plan je bezoek</h3>
-        <table class="table table-bordered calendar">
+        <table class="table table-bordered calendar" data-tablesaw-mode="swipe">
             <thead>
                 <tr>
-                    <th></th>
+                    <th data-tablesaw-priority="persist"></th>
                     {% for date in calendar.dates %}
                         <th>{{ date|date('d-m') }}</th>
                     {% endfor %}
@@ -25,7 +27,9 @@
                         <th>{{ time }}</th>
                         {% for date in calendar.dates %}
                             {% set state = enabled ? calendar.slotState(date, time) : 'disabled' %}
-                            <td class="{{ state }}" data-date="{{ date }}" data-time="{{ time }}" {% if state == 'available' %}title="Plan een bezoek voor {{ date|localdate('long') }} om {{ time }}"{% endif %}></td>
+                            <td class="{{ state }}" data-date="{{ date }}" data-time="{{ time }}" {% if state == 'available' %}title="Plan een bezoek voor {{ date|localdate('long') }} om {{ time }}"{% endif %}>
+                                {% if state == 'taken' %}{{ calendar.slotVisit(date, time).name }}{% endif %}
+                            </td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -65,6 +69,12 @@
     </div><!-- /.modal -->
 {% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="/css/tablesaw.css">
+{% endblock %}
+
 {% block javascripts %}
-    <script src="/calendar.js"></script>
+    <script src="/js/calendar.js"></script>
+    <script src="/js/tablesaw.js"></script>
+    <script src="/js/tablesaw-init.js"></script>
 {% endblock %}

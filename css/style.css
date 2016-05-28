@@ -92,6 +92,15 @@ body.create-page form section + section {
 body.show-page #info {
     margin: 0 15px;
 }
+body.show-page #info .top {
+    height: 100px;
+    margin-top: -5px;
+    margin-left: -15px;
+    margin-right: -15px;
+    background-position: center 39%;
+    background-size: cover;
+    border-bottom: 1px solid #ccc;
+}
 body.show-page #info .map {
     display: block;
     margin: 20px -15px -10px -15px;
@@ -123,6 +132,9 @@ table.calendar th {
     text-align: center;
 }
 
+table.calendar td {
+    text-align: center;
+}
 table.calendar td.disabled {
     background-color: #ccc;
 }
@@ -132,4 +144,5 @@ table.calendar td.available {
 }
 table.calendar td.taken {
     background-color: #cc0000;
+    color: #ffffff;
 }

@@ -34,6 +34,10 @@ class CreatePageController extends Controller
         if (isset($_SESSION['create-page'])) {
             $this->info = array_merge($this->info, $_SESSION['create-page']);
         }
+        
+        if (!empty($this->info['reference'])) {
+            $this->redirect('/page/' . $this->info['reference']);
+        }
     }
     
     /**

@@ -7,6 +7,8 @@
 
 {% block contents %}
     <div id="info">
+        <div style="background-image: url(/img/bg-beschuit.jpg);" class="top"></div>
+        
         <h1><span class="text-light">Kraamvisite voor</span> {{ info.name }}</h1>
         
         <p>Geboren op {{ info.date_of_birth|localdate('full') }}</p>
@@ -33,7 +35,8 @@
             <h4>Adres</h4>
             <p>
                 {{ info.street }}<br>
-                {{ info.postalcode }} {{ info.city }}
+                {{ info.postalcode }} {{ info.city }}<br>
+                <a href="https://www.google.nl/maps?q={{ (info.street~', '~info.city)|url_encode }}" target="_blank">(op de kaart)</a>
             </p>
         {% endif %}
         
@@ -51,7 +54,7 @@
             </p>
         {% endif %}
         
-        {% if info.street %}
+        {% if info.street and false %}
             <a class="map" href="https://www.google.nl/maps?q={{ (info.street~', '~info.city)|url_encode }}" target="_blank">
                 <img src="https://maps.googleapis.com/maps/api/staticmap
 ?zoom=14&size=640x180&scale=2&maptype=roadmap
