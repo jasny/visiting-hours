@@ -43,7 +43,7 @@
             </div>
             <div class="form-group">
                 <label for="inputGifts">Wat zijn de wensen voor kraamcadeautjes?</label>
-                <textarea class="form-control" name="gifts" id="inputDescription" maxlength="500" rows="3" placeholder="Cadeautips en ideëen (optioneel)">{{ info.wishes }}</textarea>
+                <textarea class="form-control" name="gifts" id="inputDescription" maxlength="500" rows="3" placeholder="Cadeautips en ideëen (optioneel)">{{ info.gifts }}</textarea>
             </div>
             <div class="form-group">
                 <label for="inputContact">Hoe kan het bezoek contact met jou/jullie opnemen?</label>
@@ -56,7 +56,7 @@
         </section>
         
         <section class="text-right">
-            <button type="submit" class="btn btn-primary next" formaction="/add/step2">Volgende &raquo;</button>
+            <button type="submit" class="btn btn-primary next" formaction="/create/step2">Volgende &raquo;</button>
         </section>
     </form>
 {% endblock %}

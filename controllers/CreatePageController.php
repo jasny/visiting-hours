@@ -10,17 +10,9 @@ class CreatePageController extends Controller
 {
     /**
      * The info about the page
-     * @var array
+     * @var Page
      */
-    protected $info = [
-        'morning' => 'no',
-        'afternoon' => 'yes',
-        'evening' => 'no',
-        'duration' => [
-            'hours' => 1,
-            'minutes' => 0
-        ]
-    ];
+    protected $info;
     
     /**
      * Class constructor
@@ -30,14 +22,20 @@ class CreatePageController extends Controller
     public function __construct($router = null)
     {
         parent::__construct($router);
+
+        $info = isset($_SESSION['page']) ? $_SESSION['page'] : null;
         
-        if (isset($_SESSION['create-page'])) {
-            $this->info = array_merge($this->info, $_SESSION['create-page']);
+        if (empty($info['reference'])) {
+            $this->info = ORM::factory('Page')->create();
+        } else {
+            $this->info = ORM::factory('Page')->findOne($info['reference']);
+            if (!$this->info) {
+                $this->notFound();
+                exit();
+            }
         }
         
-        if (!empty($this->info['reference'])) {
-            $this->redirect('/page/' . $this->info['reference']);
-        }
+        if ($info) $this->info->setAll($info);
     }
     
     /**
@@ -45,25 +43,13 @@ class CreatePageController extends Controller
      */
     public function __destruct()
     {
-        $_SESSION['create-page'] = $this->info;
+        if (isset($this->info)) {
+            $_SESSION['page'] = $this->info->asArray();
+        } else {
+            unset($_SESSION['page']);
+        }
     }
 
-    
-    /**
-     * Get the link to the page
-     * 
-     * @return string
-     */
-    protected function getLinkToPage()
-    {
-        if (!isset($this->info['reference'])) {
-            throw new RuntimeException("Reference not set");
-        }
-        
-        return 'http://' . $_SERVER['HTTP_HOST']
-            . ($_SERVER['SERVER_PORT'] == 80 ? '' : ':' . $_SERVER['SERVER_PORT'])
-            . '/page/' . $this->info['reference'];
-    }
     
     /**
      * Add input to info
@@ -72,13 +58,23 @@ class CreatePageController extends Controller
      */
     protected function addInputToInfo($done = false)
     {
-        $this->info = array_merge($this->info, $_POST);
+        $this->info->setAll($_POST);
 
         if (!$done) {
             $this->redirect($_SERVER['REQUEST_URI']);
         }
     }
 
+    
+    /**
+     * Add a new page
+     */
+    public function newAction()
+    {
+        $this->info = null;
+        $this->redirect('/create/step1');
+    }
+    
     /**
      * Show 'basic-info' form
      */
@@ -86,9 +82,9 @@ class CreatePageController extends Controller
     {
         if ($this->isPostRequest()) return $this->addInputToInfo();
         
-        $hospitals = Hospitals::load();
+        //$hospitals = Hospitals::load();
         
-        $this->view('create-page/basic-info.html.twig', compact('hospitals'));
+        $this->view('create-page/basic-info.html.twig');
     }
 
     /**
@@ -108,13 +104,35 @@ class CreatePageController extends Controller
     {
         $this->addInputToInfo(true);
         
-        $page = ORM::factory('Page')->create($this->info);
-        $page->save();
-
-        $this->info['reference'] = $page->reference;
+        $this->info->save();
         
-        $link = $this->getLinkToPage();
-        $this->redirect($link);
+        $this->redirect('/create/done');
+    }
+    
+    /**
+     * All done
+     */
+    public function doneAction()
+    {
+        $this->redirect($this->info->getLink(), 302);
+    }
+
+    
+    /**
+     * Confirm to delete the page
+     */
+    public function confirmDeleteAction()
+    {
+        $this->view('confirm-delete.html.twig');
+    }
+    
+    /**
+     * Delete the page
+     */
+    public function deleteAction()
+    {
+        $this->info->delete();
+        $this->redirect('/');
     }
     
     

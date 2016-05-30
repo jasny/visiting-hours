@@ -23,9 +23,13 @@ View::init('templates');
 
 $router = new Router([
     '/ +GET'                  => (object)['controller' => 'default',  'action' => 'frontpage'],
-    '/add/step1'              => (object)['controller' => 'create-page', 'action' => 'basic-info'],
-    '/add/step2'              => (object)['controller' => 'create-page', 'action' => 'visiting'],
-    '/add/finish +POST'       => (object)['controller' => 'create-page', 'action' => 'finish'],
+    '/create'                 => (object)['controller' => 'create-page', 'action' => 'new'],
+    '/create/step1'           => (object)['controller' => 'create-page', 'action' => 'basic-info'],
+    '/create/step2'           => (object)['controller' => 'create-page', 'action' => 'visiting'],
+    '/create/finish +POST'    => (object)['controller' => 'create-page', 'action' => 'finish'],
+    '/create/done   +GET'     => (object)['controller' => 'create-page', 'action' => 'done'],
+    '/delete +GET'            => (object)['controller' => 'create-page', 'action' => 'confirm-delete'],
+    '/delete +POST'           => (object)['controller' => 'create-page', 'action' => 'delete'],
     '/page/* +GET'            => (object)['controller' => 'show-page', 'action' => 'show', 'reference' => '$2'],
     '/page/*/calendar +GET'   => (object)['controller' => 'show-page', 'action' => 'calendar', 'reference' => '$2'],
     '/page/*/calendar +POST'  => (object)['controller' => 'show-page', 'action' => 'plan', 'reference' => '$2']

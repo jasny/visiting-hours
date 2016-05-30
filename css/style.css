@@ -67,6 +67,11 @@ body.create-page form section + section {
     margin-top: 40px;
 }
 
+body.delete-page form {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
 .input-time {
     max-width: 250px;
 }
@@ -108,6 +113,25 @@ body.show-page #info .map {
 body.show-page #info .map img {
     width: 100%;
 }
+
+body.show-page #manage {
+    margin: 30px 5px 15px 5px;
+}
+body.show-page #manage .panel-heading,
+body.show-page #manage .panel-body {
+    padding: 10px;
+}
+body.show-page #manage #inputLink {
+    cursor: text;
+}
+body.show-page #manage .text-danger {
+    margin-top: 7px;
+}
+@media (min-width: 768px) {
+    body.show-page #manage .panel-heading .text-muted {
+        text-align: right;
+    }
+}
 @media (min-width: 840px) {
     body.show-page #info {
         border: 1px solid #ccc;
@@ -118,6 +142,15 @@ body.show-page #info .map img {
     }
     body.show-page #info .map {
         margin-top: 30px;
+    }
+    
+    body.show-page #manage {
+        width: 800px;
+        margin: 30px auto 15px auto;
+    }
+    body.show-page #manage .panel-heading,
+    body.show-page #manage .panel-body {
+        padding: 10px 15px;
     }
 }
 

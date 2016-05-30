@@ -10,12 +10,48 @@ class ShowPageController extends Controller
 {
     const GOOGLE_API_KEY = 'AIzaSyB_uG1XhXROu87P-an0YUs0EPSTr-cY7QE';
     
+    /**
+     * User may manage the page
+     * @var boolean
+     */
+    protected $manage;
+    
+    public function __construct($router = null)
+    {
+        parent::__construct($router);
+        
+        $reference = isset($router->getRoute()->reference) ? $router->getRoute()->reference : null;
+        
+        if ($this->isGetRequest() && isset($_GET['manage'])) {
+            $this->manageAction($reference);
+            exit();
+        }
+        
+        $this->manage = isset($_SESSION['page']['reference']) && $_SESSION['page']['reference'] === $reference;
+    }
+    
+    public function manageAction($reference)
+    {
+        $page = ORM::factory('Page')->findOne($reference);
+        if (!$page) return $this->notFound();
+        
+        if ($page->manage_token !== $_GET['manage']) {
+            return $this->forbidden("Invalid manage token");
+        }
+        
+        $_SESSION['page'] = $page->asArray();
+        
+        $url = preg_replace('/([\?\&]manage=[^\?\&]*)/i', $_SERVER['REQUEST_URI']);
+        $this->redirect($url);
+    }
+    
     public function showAction($reference)
     {
         $page = ORM::factory('Page')->findOne($reference);
         if (!$page) return $this->notFound();
         
-        $this->view('show-page/page.html.twig', ['info' => $page, 'google_api_key' => self::GOOGLE_API_KEY]);
+        $context = ['info' => $page, 'link' => $page->getLink(), 'google_api_key' => self::GOOGLE_API_KEY];
+        $this->view('show-page/page.html.twig', $context);
     }
     
     public function calendarAction($reference)
@@ -39,5 +75,17 @@ class ShowPageController extends Controller
         
         $this->flash('success', "Uw bezoek is ingepland.");
         $this->redirect("/page/{$page->reference}");
+    }
+    
+    /**
+     * Show a view
+     * 
+     * @param string $name
+     * @param array  $context
+     */
+    protected function view($name = null, $context = [])
+    {
+        $context['manage'] = $this->manage;
+        parent::view($name, $context);
     }
 }

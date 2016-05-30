@@ -32,18 +32,51 @@ class Page extends ORM
         'evening_from'       => 'S',
         'evening_to'         => 'S',
         'duration'           => 'N',
-        'visits'             => 'S'
+        'visits'             => 'S',
+        'manage_token'       => 'S'
     ];
+
     
     /**
-     * Class constructor
+     * Has any times set?
+     * 
+     * @return boolean
      */
-    public function __construct()
+    protected function hasAnyTimes()
     {
-        parent::__construct();
-        
-        $this->reference = static::generateReference();
+        return !empty($this->morning_from) || !empty($this->afternoon_from) || !empty($this->evening_from);
     }
+    
+    /**
+     * Has times in the morning?
+     * 
+     * @return string|null
+     */
+    public function hasMorning()
+    {
+        return !$this->hasAnyTimes() ? null : (!empty($this->morning_from) ? 'yes' : 'no');
+    }
+    
+    /**
+     * Has times in the afternoon?
+     * 
+     * @return string|null
+     */
+    public function hasAfternoon()
+    {
+        return !$this->hasAnyTimes() ? null : (!empty($this->afternoon_from) ? 'yes' : 'no');
+    }
+    
+    /**
+     * Has times in the evening?
+     * 
+     * @return string|null
+     */
+    public function hasEvening()
+    {
+        return !$this->hasAnyTimes() ? null : (!empty($this->evening_from) ? 'yes' : 'no');
+    }
+    
     
     /**
      * Set the values of the page
@@ -51,10 +84,31 @@ class Page extends ORM
      * @param array $values
      * @return $this
      */
-    public function hydrate(array $values = [])
+    public function setAll(array $values = [])
     {
         $this->sanitizeValues($values);
-        return parent::hydrate($values);
+        
+        foreach ($values as $key => $value) {
+            $this->set($key, $value);
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Save the page
+     * 
+     * @param array $options
+     * @return \Aws\Result
+     */
+    public function save(array $options = array())
+    {
+        if (!isset($this->reference)) {
+            $this->reference = static::generateReference();
+            $this->manage_token = static::generateReference();
+        }
+        
+        return parent::save($options);
     }
     
     /**
@@ -79,7 +133,7 @@ class Page extends ORM
             $values['evening_to'] = null;
         }
         
-        if (is_array($values['duration'])) {
+        if (isset($values['duration']) && is_array($values['duration'])) {
             $values['duration'] = ($values['duration']['hours'] * 60) + $values['duration']['minutes'];
         }
     }
@@ -102,5 +156,19 @@ class Page extends ORM
     public function getCalendar()
     {
         return new Calendar($this);
+    }
+    
+    /**
+     * Get the link to the page
+     * 
+     * @return string
+     */
+    public function getLink()
+    {
+        if (!isset($this->reference)) {
+            throw new RuntimeException("Reference not set");
+        }
+        
+        return 'http://' . $_SERVER['HTTP_HOST'] . '/page/' . $this->reference;
     }
 }

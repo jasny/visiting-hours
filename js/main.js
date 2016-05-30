@@ -46,3 +46,14 @@
         $(this).closest('.row').find('.date-from').data("DateTimePicker").maxDate(e.date);
     });
 }(jQuery, moment));
+
+(function($, Clipboard) {
+    var clipboard = new Clipboard('.clipboard');
+
+    clipboard.on('success', function(e) {
+        $(e.trigger).tooltip('show');
+        setTimeout(function() {
+            $(e.trigger).tooltip('hide');
+        }, 2000);
+    });
+})(jQuery, Clipboard);
