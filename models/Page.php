@@ -19,6 +19,7 @@ class Page extends ORM
         'postalcode'         => 'S',
         'city'               => 'S',
         'description'        => 'S',
+        'gifts'              => 'S',
         'contact'            => 'S',
         'date_from'          => 'S',
         'date_to'            => 'S',

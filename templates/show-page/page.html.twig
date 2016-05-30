@@ -40,10 +40,10 @@
             </p>
         {% endif %}
         
-        {% if info.wishes %}
+        {% if info.gifts %}
             <h4>Cadeauideëen en wensen</h4>
             <p>
-                {{ info.wishes|paragraph|linkify('http', [], 'all') }}
+                {{ info.gifts|paragraph|linkify('http', [], 'all') }}
             </p>
         {% endif %}
         
