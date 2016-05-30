@@ -94,8 +94,9 @@ body.delete-page form {
     font-weight: bold;
 }
 
-body.show-page #info {
+body.show-page .plane {
     margin: 0 15px;
+    overflow: hidden;
 }
 body.show-page #info .top {
     height: 100px;
@@ -133,7 +134,7 @@ body.show-page #manage .text-danger {
     }
 }
 @media (min-width: 840px) {
-    body.show-page #info {
+    body.show-page .plane {
         border: 1px solid #ccc;
         border-radius: 5px;
         margin: 15px auto;

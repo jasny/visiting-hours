@@ -178,7 +178,7 @@ class Calendar
         $count = 0;
         
         foreach ($this->getVisits() as $visit) {
-            if ($visit->date === $date) $count++;
+            if ($visit->date === $date && $this->getPeriodForTime($visit->time) === $period) $count++;
         }
         
         return $count >= $amount;

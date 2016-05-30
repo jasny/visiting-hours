@@ -6,7 +6,7 @@
 } %}
 
 {% block contents %}
-    <div id="info">
+    <div id="info" class="plane">
         <div style="background-image: url(/img/bg-beschuit.jpg);" class="top"></div>
 
         <h1><span class="text-light">Kraamvisite voor</span> {{ info.name }}</h1>
@@ -40,13 +40,6 @@
             </p>
         {% endif %}
 
-        {% if info.gifts %}
-            <h4>Cadeauideëen en wensen</h4>
-            <p>
-                {{ info.gifts|paragraph|linkify('http', [], 'all') }}
-            </p>
-        {% endif %}
-
         {% if info.contact %}
             <h4>Voor meer informatie</h4>
             <p>
@@ -64,6 +57,15 @@
             </a>
         {% endif %}
     </div>
+    
+    {% if info.gifts %}
+        <div id="gifts" class="plane">
+            <h3>Cadeauideeën en wensen</h3>
+            <p>
+                {{ info.gifts|paragraph|linkify('http', [], 'all') }}
+            </p>
+        </div>
+    {% endif %}
 
     {% if manage %}
         <div id="manage" class="panel panel-default">
