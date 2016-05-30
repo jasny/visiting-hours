@@ -38,6 +38,17 @@ class Page extends ORM
 
     
     /**
+     * Check if this is a new page
+     * 
+     * @return boolean
+     */
+    public function isNew()
+    {
+        return $this->_is_new;
+    }
+    
+    
+    /**
      * Has any times set?
      * 
      * @return boolean

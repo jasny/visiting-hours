@@ -15,7 +15,8 @@
         "aws/aws-sdk-php": "^3.18",
         "twig/twig": "^1.24",
         "kettle/dynamodb-orm": "^0.2.8",
-        "jasny/twig-extensions": "^1.0"
+        "jasny/twig-extensions": "^1.0",
+        "phpmailer/phpmailer": "^5.2"
     },
     "config": {
         "use-include-path": true

@@ -41,7 +41,7 @@ class ShowPageController extends Controller
         
         $_SESSION['page'] = $page->asArray();
         
-        $url = preg_replace('/([\?\&]manage=[^\?\&]*)/i', $_SERVER['REQUEST_URI']);
+        $url = preg_replace('/([\?\&]manage=[^\?\&]*)/i', '', $_SERVER['REQUEST_URI']);
         $this->redirect($url);
     }
     

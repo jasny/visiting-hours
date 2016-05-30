@@ -1,0 +1,23 @@
+{% extends "email/base.html.twig" %}
+{% do email.setSubject("De kraambezoekpagina van "~info.name) %}
+
+{% block content %}
+    <p style="font-size: 14px; line-height: 1.5;">Hoi {{ info.parent_name }},</p>
+    <p style="font-size: 18px; line-height: 1.5">Gefeliciteerd met de komst van {{ info.name }}!</p>
+
+    <p style="font-size: 14px; line-height: 1.5;">
+        Deel de link naar de kraambezoekpagina met familie en vrienden:<br/>
+        <div style="font-size: 14px; line-height: 1.5; font-weight: bold; display: block; padding: 5px 5px; text-align: center; background-color: #eee; border: 1px solid #ccc; border">{{ info.link }}</div>
+    </p>
+
+    <br>
+    
+    <p style="font-size: 14px; line-height: 1.5;">
+        <a href="{{ info.link }}?manage={{ info.manage_token }}">&raquo; Beheer uw pagina</a>
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.5;">
+        Met vriendelijke groet,<br/>
+        Het team van opkraambezoek.nl
+    </p>
+{% endblock %}

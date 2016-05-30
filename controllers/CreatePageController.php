@@ -103,8 +103,15 @@ class CreatePageController extends Controller
     public function finishAction()
     {
         $this->addInputToInfo(true);
+        $isNew = $this->info->isNew();
         
         $this->info->save();
+        
+        if ($isNew) {
+            Email::load('register.html.twig')
+                ->render(['info' => $this->info])
+                ->send($this->info->email, $this->info->parent_name);
+        }
         
         $this->redirect('/create/done');
     }
