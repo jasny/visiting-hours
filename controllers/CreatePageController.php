@@ -107,12 +107,11 @@ class CreatePageController extends Controller
         
         $this->info->save();
         
-        /*
-        if ($isNew) {
+        if ($isNew || true) {
             Email::load('register.html.twig')
                 ->render(['info' => $this->info])
                 ->send($this->info->email, $this->info->parent_name);
-        }*/
+        }
         
         $this->redirect('/create/done');
     }
@@ -122,8 +121,7 @@ class CreatePageController extends Controller
      */
     public function doneAction()
     {
-        //$this->redirect($this->info->getLink(), 302);
-        $this->view('email/register.html.twig');
+        $this->redirect($this->info->getLink(), 302);
     }
 
     

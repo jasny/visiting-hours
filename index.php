@@ -10,7 +10,7 @@ if (strpos($_SERVER['SERVER_SOFTWARE'], 'PHP') === 0 && pathinfo($_SERVER['SCRIP
 
 require_once 'vendor/autoload.php';
 
-set_include_path(__DIR__ . '/controllers' . PATH_SEPARATOR . __DIR__ . '/models');
+set_include_path(__DIR__ . '/controllers' . PATH_SEPARATOR . __DIR__ . '/models' . PATH_SEPARATOR . __DIR__ . '/lib');
 
 ORM::configure("key",    'AKIAJTLSTHR4TKGFX5DQ');
 ORM::configure("secret", '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');

@@ -1,5 +1,7 @@
 <?php
 
+use Jasny\MVC\View\Twig as View;
+
 /**
  * Render and send e-mail
  * 
@@ -7,9 +9,15 @@
 class Email extends PHPMailer
 {
     protected static $config = [
-        'host' => '',
-        'username' => '',
-        'password' => ''
+        'host' => 'email-smtp.eu-west-1.amazonaws.com',
+        'port' => 587,
+        'tls' => true,
+        'username' => 'AKIAIDZVXSG44ZO7ZQBA',
+        'password' => 'AsuilxGaeHcPIMwbcpS5N8L74rjFqxoEGeUaPNI4yUx3',
+        'from' => [
+            'email' => 'info@opkraambezoek.nl',
+            'name' => 'Op kraambezoek'
+        ]
     ];
     
     /** @var View */
@@ -22,22 +30,30 @@ class Email extends PHPMailer
      */
     public function __construct($template)
     {
-        if (!empty(App::config()->email->host)) {
-            $this->IsSMTP();
-            $this->Host = App::config()->email->host;
-            $this->Port = isset(App::config()->email->port) ? App::config()->email->port : 25;
-            if (!empty(App::config()->email->tls)) $this->SMTPSecure = "tls"; 
-            if (!empty(App::config()->email->username)) {
-                $this->SMTPAuth = true;
-                $this->Username = App::config()->email->username;
-                $this->Password = App::config()->email->password;
-            }
+        if (!empty(static::$config['host'])) {
+            $this->useSMTP(static::$config);
         }
         
-        $this->SetFrom(App::config()->email->from, App::config()->email->from_name);
-        
         $this->view = View::load("email/$template");
-        $this->SetFrom(App::config()->email->from, App::config()->email->from_name);
+        $this->SetFrom(static::$config['from']['email'], static::$config['from']['name']);
+    }
+
+    /**
+     * Configure sending email through SMTP
+     * 
+     * @param array $config
+     */
+    public function useSMTP($config)
+    {
+        $this->IsSMTP();
+        $this->Host = $config['host'];
+        $this->Port = isset($config['port']) ? $config['port'] : 25;
+        if (!empty($config['tls'])) $this->SMTPSecure = "tls"; 
+        if (!empty($config['username'])) {
+            $this->SMTPAuth = true;
+            $this->Username = $config['username'];
+            $this->Password = $config['password'];
+        }
     }
     
     /**
