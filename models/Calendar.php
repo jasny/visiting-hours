@@ -193,10 +193,12 @@ class Calendar
      */
     public function getSlotVisit($date, $time)
     {
+        $time = vsprintf('%02d:%02d', explode(':', $time));
+        
         foreach ($this->getVisits() as $visit) {
             if (
                 $visit->date === $date &&
-                $time >= $visit->time &&
+                $time >= vsprintf('%02d:%02d', explode(':', $visit->time)) &&
                 $time < self::timeAddMinites($visit->time, $this->page->duration)
             ) {
                 return $visit;
