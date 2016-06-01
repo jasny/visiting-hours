@@ -15,13 +15,13 @@
         Op deze pagina kunnen genodigden zelf een afspraak inplannen om op kraambezoek te komen. Voor ieder gepland bezoek ontvang je een e-mail.
     </p>
 
-    <p {{ my.style('14px', '20px 0 20px 0') }}>
-        <a href="{{ info.link }}?manage={{ info.manage_token }}">&raquo; Beheer uw pagina</a>
-    </p>
-
     <p {{ my.style }}>
         Met vriendelijke groet,<br>
-        Aline<br>
+        Aline &amp; Arnold<br>
         &mdash; opkraambezoek.nl
+    </p>
+    
+    <p {{ my.style('14px', '20px 0 0 0') }}>
+        <a href="{{ info.link }}?manage={{ info.manage_token }}">&raquo; Beheer uw pagina</a>
     </p>
 {% endblock %}

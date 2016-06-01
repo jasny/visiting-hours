@@ -107,7 +107,7 @@ class CreatePageController extends Controller
         
         $this->info->save();
         
-        if ($isNew || true) {
+        if ($isNew) {
             Email::load('register.html.twig')
                 ->render(['info' => $this->info])
                 ->send($this->info->email, $this->info->parent_name);

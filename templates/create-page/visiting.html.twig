@@ -17,13 +17,13 @@
                     <div class='col-sm-6'>
                         <div class="input-group date">
                             <span class="input-group-addon">van</span>
-                            <input type="text" name="date_from" value="{{ info.date_from }}" class="form-control date-from" required placeholder="datum" data-mask="dd-mm-yyyy">
+                            <input type="text" name="date_from" value="{{ info.date_from|default('now')|date('d-m-Y') }}" class="form-control date-from" required placeholder="datum" data-mask="09-09-0000">
                         </div>
                     </div>
                     <div class='col-sm-6'>
                         <div class='input-group date' id='datetimepicker7'>
                             <span class="input-group-addon">tot</span>
-                            <input type="text" name="date_to" value="{{ info.date_to }}" class="form-control date-to" required placeholder="datum" data-mask="dd-mm-yyyy">
+                            <input type="text" name="date_to" value="{{ info.date_to }}" class="form-control date-to" required placeholder="datum" data-mask="09-09-0000">
                         </div>
                     </div>
                 </div>
@@ -47,13 +47,13 @@
                     <div class="col-sm-3 col-toggle">
                         <div class="input-group">
                             <span class="input-group-addon">van</span>
-                            <input type="text" class="form-control" name="morning_from" value="{{ info.morning_from }}" data-mask="h:s" placeholder="uu:mm" pattern="\d?\d:\d\d" {{ info.hasMorning== "yes" ? 'required' : '' }}>
+                            <input type="text" class="form-control" name="morning_from" value="{{ info.morning_from }}" data-mask="09:00" placeholder="tijd" pattern="\d?\d:\d\d" {{ info.hasMorning== "yes" ? 'required' : '' }}>
                         </div>
                     </div>
                     <div class="col-sm-3 col-toggle">
                         <div class="input-group">
                             <span class="input-group-addon">tot</span>
-                            <input type="text" class="form-control" name="morning_to" value="{{ info.morning_to }}" data-mask="h:s" placeholder="uu:mm" pattern="\d?\d:\d\d" {{ info.hasMorning== "yes" ? 'required' : '' }}>
+                            <input type="text" class="form-control" name="morning_to" value="{{ info.morning_to }}" data-mask="09:00" placeholder="tijd" pattern="\d?\d:\d\d" {{ info.hasMorning== "yes" ? 'required' : '' }}>
                         </div>
                     </div>
                     <div class="col-sm-4 col-toggle">
@@ -81,13 +81,13 @@
                     <div class="col-sm-3 col-toggle">
                         <div class="input-group">
                             <span class="input-group-addon">van</span>
-                            <input type="text" class="form-control" name="afternoon_from" value="{{ info.afternoon_from }}" data-mask="h:m" placeholder="uu:mm" pattern="\d?\d:\d\d" {{ info.hasAfternoon== "yes" ? 'required' : '' }}>
+                            <input type="text" class="form-control" name="afternoon_from" value="{{ info.afternoon_from }}" data-mask="09:00" placeholder="tijd" pattern="\d?\d:\d\d" {{ info.hasAfternoon== "yes" ? 'required' : '' }}>
                         </div>
                     </div>
                     <div class="col-sm-3 col-toggle">
                         <div class="input-group">
                             <span class="input-group-addon">tot</span>
-                            <input type="text" class="form-control" name="afternoon_to" value="{{ info.afternoon_to }}" data-mask="h:m" placeholder="uu:mm" pattern="\d?\d:\d\d" {{ info.hasAfternoon== "yes" ? 'required' : '' }}>
+                            <input type="text" class="form-control" name="afternoon_to" value="{{ info.afternoon_to }}" data-mask="09:00" placeholder="tijd" pattern="\d?\d:\d\d" {{ info.hasAfternoon== "yes" ? 'required' : '' }}>
                         </div>
                     </div>
                     <div class="col-sm-4 col-toggle">
@@ -115,13 +115,13 @@
                     <div class="col-sm-3 col-toggle">
                         <div class="input-group">
                             <span class="input-group-addon">van</span>
-                            <input type="text" class="form-control" name="evening_from" value="{{ info.evening_from }}" data-mask="h:m" placeholder="uu:mm" pattern="\d?\d:\d\d" {{ info.hasEvening== "yes" ? 'required' : '' }}>
+                            <input type="text" class="form-control" name="evening_from" value="{{ info.evening_from }}" data-mask="09:00" placeholder="tijd" pattern="\d?\d:\d\d" {{ info.hasEvening== "yes" ? 'required' : '' }}>
                         </div>
                     </div>
                     <div class="col-sm-3 col-toggle">
                         <div class="input-group">
                             <span class="input-group-addon">tot</span>
-                            <input type="text" class="form-control" name="evening_to" value="{{ info.evening_to }}" data-mask="h:m" placeholder="uu:mm" pattern="\d?\d:\d\d" {{ info.hasEvening== "yes" ? 'required' : '' }}>
+                            <input type="text" class="form-control" name="evening_to" value="{{ info.evening_to }}" data-mask="09:00" placeholder="tijd" pattern="\d?\d:\d\d" {{ info.hasEvening== "yes" ? 'required' : '' }}>
                         </div>
                     </div>
                     <div class="col-sm-4 col-toggle">
@@ -139,9 +139,9 @@
             <div class="form-group">
                 <label>Hoe lang mag een bezoek duren?</label>
                 <div class="input-group input-time">
-                    <input type="text" class="form-control" name="duration[hours]" value="{{ info.duration ? (info.duration / 60)|round(0, 'floor') : null }}" data-mask="0">
+                    <input type="text" class="form-control" name="duration[hours]" value="{{ info.duration ? (info.duration / 60)|round(0, 'floor') : 0 }}" data-mask="0">
                     <span class="input-group-addon">uur</span>
-                    <input type="text" class="form-control" name="duration[minutes]" value="{{ info.duration ? info.duration % 60 : null }}" data-mask="m" pattern="[0-5]?\d">
+                    <input type="text" class="form-control" name="duration[minutes]" value="{{ info.duration ? info.duration % 60 : 0 }}" data-mask="09" pattern="[0-5]?\d">
                     <span class="input-group-addon">minuten</span>
                 </div>
             </div>

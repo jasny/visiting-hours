@@ -1,11 +1,4 @@
 (function($) {
-    $('input[data-mask]').each(function() {
-        var mask = $(this).attr('data-mask');
-        $(this).mask(mask);
-    });
-}(jQuery));
-
-(function($) {
     $('.row-toggle .btn-group input[type=radio]').on('change', function() {
         var toggleClass = $(this).val() === 'yes' ? 'addClass' : 'removeClass';
         
@@ -31,7 +24,7 @@
     $('input.date-from').datetimepicker({
         format: 'DD-MM-YYYY',
         defaultDate: 'now',
-        minDate: 'now'
+//        minDate: 'now'
     });
     $('input.date-to').datetimepicker({
         format: 'DD-MM-YYYY',
