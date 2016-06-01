@@ -70,10 +70,15 @@ class ShowPageController extends Controller
         $page = ORM::factory('Page')->findOne($reference);
         if (!$page) return $this->notFound();
         
-        $page->getCalendar()->addVisit($_POST['date'], $_POST['time'], $_POST['name']);
+        $visit = $page->getCalendar()->addVisit($_POST['date'], $_POST['time'], $_POST['name']);
         $page->save();
         
         $this->flash('success', "Uw bezoek is ingepland.");
+
+        Email::load('new-visit.html.twig')
+            ->render(['info' => $page, 'visit' => $visit])
+            ->send($page->email, $page->parent_name);
+        
         $this->redirect("/page/{$page->reference}");
     }
     

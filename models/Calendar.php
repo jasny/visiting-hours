@@ -246,6 +246,7 @@ class Calendar
      * @param string $date
      * @param string $time
      * @param string $name  Name of the person who is visiting
+     * @return array
      */
     public function addVisit($date, $time, $name)
     {
@@ -253,12 +254,16 @@ class Calendar
             throw new RuntimeException("Slot is not available");
         }
         
-        $visit = compact('date', 'time', 'name');
+        $visit = compact('date', 'time', 'name') + ['duration' => $this->page->duration];
         
         $visits = json_decode($this->page->visits);
         $visits[] = $visit;
         
         $this->page->visits = json_encode($visits);
+        
+        $visit['time_until'] = date('H:i', strtotime($visit['time'] . $visit['duration'] . ' minutes'));
+        
+        return $visit;
     }
     
     /**
