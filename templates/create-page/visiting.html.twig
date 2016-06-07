@@ -1,14 +1,25 @@
 {% extends 'base.html.twig' %}
 
 {% set page = {
-  title: "Pagina voor het kraambezoek aanmaken (stap 2)",
+  title: "Pagina voor het kraambezoek aanmaken (stap 1)",
   class: "create-page"
 } %}
 
 {% block contents %}
     <form method="post">
         <h1>Pagina voor het kraambezoek aanmaken</h1>
-        <p class="steps">Stap 2 van 2</p>
+        <p class="steps">Stap 1 van 2</p>
+
+        <section id="basic-info">
+            <div class="form-group">
+                <label for="inputName">Wat is de naam van de baby?</label>
+                <input type="text" name="name" value="{{ info.name }}" class="form-control" id="inputName" required placeholder="Naam van de baby">
+            </div>
+            <div class="form-group">
+                <label for="inputDateOfBirth">Wanneer is de baby geboren?</label>
+                <input type="text" name="date_of_birth" value="{{ info.date_of_birth }}" class="form-control date" id="inputDateOfBirth" placeholder="Geboortedatum (optioneel)" data-mask="00-00-0000">
+            </div>
+        </section>
         
         <section id="visiting">
             <div class="form-group">
@@ -147,9 +158,8 @@
             </div>
         </section>
         
-        <section>
-            <button type="submit" class="btn btn-default next pull-left previous" formaction="/create/step1">&laquo; Vorige</button>
-            <button type="submit" class="btn btn-primary btn-lg next pull-right" formaction="/create/finish">Voltooien</button>
-       </section>
+        <section class="text-right">
+            <button type="submit" class="btn btn-primary next" formaction="/create/step2">Volgende &raquo;</button>
+        </section>
     </form>
 {% endblock %}

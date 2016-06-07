@@ -24,8 +24,8 @@ View::init('templates');
 $router = new Router([
     '/ +GET'                  => (object)['controller' => 'default',  'action' => 'frontpage'],
     '/create'                 => (object)['controller' => 'create-page', 'action' => 'new'],
-    '/create/step1'           => (object)['controller' => 'create-page', 'action' => 'basic-info'],
-    '/create/step2'           => (object)['controller' => 'create-page', 'action' => 'visiting'],
+    '/create/step1'           => (object)['controller' => 'create-page', 'action' => 'visiting'],
+    '/create/step2'           => (object)['controller' => 'create-page', 'action' => 'basic-info'],
     '/create/finish +POST'    => (object)['controller' => 'create-page', 'action' => 'finish'],
     '/create/done   +GET'     => (object)['controller' => 'create-page', 'action' => 'done'],
     '/delete +GET'            => (object)['controller' => 'create-page', 'action' => 'confirm-delete'],

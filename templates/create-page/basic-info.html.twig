@@ -1,30 +1,33 @@
 {% extends 'base.html.twig' %}
 
 {% set page = {
-  title: "Pagina voor het kraambezoek aanmaken (stap 1)",
+  title: "Pagina voor het kraambezoek aanmaken (stap 2)",
   class: "create-page"
 } %}
 
 {% block contents %}
     <form method="post">
         <h1>Pagina voor het kraambezoek aanmaken</h1>
-        <p class="steps">Stap 1 van 2</p>
-        
+        <p class="steps">Stap 2 van 2</p>
+
+        <section id="page-info">
+            <div class="form-group">
+                <label for="inputDescription">Wat wil je vertellen aan het bezoek?</label>
+                <textarea class="form-control" name="description" id="inputDescription" maxlength="500" rows="6" required placeholder="Welkomsbericht (max 500 tekens)">{{ info.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="inputGifts">Wat zijn de wensen voor kraamcadeautjes?</label>
+                <textarea class="form-control" name="gifts" id="inputDescription" maxlength="500" rows="4" placeholder="Cadeautips en ideeën (optioneel)">{{ info.gifts }}</textarea>
+            </div>
+        </section>
+            
         <section id="basic-info">
-            <div class="form-group">
-                <label for="inputName">Wat is de naam van de baby?</label>
-                <input type="text" name="name" value="{{ info.name }}" class="form-control" id="inputName" required placeholder="Naam van de baby">
-            </div>
-            <div class="form-group">
-                <label for="inputDateOfBirth">Wanneer is de baby geboren?</label>
-                <input type="text" name="date_of_birth" value="{{ info.date_of_birth }}" class="form-control date" id="inputDateOfBirth" placeholder="Geboortedatum (optioneel)" data-mask="00-00-0000">
-            </div>
             <div class="form-group">
                 <label for="inputName">Wat is jouw/jullie naam?</label>
                 <input type="text" name="parent_name" value="{{ info.parent_name }}" class="form-control" id="inputName" required placeholder="Naam van de ouder(s)">
             </div>
             <div class="form-group">
-                <label for="inputStreet">Wat is het adres?</label>
+                <label for="inputStreet">Wat is het bezoekadres?</label>
                 <div class="row">
                     <div class="col-sm-6">
                         <input type="text" name="street" value="{{ info.street }}" class="form-control" id="inputStreet" placeholder="Straat en huisnummer (optioneel)">
@@ -38,25 +41,14 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputDescription">Wat wil je vertellen aan het bezoek?</label>
-                <textarea class="form-control" name="description" id="inputDescription" maxlength="500" rows="6" required placeholder="Welkomsbericht (max 500 tekens)">{{ info.description }}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="inputGifts">Wat zijn de wensen voor kraamcadeautjes?</label>
-                <textarea class="form-control" name="gifts" id="inputDescription" maxlength="500" rows="3" placeholder="Cadeautips en ideeën (optioneel)">{{ info.gifts }}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="inputContact">Hoe kan het bezoek contact met jou/jullie opnemen?</label>
-                <textarea class="form-control" name="contact" id="inputContact" maxlength="250" rows="3" placeholder="Bijvoorbeeld via een facebookpagina, jouw telefoonnummer of een ander familielid">{{ info.contact }}</textarea>
-            </div>
-            <div class="form-group">
                 <label for="inputEmail">Wat is jouw e-mailadres?</label>
                 <input type="email" name="email" value="{{ info.email }}" class="form-control" id="inputEmail" required placeholder="Jouw e-mailadres">
             </div>
         </section>
         
         <section class="text-right">
-            <button type="submit" class="btn btn-primary next" formaction="/create/step2">Volgende &raquo;</button>
+            <button type="submit" class="btn btn-default pull-left previous" formaction="/create/step1">&laquo; Vorige</button>
+            <button type="submit" class="btn btn-primary btn-lg next" formaction="/create/finish">Voltooien</button>
         </section>
     </form>
 {% endblock %}
