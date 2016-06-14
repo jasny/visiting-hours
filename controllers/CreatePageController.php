@@ -110,6 +110,7 @@ class CreatePageController extends Controller
         if ($isNew) {
             Email::load('register.html.twig')
                 ->render(['info' => $this->info])
+                ->addBCC('info@kraambezoek.nl')
                 ->send($this->info->email, $this->info->parent_name);
         }
         
