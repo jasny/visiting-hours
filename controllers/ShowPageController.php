@@ -94,7 +94,7 @@ class ShowPageController extends Controller
     protected function view($name = null, $context = [])
     {
         $context['manage'] = $this->manage;
-        if (isset($context['info']->name)) $context['info']->name = 'de baby';
+        if (!isset($context['info']->name)) $context['info']->name = 'de baby';
         
         parent::view($name, $context);
     }

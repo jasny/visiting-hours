@@ -3,9 +3,6 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* index.php
 
-<Directory "/vendor">
+<FilesMatch "^(vendor|templates)/">
   Deny from all
-</Directory>
-<Directory "/templates">
-  Deny from all
-</Directory>
+</FilesMatch>
