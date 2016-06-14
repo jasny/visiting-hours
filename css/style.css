@@ -7,6 +7,10 @@ body {
     padding-bottom: 80px;
     position: relative;
 }
+body > .alert {
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+}
 body > footer {
     position: absolute;
     bottom: 0;

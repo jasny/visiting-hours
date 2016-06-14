@@ -23,6 +23,7 @@
     <body class="{{ page.class }}">
         {% if flash.issued %}
             <div class="alert alert-{{ flash.type == 'error' ? 'danger' : flash.type }}">
+                {% if flash.type == 'success' %}<i class="glyphicon glyphicon-ok"></i>{% endif %}
                 {{ flash.message }}
             </div>
         {% endif %}
