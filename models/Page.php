@@ -33,7 +33,8 @@ class Page extends ORM
         'evening_to'         => 'S',
         'duration'           => 'N',
         'visits'             => 'S',
-        'manage_token'       => 'S'
+        'manage_token'       => 'S',
+        'prepare'            => 'BOOL'
     ];
 
     
@@ -47,6 +48,20 @@ class Page extends ORM
         return $this->_is_new;
     }
     
+    /**
+     * Check if the value of a field has changed
+     * 
+     * @param string $field
+     * @return boolean
+     */
+    public function hasChanged($field)
+    {
+        if (!isset($this->_data[$field])) {
+            return isset($this->_data_original[$field]);
+        }
+        
+        return $this->_data[$field] != $this->_data_original[$field];
+    }
     
     /**
      * Has any times set?

@@ -6,10 +6,21 @@
 } %}
 
 {% block contents %}
-    <div class="jumbotron">
-        <h1>Op kraambezoek?</h1>
-        <p>Maak in twee stappen een eigen pagina voor jouw kraambezoek. Via deze pagina kan familie en vrienden zelf aangeven wanneer ze op bezoek willen komen.</p>
-        <p>Jij geeft aan wanneer, hoeveel en hoelang je bezoek wilt ontvangen.</p>
-        <p><a class="btn btn-primary btn-lg" href="/create" role="button">Start hier</a><br><span class="text-muted">(het is gratis)</span></p>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Op kraambezoek?</h1>
+            <p>Maak in twee stappen een eigen pagina voor jouw kraambezoek. Via deze pagina kan familie en vrienden zelf aangeven wanneer ze op bezoek willen komen.</p>
+            <p>Jij geeft aan wanneer, hoeveel en hoelang je bezoek wilt ontvangen.</p>
+            <p><a class="btn btn-primary btn-lg" href="/create" role="button">Start hier</a><br><span class="text-muted">(het is gratis)</span></p>
+        </div>
     </div>
+{% endblock %}
+
+{% block footer %}
+    <footer>
+        Nog zwanger?
+        <a class="btn btn-default btn-lg btn-labeled" href="/create?start=prepare" role="button">
+            Bereid een pagina voor <span class="btn-label btn-label-right"><i class="glyphicon glyphicon-chevron-right"></i></span>
+        </a>
+    </footer>
 {% endblock %}

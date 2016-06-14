@@ -28,7 +28,8 @@
         </p>
 
         <div class="plan-visit text-center">
-            <a class="btn btn-lg btn-primary" href="/page/{{ info.reference }}/calendar">Plan een bezoek</a>
+            <a class="btn btn-lg btn-primary {{ info.prepare ? 'disabled' : ''}}" {% if info.prepare %}href="#"{% else %}href="/page/{{ info.reference }}/calendar"{% endif %}>Plan een bezoek</a>
+            {% if info.prepare %}<div class="text-muted"><em>Inplannen is beschikbaar na publicatie</em></div>{% endif %}
         </div>
 
         {% if info.street %}
@@ -88,6 +89,7 @@
                 </div>
             </div>
             <div class="panel-footer">
+                {% if info.prepare %}<a class="btn btn-primary" href="/create/step1?start=publish">Publiseren</a>{% endif %}
                 <a class="btn btn-default" href="/create/step1">Pagina bewerken</a>
                 <a class="text-danger pull-right" href="/delete">Pagina verwijderen</a>
             </div>

@@ -4,16 +4,17 @@
 
 {% block content %}
     <p {{ my.style }}>Hoi {{ info.parent_name }},</p>
+    <p {{ my.style('18px') }}>Gefeliciteerd met de geboorte van {{ info.name }}!</p>
 
     <p {{ my.style }}>
-        Je hebt een pagina aangemaakt voor het kraambezoek:<br>
+        Deel de link naar de kraambezoekpagina met familie en vrienden:<br/>
         <div style="font-size: 14px; line-height: 1.5; font-weight: bold; display: block; padding: 5px 5px; text-align: center; background-color: #eee; border: 1px solid #ccc; border">{{ info.link }}</div>
     </p>
     
-    <p {{ my.style() }}>
-        Deze pagina is op dit moment enkel voor jou zichtbaar. Na de geboorte kan je <a href="{{ info.link }}?start=publish&amp;manage={{ info.manage_token }}">de pagina publiseren</a>.
+    <p {{ my.style }}>
+        Op deze pagina kunnen genodigden zelf een afspraak inplannen om op kraambezoek te komen. Voor ieder gepland bezoek ontvang je een e-mail.
     </p>
-    
+
     <p {{ my.style }}>
         Met vriendelijke groet,<br>
         Aline &amp; Arnold<br>

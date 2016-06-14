@@ -36,6 +36,10 @@ class CreatePageController extends Controller
         }
         
         if ($info) $this->info->setAll($info);
+        
+        if (isset($_GET['start'])) {
+            $this->info->prepare = $_GET['start'] === 'prepare' ? true : false;
+        }
     }
     
     /**
@@ -72,7 +76,7 @@ class CreatePageController extends Controller
     public function newAction()
     {
         $this->info = null;
-        $this->redirect('/create/step1');
+        $this->redirect('/create/step1' . (!empty($_GET) ? '?' . $_SERVER['QUERY_STRING'] : ''));
     }
     
     /**
@@ -103,12 +107,13 @@ class CreatePageController extends Controller
     public function finishAction()
     {
         $this->addInputToInfo(true);
-        $isNew = $this->info->isNew();
+        $isNew = $this->info->isNew() || $this->info->hasChanged('prepare');
+        $mail = $this->info->prepare ? 'register.html.twig' : 'publish.html.twig';
         
         $this->info->save();
         
         if ($isNew) {
-            Email::load('register.html.twig')
+            Email::load($mail)
                 ->render(['info' => $this->info])
                 ->addBCC('info@kraambezoek.nl')
                 ->send($this->info->email, $this->info->parent_name);

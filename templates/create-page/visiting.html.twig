@@ -13,31 +13,35 @@
         <section id="basic-info">
             <div class="form-group">
                 <label for="inputName">Wat is de naam van de baby?</label>
-                <input type="text" name="name" value="{{ info.name }}" class="form-control" id="inputName" required placeholder="Naam van de baby">
+                <input type="text" name="name" value="{{ info.name }}" class="form-control" id="inputName" {% if not info.prepare %}required{% endif %} placeholder="Naam van de baby {% if info.prepare %}(optioneel){% endif %}">
             </div>
             <div class="form-group">
-                <label for="inputDateOfBirth">Wanneer is de baby geboren?</label>
-                <input type="text" name="date_of_birth" value="{{ info.date_of_birth }}" class="form-control date" id="inputDateOfBirth" placeholder="Geboortedatum (optioneel)" data-mask="00-00-0000">
+                <label for="inputDateOfBirth">{% if info.prepare %}Wat is de uitgerekende datum?{% else %}Wanneer is de baby geboren?{% endif %}</label>
+                <input type="text" name="date_of_birth" value="{{ info.date_of_birth }}" class="form-control date" id="inputDateOfBirth" {% if info.prepare %}required{% endif %} placeholder="{{ info.prepare ? 'Datum' : 'Geboortedatum (optioneel)' }}" data-mask="00-00-0000">
             </div>
         </section>
         
         <section id="visiting">
             <div class="form-group">
                 <label>Welke periode kan men op kraambezoek komen?</label>
-                <div class="row">
-                    <div class='col-sm-6'>
-                        <div class="input-group date">
-                            <span class="input-group-addon">van</span>
-                            <input type="text" name="date_from" value="{{ info.date_from|default('now')|date('d-m-Y') }}" class="form-control date-from" required placeholder="datum" data-mask="09-09-0000">
+                {% if info.prepare %}
+                    <div><em>In te vullen na de geboorte</em></div>
+                {% else %}
+                    <div class="row">
+                        <div class='col-sm-6'>
+                            <div class="input-group date">
+                                <span class="input-group-addon">van</span>
+                                <input type="text" name="date_from" value="{{ info.date_from|default('now')|date('d-m-Y') }}" class="form-control date-from" required placeholder="datum" data-mask="09-09-0000">
+                            </div>
+                        </div>
+                        <div class='col-sm-6'>
+                            <div class='input-group date' id='datetimepicker7'>
+                                <span class="input-group-addon">tot</span>
+                                <input type="text" name="date_to" value="{{ info.date_to }}" class="form-control date-to" required placeholder="datum" data-mask="09-09-0000">
+                            </div>
                         </div>
                     </div>
-                    <div class='col-sm-6'>
-                        <div class='input-group date' id='datetimepicker7'>
-                            <span class="input-group-addon">tot</span>
-                            <input type="text" name="date_to" value="{{ info.date_to }}" class="form-control date-to" required placeholder="datum" data-mask="09-09-0000">
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
             </div>
         </section>
         
@@ -150,9 +154,9 @@
             <div class="form-group">
                 <label>Hoe lang mag een bezoek duren?</label>
                 <div class="input-group input-time">
-                    <input type="text" class="form-control" name="duration[hours]" value="{{ info.duration ? (info.duration / 60)|round(0, 'floor') : 0 }}" data-mask="0">
+                    <input type="text" class="form-control" name="duration[hours]" value="{{ info.duration ? (info.duration / 60)|round(0, 'floor') : '' }}" data-mask="0">
                     <span class="input-group-addon">uur</span>
-                    <input type="text" class="form-control" name="duration[minutes]" value="{{ info.duration ? info.duration % 60 : 0 }}" data-mask="09" pattern="[0-5]?\d">
+                    <input type="text" class="form-control" name="duration[minutes]" value="{{ info.duration ? info.duration % 60 : '' }}" data-mask="09" pattern="[0-5]?\d">
                     <span class="input-group-addon">minuten</span>
                 </div>
             </div>

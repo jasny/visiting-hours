@@ -27,21 +27,21 @@ body > footer {
 body.frontpage {
     background-image: url(https://static.pexels.com/photos/54547/pexels-photo-54547.jpeg);
     background-size: cover;
-    padding: 20px 20px 80px 20px;
+}
+body.frontpage .container {
+    width: auto;
     max-width: 1024px;
-    margin: 0 auto;
+    padding-top: 15px;
 }
-body.frontpage > footer {
-    display: none;
-}
-body.frontpage .jumbotron h1 {
-    font-size: 28px;
-}
+
 body.frontpage .jumbotron {
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     background: rgba(255,255,255,0.8);
+}
+body.frontpage .jumbotron h1 {
+    font-size: 28px;
 }
 body.frontpage .jumbotron p {
     margin-top: 20px;
@@ -51,6 +51,16 @@ body.frontpage .jumbotron .btn {
     font-size: 28px;
     padding: 10px 40px;
     margin-top: 20px;
+}
+body.frontpage footer {
+    font-size: 20px;
+    height: 75px;
+    background: rgba(0,0,0,0.3);
+    padding-top: 15px;
+    color: #fff;
+}
+body.frontpage footer .btn {
+    margin-left: 20px;
 }
 
 @media (min-width: 450px) {
@@ -216,4 +226,9 @@ table.calendar td.available {
 table.calendar td.taken {
     background-color: #cc0000;
     color: #ffffff;
+}
+
+
+.form-group > .checkbox, .form-group > .radio {
+    margin-top: 0;
 }
