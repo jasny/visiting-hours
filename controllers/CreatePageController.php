@@ -115,7 +115,7 @@ class CreatePageController extends Controller
         if ($isNew) {
             $email = Email::load($this->info->prepare ? 'register.html.twig' : 'publish.html.twig');
             $email->render(['info' => $this->info]);
-            $email->addBCC('info@kraambezoek.nl');
+            $email->addBCC('info@opkraambezoek.nl');
             $email->send($this->info->email, $this->info->parent_name);
         }
         
