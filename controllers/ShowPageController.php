@@ -85,6 +85,22 @@ class ShowPageController extends Controller
         $this->redirect("/page/{$page->reference}");
     }
     
+    public function deleteVisitAction($reference)
+    {
+        $page = ORM::factory('Page')->findOne($reference);
+        if (!$page) return $this->notFound();
+        if (!$this->manage) return $this->forbidden();
+        
+        $visit = $page->getCalendar()->removeVisit($_GET['date'], $_GET['time']);
+        
+        if ($visit) {
+            $page->save();
+            $this->flash('warning', "Het bezoek van {$visit->name} is verwijderd uit de agenda.");
+        }
+        
+        $this->redirect("/page/{$page->reference}");
+    }
+    
     /**
      * Show a view
      * 

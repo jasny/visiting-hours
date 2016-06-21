@@ -213,9 +213,12 @@ class Calendar
      * 
      * @param string $date
      * @param string $time
+     * @return string
      */
     public function getSlotState($date, $time)
     {
+        if ($this->getSlotVisit($date, $time)) return 'taken';
+        
         if (!$this->isVisitingTime($time)) return 'disabled';
         
         if (
@@ -225,9 +228,18 @@ class Calendar
             return 'disabled';
         }
         
-        if ($this->getSlotVisit($date, $time)) return 'taken';
         if ($this->isPeriodFull($date, $time)) return 'full';
         return 'available';
+    }
+    
+    /**
+     * Get the visits
+     * 
+     * @param array $visits
+     */
+    public function setVisits(array $visits)
+    {
+        $this->page->visits = json_encode(array_values($visits));
     }
     
     /**
@@ -237,7 +249,8 @@ class Calendar
      */
     public function getVisits()
     {
-        return $this->page->visits ? json_decode($this->page->visits) : [];
+        $visits = $this->page->visits ? (array)json_decode($this->page->visits) : [];
+        return array_filter($visits);
     }
     
     /**
@@ -256,10 +269,10 @@ class Calendar
         
         $visit = compact('date', 'time', 'name') + ['duration' => $this->page->duration];
         
-        $visits = json_decode($this->page->visits);
+        $visits = $this->getVisits();
         $visits[] = $visit;
         
-        $this->page->visits = json_encode($visits);
+        $this->setVisits($visits);
         
         $visit['time_until'] = date('H:i', strtotime($visit['time'] . $visit['duration'] . ' minutes'));
         
@@ -271,19 +284,24 @@ class Calendar
      * 
      * @param string $date
      * @param string $time
+     * @return stdClass|null
      */
     public function removeVisit($date, $time)
     {
-        $visits = json_decode($this->page->visits);
-        $visits[] = $visit;
+        $visit = null;
+        $visits = $this->getVisits();
 
         foreach ($visits as $i => $visit) {
             if ($visit->date === $date && $visit->time === $time) {
+                $visit = $visits[$i];
                 unset($visits[$i]);
+                break;
             }
         }
         
-        $this->page->visits = json_encode($visits);
+        $this->setVisits($visits);
+        
+        return $visit;
     }
     
     

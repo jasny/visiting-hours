@@ -224,6 +224,7 @@ table.calendar th {
 
 table.calendar td {
     text-align: center;
+    position: relative;
 }
 table.calendar td.disabled {
     background-color: #ccc;
@@ -236,6 +237,12 @@ table.calendar td.taken {
     background-color: #cc0000;
     color: #ffffff;
 }
+table.calendar td .close {
+    font-size: 18px;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}}
 
 
 .form-group > .checkbox, .form-group > .radio {

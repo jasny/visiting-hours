@@ -32,7 +32,8 @@ $router = new Router([
     '/delete +POST'           => (object)['controller' => 'create-page', 'action' => 'delete'],
     '/page/* +GET'            => (object)['controller' => 'show-page', 'action' => 'show', 'reference' => '$2'],
     '/page/*/calendar +GET'   => (object)['controller' => 'show-page', 'action' => 'calendar', 'reference' => '$2'],
-    '/page/*/calendar +POST'  => (object)['controller' => 'show-page', 'action' => 'plan', 'reference' => '$2']
+    '/page/*/calendar +POST'  => (object)['controller' => 'show-page', 'action' => 'plan', 'reference' => '$2'],
+    '/page/*/delete-visit'    => (object)['controller' => 'show-page', 'action' => 'delete-visit', 'reference' => '$2']
 ]);
 
 session_start();
