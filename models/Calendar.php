@@ -217,9 +217,9 @@ class Calendar
      */
     public function getSlotState($date, $time)
     {
-        if ($this->getSlotVisit($date, $time)) return 'taken';
-        
         if (!$this->isVisitingTime($time)) return 'disabled';
+        
+        if ($this->getSlotVisit($date, $time)) return 'taken';
         
         if (
             strtotime($date) < strtotime($this->page->date_from) ||
