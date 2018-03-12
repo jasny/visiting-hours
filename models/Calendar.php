@@ -61,22 +61,22 @@ class Calendar
 
             if ($this->page->morning_from) {
                 $this->visiting_times['morning'] = [
-                    'from' => $this->page->morning_from,
-                    'to' => $this->page->morning_to
+                    'from' => str_pad($this->page->morning_from, 5, '0', STR_PAD_LEFT),
+                    'to' => str_pad($this->page->morning_to, 5, '0', STR_PAD_LEFT)
                 ];
             }
 
             if ($this->page->afternoon_from) {
                 $this->visiting_times['afternoon'] = [
-                    'from' => $this->page->afternoon_from,
-                    'to' => $this->page->afternoon_to
+                    'from' => str_pad($this->page->afternoon_from, 5, '0', STR_PAD_LEFT),
+                    'to' => str_pad($this->page->afternoon_to, 5, '0', STR_PAD_LEFT)
                 ];
             }
 
             if ($this->page->evening_from) {
                 $this->visiting_times['evening'] = [
-                    'from' => $this->page->evening_from,
-                    'to' => $this->page->evening_to
+                    'from' => str_pad($this->page->evening_from, 5, '0', STR_PAD_LEFT),
+                    'to' => str_pad($this->page->evening_to, 5, '0', STR_PAD_LEFT)
                 ];
             }
         }
