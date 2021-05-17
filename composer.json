@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.2",
         "slim/slim": "^3.4",
         "jasny/mvc": "^1.2",
         "aws/aws-sdk-php": "^3.18",
