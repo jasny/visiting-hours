@@ -12,8 +12,6 @@ class Email extends PHPMailer
         'host' => 'email-smtp.eu-west-1.amazonaws.com',
         'port' => 587,
         'tls' => true,
-        'username' => 'AKIAIDZVXSG44ZO7ZQBA',
-        'password' => 'AsuilxGaeHcPIMwbcpS5N8L74rjFqxoEGeUaPNI4yUx3',
         'from' => [
             'email' => 'info@opkraambezoek.nl',
             'name' => 'Op kraambezoek'
@@ -31,7 +29,10 @@ class Email extends PHPMailer
     public function __construct($template)
     {
         if (!empty(static::$config['host'])) {
-            $this->useSMTP(static::$config);
+            $this->useSMTP(static::$config + [
+                'username' => $_ENV['SES_ACCESSKEY'],
+                'password' => $_ENV['SES_SECRET'],
+            ]);
         }
         
         $this->view = View::load("email/$template");

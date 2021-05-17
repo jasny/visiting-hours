@@ -12,6 +12,7 @@ require_once 'vendor/autoload.php';
 
 set_include_path(__DIR__ . '/controllers' . PATH_SEPARATOR . __DIR__ . '/models' . PATH_SEPARATOR . __DIR__ . '/lib');
 
+ORM::configure("region", 'eu-west-1');
 Locale::setDefault("nl_NL");
 
 Jasny\MVC\View::$map['twig'] = 'Jasny\MVC\View\Twig';
