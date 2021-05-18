@@ -107,6 +107,6 @@ class Email extends PHPMailer
         $send = parent::send();
         $this->clearAddresses();
         
-        if (!$send) throw new Exception($this->ErrorInfo);
+        if (!$send) trigger_error($this->ErrorInfo, E_USER_WARNING);
     }
 }
