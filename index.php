@@ -3,6 +3,7 @@
 use Jasny\MVC\Router;
 use Jasny\MVC\View\Twig as View;
 use Kettle\ORM;
+use Dotenv;
 
 if (strpos($_SERVER['SERVER_SOFTWARE'], 'PHP') === 0 && pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_EXTENSION) !== 'php') {
     return false;
@@ -12,7 +13,15 @@ require_once 'vendor/autoload.php';
 
 set_include_path(__DIR__ . '/controllers' . PATH_SEPARATOR . __DIR__ . '/models' . PATH_SEPARATOR . __DIR__ . '/lib');
 
-ORM::configure("region", 'eu-west-1');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
+
+ORM::configure("key",    $_ENV['AWS_KEY']);
+ORM::configure("secret", $_ENV['AWS_SECRET']);
+ORM::configure("region", $_ENV['AWS_REGION']);
+
+// In order to use DynamoDB Local, you need to set "base_url".
+ORM::configure("base_url", $_ENV['AWS_BASE_URL']);
 Locale::setDefault("nl_NL");
 
 Jasny\MVC\View::$map['twig'] = 'Jasny\MVC\View\Twig';
