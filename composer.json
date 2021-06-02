@@ -16,7 +16,8 @@
         "twig/twig": "^1.24",
         "kettle/dynamodb-orm": "^0.2.8",
         "jasny/twig-extensions": "^1.0",
-        "phpmailer/phpmailer": "^5.2"
+        "phpmailer/phpmailer": "^5.2",
+        "vlucas/phpdotenv": "^5.3"
     },
     "config": {
         "use-include-path": true
