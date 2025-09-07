@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   description: 'Plan visiting hours',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
