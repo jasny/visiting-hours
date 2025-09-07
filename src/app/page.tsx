@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from 'primereact/button';
 
-export default function Home() {
+export default async function Home() {
   return (
     <main
       className="min-h-screen flex flex-col items-center justify-center text-center p-4"

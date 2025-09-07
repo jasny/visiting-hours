@@ -1,4 +1,4 @@
-import { Page, Visit, addVisit as saveVisit } from '@/services/pageService';
+import type { Page, Visit } from '@/services/pageService';
 
 export class Calendar {
   private page: Page;
@@ -139,11 +139,6 @@ export class Calendar {
     }
     if (this.isPeriodFull(date, time)) return 'full';
     return 'available';
-  }
-
-  async addVisit(date: string, time: string, name: string) {
-    const visit = await saveVisit(this.page.reference, { date, time, name });
-    return visit;
   }
 
   static timeAddMinutes(time: string, addMinutes: number) {
