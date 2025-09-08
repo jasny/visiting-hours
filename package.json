@@ -13,26 +13,21 @@
     "@aws-sdk/credential-providers": "^3.883.0",
     "@aws-sdk/lib-dynamodb": "^3.883.0",
     "@aws-sdk/util-dynamodb": "^3.883.0",
-    "@vercel/functions": "^3.0.0",
     "lucide-react": "^0.542.0",
     "next": "15.5.2",
-    "primeicons": "^7.0.0",
     "primereact": "^10.9.7",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@next/eslint-plugin-next": "^15.5.2",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.13",
+    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }
