@@ -4,8 +4,7 @@ import { useState, useTransition } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
-import { registerVisit } from '@/services/pageActions';
-import { Visit } from '@/services/pageService';
+import { addVisit, Visit } from '@/services/pageService';
 
 interface Props {
   reference: string;
@@ -24,7 +23,7 @@ export default function VisitForm({ reference, calendarDates, timeSlots }: Props
 
   const submit = async () => {
     startTransition(async () => {
-      await registerVisit(reference, form as Omit<Visit, 'duration'>);
+      await addVisit(reference, form as Omit<Visit, 'duration'>);
     });
   };
 

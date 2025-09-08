@@ -1,7 +1,7 @@
 import type { Page, Visit } from '@/services/pageService';
 
 export class Calendar {
-  private page: Page;
+  private readonly page: Page;
   private periodDates?: string[];
   private visitingTimes?: Record<string, { from: string; to: string }>;
   private timeSlots?: Record<string, boolean>;
@@ -103,7 +103,7 @@ export class Calendar {
   isPeriodFull(date: string, time: string) {
     const period = this.getPeriodForTime(time);
     if (!period) return true;
-    const amount = (this.page as Record<string, number | undefined>)[
+    const amount = (this.page as unknown as Record<string, number | undefined>)[
       `${period}_amount`
     ];
     if (!amount) return false;

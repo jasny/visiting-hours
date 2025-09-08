@@ -1,7 +1,7 @@
 'use server';
 
 import { GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
-import { db } from './dynamodb';
+import { db } from '@/lib/dynamodb';
 
 export interface Visit {
   date: string;

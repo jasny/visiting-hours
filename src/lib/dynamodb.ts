@@ -1,5 +1,3 @@
-'use server';
-
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { fromTokenFile } from '@aws-sdk/credential-providers';
@@ -16,7 +14,7 @@ const credentials =
       };
 
 const client = new DynamoDBClient({
-  region: process.env.AWS_REGION || 'us-east-1',
+  region: process.env.AWS_REGION || 'eu-west-1',
   endpoint: process.env.AWS_DYNAMODB_ENDPOINT,
   credentials,
 });

@@ -5,8 +5,7 @@ import { InputText } from 'primereact/inputtext';
 import { Calendar as PCalendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { createPage } from '@/services/pageActions';
-import { Page } from '@/services/pageService';
+import { Page, savePage } from '@/services/pageService';
 
 type FormState = Partial<Page>;
 
@@ -20,7 +19,7 @@ export default function CreatePageForm() {
 
   const submit = async () => {
     startTransition(async () => {
-      await createPage(form as Page);
+      await savePage(form as Page);
     });
   };
 
@@ -36,11 +35,11 @@ export default function CreatePageForm() {
       </div>
       <div className="field col-6">
         <label htmlFor="date_from">Bezoek vanaf</label>
-        <PCalendar id="date_from" onChange={(e) => update('date_from', e.value)} />
+        <PCalendar id="date_from" onChange={(e) => update('date_from', e.value?.toISOString())} />
       </div>
       <div className="field col-6">
         <label htmlFor="date_to">Bezoek tot</label>
-        <PCalendar id="date_to" onChange={(e) => update('date_to', e.value)} />
+        <PCalendar id="date_to" onChange={(e) => update('date_to', e.value?.toISOString())} />
       </div>
       <div className="field col-6">
         <label htmlFor="morning_from">Ochtend van</label>

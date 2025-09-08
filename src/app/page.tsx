@@ -33,17 +33,17 @@ export default function Home() {
                 <Button
                   unstyled
                   onClick={() => router.push('/create')}
-                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 px-8 py-4 text-lg rounded-xl"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 px-4 py-2 text-lg rounded-xl"
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="w-5 h-5 mr-2" />
                   Maak je pagina
                 </Button>
                 <Button
                   unstyled
                   type="button"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-rose-200 text-rose-700 hover:bg-rose-50 hover:border-rose-300 transition-all duration-300 px-8 py-4 text-lg rounded-xl"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-rose-200 text-rose-700 bg-white hover:text-black hover:bg-rose-50 hover:border-rose-300 transition-all duration-300 px-4 py-2 text-lg rounded-xl"
                 >
-                  <Eye className="w-5 h-5" />
+                  <Eye className="w-5 h-5 mr-2" />
                   Bekijk voorbeeld
                 </Button>
               </div>
@@ -57,9 +57,9 @@ export default function Home() {
                   height={512}
                   className="w-full h-auto object-contain"
                 />
-                <Heart className="absolute -top-4 -right-4 w-8 h-8 text-rose-400 opacity-60" />
-                <Heart className="absolute top-1/4 -left-6 w-6 h-6 text-pink-400 opacity-40" />
-                <Heart className="absolute bottom-1/4 -right-8 w-5 h-5 text-rose-300 opacity-50" />
+                <Heart className="absolute -top-4 -right-4 w-8 h-8 text-rose-400 opacity-60" fill="currentColor" />
+                <Heart className="absolute top-1/4 -left-6 w-6 h-6 text-pink-400 opacity-40" fill="currentColor" />
+                <Heart className="absolute bottom-1/4 -right-8 w-5 h-5 text-rose-300 opacity-50" fill="currentColor" />
               </div>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function Home() {
           </div>
           <div className="flex items-center justify-center mt-12 mb-8">
             <div className="flex-1 h-px bg-rose-200 max-w-24" />
-            <Heart className="w-6 h-6 text-rose-400 mx-6" />
+            <Heart className="w-6 h-6 text-rose-400 mx-6" fill="currentColor" />
             <div className="flex-1 h-px bg-rose-200 max-w-24" />
           </div>
         </div>
@@ -97,9 +97,9 @@ export default function Home() {
             <p className="text-gray-600 font-light">Met liefde gemaakt voor alle nieuwe ouders en hun kleine wonderen.</p>
           </div>
           <div className="flex items-center justify-center gap-2 text-rose-500">
-            <Heart className="w-4 h-4" />
+            <Heart className="w-4 h-4" fill="currentColor" />
             <span className="text-sm font-light">Gemaakt met liefde</span>
-            <Heart className="w-4 h-4" />
+            <Heart className="w-4 h-4" fill="currentColor" />
           </div>
         </div>
       </footer>
