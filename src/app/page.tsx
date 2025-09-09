@@ -98,7 +98,7 @@ export default function Home() {
           </div>
           <div className="flex items-center justify-center gap-2 text-rose-500">
             <Heart className="w-4 h-4" fill="currentColor" />
-            <span className="text-sm font-light">Gemaakt met liefde</span>
+            <span className="text-sm font-light">&copy; 2016-2025 &mdash; Gemaakt met liefde door Arnold &amp; Aline Daniels</span>
             <Heart className="w-4 h-4" fill="currentColor" />
           </div>
         </div>
