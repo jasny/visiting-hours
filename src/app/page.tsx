@@ -92,10 +92,48 @@ export default function Home() {
 
       <footer className="bg-gradient-to-br from-rose-50 to-pink-50 px-6 py-12 md:px-12 md:py-16 text-center">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h3 className="text-2xl text-rose-800 mb-4 font-light">Deel je vreugde</h3>
-            <p className="text-gray-600 font-light">Met liefde gemaakt voor alle nieuwe ouders en hun kleine wonderen.</p>
-          </div>
+          <section aria-labelledby="faq-heading" className="mb-8">
+            <h2
+              id="faq-heading"
+              className="text-3xl md:text-4xl text-gray-800 mb-8 font-light"
+            >
+              Veelgestelde vragen
+            </h2>
+
+            <div className="space-y-8 text-left">
+              <div>
+                <h3 className="text-xl text-rose-800 mb-2 font-medium">
+                  Kost het iets om een pagina te maken?
+                </h3>
+                <p className="text-gray-600 font-light">
+                  Nee, OpKraambezoek is gratis te gebruiken.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl text-rose-800 mb-2 font-medium">
+                  Kunnen bezoekers zelf een tijdstip kiezen?
+                </h3>
+                <p className="text-gray-600 font-light">
+                  Ja, vrienden en familie reserveren eenvoudig een moment dat nog vrij is.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl text-rose-800 mb-2 font-medium">
+                  Hoe zit het met mijn privacy?
+                </h3>
+                <p className="text-gray-600 font-light">
+                  Alle gegevens en foto&apos;s zijn alleen zichtbaar via de unieke link die je deelt. We delen niets met derden en verwijderen alle gegevens uiterlijk 90 dagen na de geboortedatum.{' '}
+                  <a href="/privacy" className="text-rose-600 underline">
+                    Lees onze privacyverklaring
+                  </a>
+                  .
+                </p>
+              </div>
+            </div>
+          </section>
+
           <div className="flex items-center justify-center gap-2 text-rose-500">
             <Heart className="w-4 h-4" fill="currentColor" />
             <span className="text-sm font-light">&copy; 2016-2025 &mdash; Gemaakt met liefde door Arnold &amp; Aline Daniels</span>
