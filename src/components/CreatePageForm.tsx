@@ -9,7 +9,8 @@ import { Button } from 'primereact/button';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputNumber } from 'primereact/inputnumber';
 import { Baby, MapPinIcon, CalendarDays, Settings, Clock, Info } from 'lucide-react';
-import { Page, savePage } from '@/services/pageService';
+import { savePage } from '@/services/pageService';
+import { Page } from "@/lib/types"
 
 type FormState = Partial<Page>;
 

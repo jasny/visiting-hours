@@ -3,21 +3,20 @@
 import { notFound } from 'next/navigation';
 import { getPage } from '@/services/pageService';
 import PageInfo from '@/components/PageInfo';
-import { Calendar } from '@/lib/calendar';
-import CalendarView from '@/components/CalendarView';
-import VisitForm from '@/components/VisitForm';
+import { buildCalendarDTO } from '@/lib/calendar';
+import NewbornVisitSection from '@/components/NewbornVisitSection';
 
-export default async function ShowPage({ params }: { params: { reference: string } }) {
-  const page = await getPage(params.reference);
+export default async function ShowPage({ params }: { params: Promise<{ reference: string }> }) {
+  const { reference } = await params;
+  const page = await getPage(reference);
   if (!page) return notFound();
-  const calendar = new Calendar(page);
-  const dates = calendar.getDates();
-  const slots = Object.keys(calendar.getTimeSlots());
+  const calendar = buildCalendarDTO(page);
   return (
-    <main className="p-4">
-      <PageInfo info={page} />
-      <CalendarView calendar={calendar} />
-      <VisitForm reference={page.reference} calendarDates={dates} timeSlots={slots} />
+    <main className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-orange-50 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto flex flex-col gap-4">
+        <PageInfo info={page} />
+        <NewbornVisitSection calendar={calendar} reference={page.reference} />
+      </div>
     </main>
   );
 }
