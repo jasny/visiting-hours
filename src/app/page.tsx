@@ -55,7 +55,7 @@ export default function Home() {
                   alt="Stork carrying baby illustration"
                   width={512}
                   height={512}
-                  className="w-full h-auto object-contain"
+                  className="w-full h-auto object-contain rounded-2xl"
                 />
                 <Heart className="absolute -top-4 -right-4 w-8 h-8 text-rose-400 opacity-60" fill="currentColor" />
                 <Heart className="absolute top-1/4 -left-6 w-6 h-6 text-pink-400 opacity-40" fill="currentColor" />
@@ -95,37 +95,37 @@ export default function Home() {
           <section aria-labelledby="faq-heading" className="mb-8">
             <h2
               id="faq-heading"
-              className="text-3xl md:text-4xl text-gray-800 mb-8 font-light"
+              className="text-3xl md:text-4xl text-rose-800 mb-8 font-light"
             >
               Veelgestelde vragen
             </h2>
 
             <div className="space-y-8 text-left">
               <div>
-                <h3 className="text-xl text-rose-800 mb-2 font-medium">
+                <h3 className="text-xl text-rose-800 mb-2 font-light">
                   Kost het iets om een pagina te maken?
                 </h3>
                 <p className="text-gray-600 font-light">
-                  Nee, OpKraambezoek is gratis te gebruiken.
+                  Nee, opkraambezoek.nl is <strong>gratis</strong> te gebruiken.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-xl text-rose-800 mb-2 font-medium">
+                <h3 className="text-xl text-rose-800 mb-2 font-light">
                   Kunnen bezoekers zelf een tijdstip kiezen?
                 </h3>
                 <p className="text-gray-600 font-light">
-                  Ja, vrienden en familie reserveren eenvoudig een moment dat nog vrij is.
+                  Ja, vrienden en familie reserveren eenvoudig een moment dat nog vrij is. Jullie ontvangen voor ieder bezoek een e-mail.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-xl text-rose-800 mb-2 font-medium">
+                <h3 className="text-xl text-rose-800 mb-2 font-light">
                   Hoe zit het met mijn privacy?
                 </h3>
                 <p className="text-gray-600 font-light">
                   Alle gegevens en foto&apos;s zijn alleen zichtbaar via de unieke link die je deelt. We delen niets met derden en verwijderen alle gegevens uiterlijk 90 dagen na de geboortedatum.{' '}
-                  <a href="/privacy" className="text-rose-600 underline">
+                  <a href="/privacy" className="underline">
                     Lees onze privacyverklaring
                   </a>
                   .
@@ -136,7 +136,7 @@ export default function Home() {
 
           <div className="flex items-center justify-center gap-2 text-rose-500">
             <Heart className="w-4 h-4" fill="currentColor" />
-            <span className="text-sm font-light">&copy; 2016-2025 &mdash; Gemaakt met liefde door Arnold &amp; Aline Daniels</span>
+            <span className="text-sm font-light">&copy; 2016-2025 &mdash; Gemaakt met liefde door <a href="https://jasny.net" target="_blank">Arnold</a> &amp; <a href="https://alinedaniels.com" target="_blank">Aline</a> Daniels</span>
             <Heart className="w-4 h-4" fill="currentColor" />
           </div>
         </div>

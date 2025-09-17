@@ -3,8 +3,8 @@ import "./globals.css";
 import "primereact/resources/themes/lara-light-pink/theme.css";
 
 export const metadata: Metadata = {
-  title: "Op kraambezoek",
-  description: "Creëer een persoonlijke pagina om familie en vrienden uit te nodigen voor hun eerste ontmoeting met je pasgeboren kindje.",
+  title: "Gratis kraambezoek plannen | OpKraambezoek.nl",
+  description: "",
 };
 
 export default function RootLayout({
