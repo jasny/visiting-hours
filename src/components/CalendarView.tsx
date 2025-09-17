@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from 'react';
 
-import { CalendarDTO } from "@/lib/types"
+import { Calendar } from "@/lib/types"
 
 interface Props {
-  calendar: CalendarDTO;
+  calendar: Calendar;
   onSelect?: (date: string, time: string) => void;
 }
 

@@ -43,10 +43,81 @@ export default function CreatePageForm() {
   };
 
   const submit = async () => {
-    startTransition(async () => {
-      await savePage(form as Page);
-    });
-  };
+      // Build a complete Page object according to the Page type. Enforce required fields.
+      const genRef = () => Math.random().toString(36).slice(2, 10);
+      const genToken = () => Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+
+      // Derive defaults for non-custom times (standard calendar)
+      const defaults = !customTimes ? {
+        duration: 60,
+        morning_from: '10:00', morning_to: '12:00', morning_amount: 1,
+        afternoon_from: '12:00', afternoon_to: '18:00', afternoon_amount: 2,
+        evening_from: '18:00', evening_to: '21:00', evening_amount: 0,
+      } : {};
+
+      const normalized = { ...defaults, ...form } as Partial<Page>;
+
+      // Validation for required fields (basic, client-side)
+      const required: (keyof Page)[] = [
+        'email','name','parent_name','description','gifts','date_from','date_to',
+        'morning_from','morning_to','morning_amount',
+        'afternoon_from','afternoon_to','afternoon_amount',
+        'evening_from','evening_to','evening_amount',
+        'duration'
+      ];
+
+      // Minimal validation: if evening_amount is 0, we still require from/to but we set a sane default if missing
+      const ensureTimeWindow = (fromKey: keyof Page, toKey: keyof Page, amountKey: keyof Page, fallbackFrom: string, fallbackTo: string) => {
+        const amt = normalized[amountKey] as unknown as number | undefined;
+        if (amt === undefined || amt === null) (normalized as any)[amountKey] = 0;
+        if (!(normalized as any)[fromKey]) (normalized as any)[fromKey] = fallbackFrom;
+        if (!(normalized as any)[toKey]) (normalized as any)[toKey] = fallbackTo;
+      };
+
+      ensureTimeWindow('morning_from','morning_to','morning_amount','10:00','12:00');
+      ensureTimeWindow('afternoon_from','afternoon_to','afternoon_amount','12:00','18:00');
+      ensureTimeWindow('evening_from','evening_to','evening_amount','18:00','21:00');
+
+      // Basic required checks
+      for (const k of required) {
+        if ((normalized as any)[k] === undefined || (normalized as any)[k] === null || (typeof (normalized as any)[k] === 'string' && (normalized as any)[k].trim() === '')) {
+          // For now, fail early; in a real UI we’d show messages.
+          alert('Veld ontbreekt: ' + String(k));
+          return;
+        }
+      }
+
+      const pagePayload: Page = {
+        reference: normalized.reference || genRef(),
+        manage_token: normalized.manage_token || genToken(),
+        email: normalized.email as string,
+        name: normalized.name as string,
+        parent_name: normalized.parent_name as string,
+        description: normalized.description as string,
+        gifts: normalized.gifts as string,
+        date_from: normalized.date_from as string,
+        date_to: normalized.date_to as string,
+        morning_from: normalized.morning_from as string,
+        morning_to: normalized.morning_to as string,
+        morning_amount: normalized.morning_amount as number,
+        afternoon_from: normalized.afternoon_from as string,
+        afternoon_to: normalized.afternoon_to as string,
+        afternoon_amount: normalized.afternoon_amount as number,
+        evening_from: normalized.evening_from as string,
+        evening_to: normalized.evening_to as string,
+        evening_amount: normalized.evening_amount as number,
+        duration: (normalized.duration as number) ?? 60,
+        date_of_birth: normalized.date_of_birth ?? null,
+        street: normalized.street ?? null,
+        postalcode: normalized.postalcode ?? null,
+        city: normalized.city ?? null,
+        slots: [],
+      };
+
+      startTransition(async () => {
+        await savePage(pagePayload);
+      });
+    };
 
   const toTimeValue = (value?: string | null) =>
     value ? new Date(`1970-01-01T${value}`) : undefined;

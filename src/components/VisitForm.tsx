@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { addVisit } from '@/services/pageService';
-import { Visit } from "@/lib/types"
+import { Slot } from "@/lib/types"
 
 interface Props {
   reference: string;
@@ -12,7 +12,7 @@ interface Props {
   selected?: { date: string | null; time: string | null };
 }
 
-type FormState = Partial<Omit<Visit, 'duration'>>;
+type FormState = Partial<Omit<Slot, 'duration'>>;
 
 export default function VisitForm({ reference, selected }: Props) {
   const [form, setForm] = useState<FormState>({});
@@ -24,7 +24,7 @@ export default function VisitForm({ reference, selected }: Props) {
   const canSubmit = Boolean((selected?.date && selected?.time) || (form.date && form.time)) && Boolean(form.name);
 
   const submit = async () => {
-    const payload: Omit<Visit, 'duration'> = {
+    const payload: Omit<Slot, 'duration' | 'state'> = {
       name: form.name as string,
       date: (selected?.date || form.date) as string,
       time: (selected?.time || form.time) as string,

@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import CalendarView from '@/components/CalendarView';
 import VisitForm from '@/components/VisitForm';
-import { CalendarDTO } from "@/lib/types"
+import { Calendar } from "@/lib/types"
 
 interface Props {
-  calendar: CalendarDTO;
+  calendar: Calendar;
   reference: string;
 }
 

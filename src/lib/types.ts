@@ -1,43 +1,42 @@
 export type SlotState = 'disabled' | 'taken' | 'full' | 'available';
 
-export interface CalendarDTO {
+export interface Calendar {
   dates: string[];
   times: string[];
-  states: Record<string, Record<string, SlotState>>; // states[date][time]
+  states: Record<string, Record<string, SlotState>>;
 }
 
-export interface Visit {
+export interface Slot {
   date: string;
   time: string;
   name: string;
   duration: number;
+  state: 'disabled' | 'taken';
 }
 
 export interface Page {
   reference: string;
-  email?: string;
-  name?: string;
-  date_of_birth?: string;
-  parent_name?: string;
-  street?: string;
-  postalcode?: string;
-  city?: string;
-  description?: string;
-  gifts?: string;
-  contact?: string;
-  date_from?: string;
-  date_to?: string | null;
-  morning_from?: string | null;
-  morning_to?: string | null;
-  morning_amount?: number | null;
-  afternoon_from?: string | null;
-  afternoon_to?: string | null;
-  afternoon_amount?: number | null;
-  evening_from?: string | null;
-  evening_to?: string | null;
-  evening_amount?: number | null;
-  duration?: number | null;
-  visits?: string | null;
-  manage_token?: string;
-  prepare?: boolean;
+  email: string;
+  name: string;
+  date_of_birth: string | null;
+  parent_name: string;
+  street: string | null;
+  postalcode: string | null;
+  city: string | null;
+  description: string;
+  gifts: string;
+  date_from: string;
+  date_to: string;
+  morning_from: string;
+  morning_to: string;
+  morning_amount: number;
+  afternoon_from: string;
+  afternoon_to: string;
+  afternoon_amount: number;
+  evening_from: string;
+  evening_to: string;
+  evening_amount: number;
+  duration: number;
+  slots: Slot[];
+  manage_token: string;
 }

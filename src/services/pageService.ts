@@ -2,7 +2,7 @@
 
 import { GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { db } from '@/lib/dynamodb';
-import { Page, Visit } from "@/lib/types"
+import { Page, Slot } from "@/lib/types"
 
 const TABLE_NAME = 'VisitingHoursPage';
 
@@ -10,7 +10,17 @@ export async function getPage(reference: string): Promise<Page | null> {
   const res = await db.send(
     new GetCommand({ TableName: TABLE_NAME, Key: { reference } })
   );
-  return (res.Item as Page) || null;
+  const raw = res.Item as Record<string, unknown> | undefined;
+  if (!raw) return null;
+  // Backward-compat: migrate JSON-string visits to Document list on read
+  if (typeof raw.visits === 'string') {
+    try {
+      raw.visits = JSON.parse(raw.visits);
+    } catch {
+      raw.visits = [];
+    }
+  }
+  return raw as unknown as Page;
 }
 
 export async function savePage(page: Page): Promise<void> {
@@ -19,19 +29,19 @@ export async function savePage(page: Page): Promise<void> {
 
 export async function addVisit(
   reference: string,
-  visit: Omit<Visit, 'duration'>
-): Promise<Visit | null> {
+  visit: Omit<Slot, 'duration' | 'state'>
+): Promise<Slot | null> {
   const page = await getPage(reference);
   if (!page || !page.duration) return null;
-  const visits: Visit[] = page.visits ? JSON.parse(page.visits) : [];
-  const newVisit: Visit = { ...visit, duration: page.duration };
+  const visits: Slot[] = page.slots ?? [];
+  const newVisit: Slot = { ...visit, duration: page.duration, state: 'taken' };
   visits.push(newVisit);
   await db.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: { reference },
       UpdateExpression: 'SET visits = :v',
-      ExpressionAttributeValues: { ':v': JSON.stringify(visits) },
+      ExpressionAttributeValues: { ':v': visits },
     })
   );
   return newVisit;
