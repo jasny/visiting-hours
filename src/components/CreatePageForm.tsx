@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -8,10 +8,13 @@ import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputNumber } from 'primereact/inputnumber';
+import { Toast } from 'primereact/toast';
 import { Baby, MapPinIcon, CalendarDays, Settings, Clock, Info } from 'lucide-react';
 import { savePage } from '@/services/pageService';
 import { Page } from "@/lib/types";
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
 
 // Keep same shape as before but managed by react-hook-form
 type FormState = Partial<Page>;
@@ -23,14 +26,15 @@ const fromTimeValue = (date: Date | null | undefined) =>
   date ? date.toTimeString().slice(0, 5) : null;
 
 export default function CreatePageForm() {
-  const [pending, startTransition] = useTransition();
+  const router = useRouter();
+  const toast = useRef<Toast | null>(null);
 
   const [showAddress, setShowAddress] = useState(false);
   const [customTimes, setCustomTimes] = useState(false);
   const [durationHours, setDurationHours] = useState(1);
   const [durationMinutes, setDurationMinutes] = useState(0);
 
-  const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormState>({
+  const { control, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormState>({
     defaultValues: {
       name: '',
       parent_name: '',
@@ -123,9 +127,11 @@ export default function CreatePageForm() {
       slots: [],
     };
 
-    startTransition(async () => {
-      await savePage(pagePayload);
-    });
+    await savePage(pagePayload);
+    toast.current?.show({ severity: 'success', summary: 'Pagina succesvol aangemaakt', life: 2000 });
+    setTimeout(() => {
+      router.push(`/page/${pagePayload.reference}`);
+    }, 800);
   };
 
   // Helpers for error UI
@@ -134,6 +140,7 @@ export default function CreatePageForm() {
 
   return (
     <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
+      <Toast ref={toast} />
       {/* Baby & ouder informatie */}
       <Card title={
         <div className="flex items-center gap-4 mb-6">
@@ -684,7 +691,7 @@ export default function CreatePageForm() {
       <Button
         label="Pagina aanmaken"
         type="submit"
-        loading={pending}
+        loading={isSubmitting}
         className="mt-2 w-full"
       />
     </form>
