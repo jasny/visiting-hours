@@ -124,7 +124,7 @@ export default function Home() {
                   Hoe zit het met mijn privacy?
                 </h3>
                 <p className="text-gray-600 font-light">
-                  Alle gegevens en foto&apos;s zijn alleen zichtbaar via de unieke link die je deelt. We delen niets met derden en verwijderen alle gegevens uiterlijk 90 dagen na de geboortedatum.{' '}
+                  Alle gegevens en foto&apos;s zijn alleen zichtbaar via de unieke link die je deelt. We delen niets met derden en verwijderen alle gegevens uiterlijk 90 dagen na de kraamperiode.{' '}
                   <a href="/privacy" className="underline">
                     Lees onze privacyverklaring
                   </a>

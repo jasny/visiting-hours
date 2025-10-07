@@ -10,23 +10,19 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { InputNumber } from 'primereact/inputnumber';
 import { Baby, MapPinIcon, CalendarDays, Settings, Clock, Info } from 'lucide-react';
 import { savePage } from '@/services/pageService';
-import { Page } from "@/lib/types"
+import { Page } from "@/lib/types";
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 
+// Keep same shape as before but managed by react-hook-form
 type FormState = Partial<Page>;
 
+const toTimeValue = (value?: string | null) =>
+  value ? new Date(`1970-01-01T${value}`) : undefined;
+
+const fromTimeValue = (date: Date | null | undefined) =>
+  date ? date.toTimeString().slice(0, 5) : null;
+
 export default function CreatePageForm() {
-  const [form, setForm] = useState<FormState>({
-    duration: 60,
-    morning_from: '10:00',
-    morning_to: '12:00',
-    morning_amount: 1,
-    afternoon_from: '12:00',
-    afternoon_to: '18:00',
-    afternoon_amount: 2,
-    evening_from: '18:00',
-    evening_to: '00:00',
-    evening_amount: 0,
-  });
   const [pending, startTransition] = useTransition();
 
   const [showAddress, setShowAddress] = useState(false);
@@ -34,99 +30,110 @@ export default function CreatePageForm() {
   const [durationHours, setDurationHours] = useState(1);
   const [durationMinutes, setDurationMinutes] = useState(0);
 
+  const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormState>({
+    defaultValues: {
+      name: '',
+      parent_name: '',
+      email: '',
+      description: '',
+      gifts: '',
+      date_from: undefined,
+      date_to: undefined,
+      date_of_birth: null,
+      street: '',
+      postalcode: '',
+      city: '',
+      duration: 60,
+      morning_from: '10:00',
+      morning_to: '12:00',
+      morning_amount: 1,
+      afternoon_from: '12:00',
+      afternoon_to: '18:00',
+      afternoon_amount: 2,
+      evening_from: '18:00',
+      evening_to: '21:00',
+      evening_amount: 0,
+    }
+  });
+
+  // keep duration in minutes in the form and update via hours/minutes controls
   useEffect(() => {
-    setForm((f) => ({ ...f, duration: durationHours * 60 + durationMinutes }));
-  }, [durationHours, durationMinutes]);
+    setValue('duration', durationHours * 60 + durationMinutes);
+  }, [durationHours, durationMinutes, setValue]);
 
-  const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
-    setForm((f) => ({ ...f, [key]: value }));
-  };
+  // Convenience watches for conditional rendering
+  const morning_amount = watch('morning_amount');
+  const afternoon_amount = watch('afternoon_amount');
+  const evening_amount = watch('evening_amount');
 
-  const submit = async () => {
-      // Build a complete Page object according to the Page type. Enforce required fields.
-      const genRef = () => Math.random().toString(36).slice(2, 10);
-      const genToken = () => Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  const onSubmit: SubmitHandler<FormState> = async (data) => {
+    const genRef = () => Math.random().toString(36).slice(2, 10);
+    const genToken = () => Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
 
-      // Derive defaults for non-custom times (standard calendar)
-      const defaults = !customTimes ? {
-        duration: 60,
-        morning_from: '10:00', morning_to: '12:00', morning_amount: 1,
-        afternoon_from: '12:00', afternoon_to: '18:00', afternoon_amount: 2,
-        evening_from: '18:00', evening_to: '21:00', evening_amount: 0,
-      } : {};
+    const defaults = !customTimes ? {
+      duration: 60,
+      morning_from: '10:00', morning_to: '12:00', morning_amount: 1,
+      afternoon_from: '12:00', afternoon_to: '18:00', afternoon_amount: 2,
+      evening_from: '18:00', evening_to: '21:00', evening_amount: 0,
+    } : {};
 
-      const normalized = { ...defaults, ...form } as Partial<Page>;
+    const normalized = { ...defaults, ...data } as Partial<Page>;
 
-      // Validation for required fields (basic, client-side)
-      const required: (keyof Page)[] = [
-        'email','name','parent_name','description','gifts','date_from','date_to',
-        'morning_from','morning_to','morning_amount',
-        'afternoon_from','afternoon_to','afternoon_amount',
-        'evening_from','evening_to','evening_amount',
-        'duration'
-      ];
-
-      // Minimal validation: if evening_amount is 0, we still require from/to but we set a sane default if missing
-      const ensureTimeWindow = (fromKey: keyof Page, toKey: keyof Page, amountKey: keyof Page, fallbackFrom: string, fallbackTo: string) => {
-        const amt = normalized[amountKey] as unknown as number | undefined;
-        if (amt === undefined || amt === null) (normalized as any)[amountKey] = 0;
-        if (!(normalized as any)[fromKey]) (normalized as any)[fromKey] = fallbackFrom;
-        if (!(normalized as any)[toKey]) (normalized as any)[toKey] = fallbackTo;
-      };
-
-      ensureTimeWindow('morning_from','morning_to','morning_amount','10:00','12:00');
-      ensureTimeWindow('afternoon_from','afternoon_to','afternoon_amount','12:00','18:00');
-      ensureTimeWindow('evening_from','evening_to','evening_amount','18:00','21:00');
-
-      // Basic required checks
-      for (const k of required) {
-        if ((normalized as any)[k] === undefined || (normalized as any)[k] === null || (typeof (normalized as any)[k] === 'string' && (normalized as any)[k].trim() === '')) {
-          // For now, fail early; in a real UI we’d show messages.
-          alert('Veld ontbreekt: ' + String(k));
-          return;
-        }
-      }
-
-      const pagePayload: Page = {
-        reference: normalized.reference || genRef(),
-        manage_token: normalized.manage_token || genToken(),
-        email: normalized.email as string,
-        name: normalized.name as string,
-        parent_name: normalized.parent_name as string,
-        description: normalized.description as string,
-        gifts: normalized.gifts as string,
-        date_from: normalized.date_from as string,
-        date_to: normalized.date_to as string,
-        morning_from: normalized.morning_from as string,
-        morning_to: normalized.morning_to as string,
-        morning_amount: normalized.morning_amount as number,
-        afternoon_from: normalized.afternoon_from as string,
-        afternoon_to: normalized.afternoon_to as string,
-        afternoon_amount: normalized.afternoon_amount as number,
-        evening_from: normalized.evening_from as string,
-        evening_to: normalized.evening_to as string,
-        evening_amount: normalized.evening_amount as number,
-        duration: (normalized.duration as number) ?? 60,
-        date_of_birth: normalized.date_of_birth ?? null,
-        street: normalized.street ?? null,
-        postalcode: normalized.postalcode ?? null,
-        city: normalized.city ?? null,
-        slots: [],
-      };
-
-      startTransition(async () => {
-        await savePage(pagePayload);
-      });
+    const ensureTimeWindow = (
+      fromKey: 'morning_from' | 'afternoon_from' | 'evening_from',
+      toKey: 'morning_to' | 'afternoon_to' | 'evening_to',
+      amountKey: 'morning_amount' | 'afternoon_amount' | 'evening_amount',
+      fallbackFrom: string,
+      fallbackTo: string
+    ) => {
+      const amt = normalized[amountKey];
+      if (amt === undefined || amt === null) normalized[amountKey] = 0;
+      if (!normalized[fromKey]) normalized[fromKey] = fallbackFrom;
+      if (!normalized[toKey]) normalized[toKey] = fallbackTo;
     };
 
-  const toTimeValue = (value?: string | null) =>
-    value ? new Date(`1970-01-01T${value}`) : undefined;
+    ensureTimeWindow('morning_from','morning_to','morning_amount','10:00','12:00');
+    ensureTimeWindow('afternoon_from','afternoon_to','afternoon_amount','12:00','18:00');
+    ensureTimeWindow('evening_from','evening_to','evening_amount','18:00','21:00');
 
-  const fromTimeValue = (date: Date | null | undefined) =>
-    date ? date.toTimeString().slice(0, 5) : null;
+    const pagePayload: Page = {
+      reference: normalized.reference || genRef(),
+      manage_token: normalized.manage_token || genToken(),
+      email: normalized.email as string,
+      name: normalized.name as string,
+      parent_name: normalized.parent_name as string,
+      description: normalized.description as string,
+      gifts: normalized.gifts as string,
+      date_from: normalized.date_from as string,
+      date_to: normalized.date_to as string,
+      morning_from: normalized.morning_from as string,
+      morning_to: normalized.morning_to as string,
+      morning_amount: normalized.morning_amount as number,
+      afternoon_from: normalized.afternoon_from as string,
+      afternoon_to: normalized.afternoon_to as string,
+      afternoon_amount: normalized.afternoon_amount as number,
+      evening_from: normalized.evening_from as string,
+      evening_to: normalized.evening_to as string,
+      evening_amount: normalized.evening_amount as number,
+      duration: (normalized.duration as number) ?? 60,
+      date_of_birth: normalized.date_of_birth ?? null,
+      street: normalized.street ?? null,
+      postalcode: normalized.postalcode ?? null,
+      city: normalized.city ?? null,
+      slots: [],
+    };
+
+    startTransition(async () => {
+      await savePage(pagePayload);
+    });
+  };
+
+  // Helpers for error UI
+  const invalid = (key: keyof FormState) => errors[key] ? 'p-invalid' : '';
+  const errorText = (key: keyof FormState) => errors[key]?.message as string | undefined;
 
   return (
-    <div className="flex flex-col gap-6">
+    <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
       {/* Baby & ouder informatie */}
       <Card title={
         <div className="flex items-center gap-4 mb-6">
@@ -144,71 +151,89 @@ export default function CreatePageForm() {
             <label htmlFor="name" className="text-sm font-medium text-rose-700">
               Wat is de naam van de baby?
             </label>
-            <InputText
-              id="name"
-              value={form.name || ''}
-              className="p-inputtext-sm"
-              onChange={(e) => update('name', e.target.value)}
+            <Controller
+              name="name"
+              control={control}
+              rules={{ required: 'Vereist' }}
+              render={({ field }) => (
+                <InputText id="name" {...field} className={`p-inputtext-sm ${invalid('name')}`} />
+              )}
             />
+            {errorText('name') && <small className="p-error">{errorText('name')}</small>}
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="date_of_birth" className="text-sm font-medium text-rose-700">
               Wanneer is de baby geboren?
             </label>
-            <Calendar
-              id="date_of_birth"
-              value={form.date_of_birth ? new Date(form.date_of_birth) : undefined}
-              onChange={(e) => update('date_of_birth', e.value?.toISOString() ?? undefined)}
-              dateFormat="dd-mm-yy"
-              className="p-inputtext-sm"
+            <Controller
+              name="date_of_birth"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Calendar
+                  id="date_of_birth"
+                  value={value ? new Date(value) : undefined}
+                  onChange={(e) => onChange(e.value ? (e.value as Date).toISOString() : null)}
+                  dateFormat="dd-mm-yy"
+                  className="p-inputtext-sm"
+                />
+              )}
             />
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="parent_name" className="text-sm font-medium text-rose-700">
               Wat is jouw/jullie naam?
             </label>
-            <InputText
-              id="parent_name"
-              value={form.parent_name || ''}
-              onChange={(e) => update('parent_name', e.target.value)}
-              className="p-inputtext-sm"
+            <Controller
+              name="parent_name"
+              control={control}
+              rules={{ required: 'Vereist' }}
+              render={({ field }) => (
+                <InputText id="parent_name" {...field} className={`p-inputtext-sm ${invalid('parent_name')}`} />
+              )}
             />
+            {errorText('parent_name') && <small className="p-error">{errorText('parent_name')}</small>}
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="email" className="text-sm font-medium text-rose-700">
               Wat is jouw e-mailadres?
             </label>
-            <InputText
-              id="email"
-              value={form.email || ''}
-              onChange={(e) => update('email', e.target.value)}
-              className="p-inputtext-sm"
+            <Controller
+              name="email"
+              control={control}
+              rules={{ required: 'Vereist', pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Ongeldig e-mailadres' } }}
+              render={({ field }) => (
+                <InputText id="email" {...field} className={`p-inputtext-sm ${invalid('email')}`} />
+              )}
             />
+            {errorText('email') && <small className="p-error">{errorText('email')}</small>}
           </div>
           <div className="flex flex-col gap-1 md:col-span-2 mt-8">
             <label htmlFor="description" className="text-sm font-medium text-rose-700">
               Wat wil je vertellen aan het bezoek?
             </label>
-            <InputTextarea
-              id="description"
-              value={form.description || ''}
-              onChange={(e) => update('description', e.target.value)}
-              rows={3}
-              className="p-inputtext-sm"
-              placeholder="We zijn zo dankbaar en gelukkig om ons kleine wonder met jullie te mogen delen..."
+            <Controller
+              name="description"
+              control={control}
+              rules={{ required: 'Vereist' }}
+              render={({ field }) => (
+                <InputTextarea id="description" {...field} rows={3} className={`p-inputtext-sm ${invalid('description')}`} placeholder="We zijn zo dankbaar en gelukkig om ons kleine wonder met jullie te mogen delen..." />
+              )}
             />
+            {errorText('description') && <small className="p-error">{errorText('description')}</small>}
           </div>
           <div className="flex flex-col gap-1 md:col-span-2">
             <label htmlFor="gifts" className="text-sm font-medium text-rose-700">
               Wat zijn de wensen voor kraamcadeautjes? <span className="text-gray-500 font-normal">(optioneel)</span>
             </label>
-            <InputTextarea
-              id="gifts"
-              value={form.gifts || ''}
-              onChange={(e) => update('gifts', e.target.value)}
-              rows={3}
-              className="p-inputtext-sm"
+            <Controller
+              name="gifts"
+              control={control}
+              rules={{ required: 'Vereist' }}
+              render={({ field }) => (
+                <InputTextarea id="gifts" {...field} rows={3} className={`p-inputtext-sm ${invalid('gifts')}`} />
+              )}
             />
+            {errorText('gifts') && <small className="p-error">{errorText('gifts')}</small>}
           </div>
         </div>
       </Card>
@@ -240,34 +265,43 @@ export default function CreatePageForm() {
               <label htmlFor="street" className="text-sm font-medium text-rose-700">
                 Straat en huisnummer
               </label>
-              <InputText
-                id="street"
-                value={form.street || ''}
-                onChange={(e) => update('street', e.target.value)}
-                className="p-inputtext-sm"
+              <Controller
+                name="street"
+                control={control}
+                rules={{ required: showAddress ? 'Vereist' : false }}
+                render={({ field }) => (
+                  <InputText id="street" {...field} className={`p-inputtext-sm ${invalid('street')}`} />
+                )}
               />
+              {errorText('street') && <small className="p-error">{errorText('street')}</small>}
             </div>
             <div className="flex flex-col gap-1">
               <label htmlFor="postalcode" className="text-sm font-medium text-rose-700">
                 Postcode
               </label>
-              <InputText
-                id="postalcode"
-                value={form.postalcode || ''}
-                onChange={(e) => update('postalcode', e.target.value)}
-                className="p-inputtext-sm"
+              <Controller
+                name="postalcode"
+                control={control}
+                rules={{ required: showAddress ? 'Vereist' : false }}
+                render={({ field }) => (
+                  <InputText id="postalcode" {...field} className={`p-inputtext-sm ${invalid('postalcode')}`} />
+                )}
               />
+              {errorText('postalcode') && <small className="p-error">{errorText('postalcode')}</small>}
             </div>
             <div className="flex flex-col gap-1 md:col-span-3">
               <label htmlFor="city" className="text-sm font-medium text-rose-700">
                 Woonplaats
               </label>
-              <InputText
-                id="city"
-                value={form.city || ''}
-                onChange={(e) => update('city', e.target.value)}
-                className="p-inputtext-sm"
+              <Controller
+                name="city"
+                control={control}
+                rules={{ required: showAddress ? 'Vereist' : false }}
+                render={({ field }) => (
+                  <InputText id="city" {...field} className={`p-inputtext-sm ${invalid('city')}`} />
+                )}
               />
+              {errorText('city') && <small className="p-error">{errorText('city')}</small>}
             </div>
           </div>
         )}
@@ -290,25 +324,41 @@ export default function CreatePageForm() {
             <label htmlFor="date_from" className="text-sm font-medium text-rose-700">
               Periode kraambezoek van
             </label>
-            <Calendar
-              id="date_from"
-              value={form.date_from ? new Date(form.date_from) : undefined}
-              onChange={(e) => update('date_from', e.value?.toISOString())}
-              dateFormat="dd-mm-yy"
-              className="p-inputtext-sm"
+            <Controller
+              name="date_from"
+              control={control}
+              rules={{ required: 'Vereist' }}
+              render={({ field: { value, onChange } }) => (
+                <Calendar
+                  id="date_from"
+                  value={value ? new Date(value) : undefined}
+                  onChange={(e) => onChange((e.value as Date | undefined)?.toISOString())}
+                  dateFormat="dd-mm-yy"
+                  className={`p-inputtext-sm ${invalid('date_from')}`}
+                />
+              )}
             />
+            {errorText('date_from') && <small className="p-error">{errorText('date_from')}</small>}
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="date_to" className="text-sm font-medium text-rose-700">
               Tot
             </label>
-            <Calendar
-              id="date_to"
-              value={form.date_to ? new Date(form.date_to) : undefined}
-              onChange={(e) => update('date_to', e.value?.toISOString())}
-              dateFormat="dd-mm-yy"
-              className="p-inputtext-sm"
+            <Controller
+              name="date_to"
+              control={control}
+              rules={{ required: 'Vereist' }}
+              render={({ field: { value, onChange } }) => (
+                <Calendar
+                  id="date_to"
+                  value={value ? new Date(value) : undefined}
+                  onChange={(e) => onChange((e.value as Date | undefined)?.toISOString())}
+                  dateFormat="dd-mm-yy"
+                  className={`p-inputtext-sm ${invalid('date_to')}`}
+                />
+              )}
             />
+            {errorText('date_to') && <small className="p-error">{errorText('date_to')}</small>}
           </div>
         </div>
       </Card>
@@ -384,64 +434,72 @@ export default function CreatePageForm() {
               <span className="text-sm text-rose-700">
                 Voor de ochtend kraam bezoek ontvangen?
               </span>
-              <InputSwitch
-                checked={(form.morning_amount || 0) > 0}
-                onChange={(e) => {
-                  const on = e.value;
-                  setForm(f => {
-                    if (on) {
-                      return { ...f, morning_amount: 1, morning_from: f.morning_from || '10:00', morning_to: f.morning_to || '12:00' };
-                    }
-                    return { ...f, morning_amount: 0 };
-                  });
-                }}
+              <Controller
+                name="morning_amount"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <InputSwitch
+                    checked={(value || 0) > 0}
+                    onChange={(e) => onChange(e.value ? 1 : 0)}
+                  />
+                )}
               />
             </div>
-            {(form.morning_amount || 0) > 0 && (
+            {(morning_amount || 0) > 0 && (
               <div className="grid md:grid-cols-3 gap-4 pt-4 pl-4 border-l-2 border-rose-100" style={{ marginTop: '-15px' }}>
                 <div className="flex flex-col gap-1">
                   <label htmlFor="morning_from" className="text-sm font-medium text-rose-700">
                     Ochtend van
                   </label>
-                  <Calendar
-                    id="morning_from"
-                    value={toTimeValue(form.morning_from)}
-                    onChange={(e) =>
-                      update('morning_from', fromTimeValue(e.value))
-                    }
-                    timeOnly
-                    stepMinute={15}
-                    hourFormat="24"
-                    className="p-inputtext-sm"
+                  <Controller
+                    name="morning_from"
+                    control={control}
+                    rules={{ required: 'Vereist' }}
+                    render={({ field: { value, onChange } }) => (
+                      <Calendar
+                        id="morning_from"
+                        value={toTimeValue(value)}
+                        onChange={(e) => onChange(fromTimeValue(e.value))}
+                        timeOnly
+                        stepMinute={15}
+                        hourFormat="24"
+                        className={`p-inputtext-sm ${invalid('morning_from')}`}
+                      />
+                    )}
                   />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label htmlFor="morning_to" className="text-sm font-medium text-rose-700">
                     Ochtend tot
                   </label>
-                  <Calendar
-                    id="morning_to"
-                    value={toTimeValue(form.morning_to)}
-                    onChange={(e) =>
-                      update('morning_to', fromTimeValue(e.value))
-                    }
-                    timeOnly
-                    stepMinute={15}
-                    hourFormat="24"
-                    className="p-inputtext-sm"
+                  <Controller
+                    name="morning_to"
+                    control={control}
+                    rules={{ required: 'Vereist' }}
+                    render={({ field: { value, onChange } }) => (
+                      <Calendar
+                        id="morning_to"
+                        value={toTimeValue(value)}
+                        onChange={(e) => onChange(fromTimeValue(e.value))}
+                        timeOnly
+                        stepMinute={15}
+                        hourFormat="24"
+                        className={`p-inputtext-sm ${invalid('morning_to')}`}
+                      />
+                    )}
                   />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label htmlFor="morning_amount" className="text-sm font-medium text-rose-700">
                     Max bezoeken
                   </label>
-                  <InputNumber
-                    id="morning_amount"
-                    value={form.morning_amount || undefined}
-                    onValueChange={(e) =>
-                      update('morning_amount', e.value ?? null)
-                    }
-                    className="p-inputtext-sm"
+                  <Controller
+                    name="morning_amount"
+                    control={control}
+                    rules={{ required: 'Vereist', min: { value: 1, message: 'Min 1' } }}
+                    render={({ field: { value, onChange } }) => (
+                      <InputNumber id="morning_amount" value={value ?? undefined} onValueChange={(e) => onChange(e.value ?? null)} className={`p-inputtext-sm ${invalid('morning_amount')}`} />
+                    )}
                   />
                 </div>
               </div>
@@ -451,20 +509,18 @@ export default function CreatePageForm() {
               <span className="text-sm text-rose-700">
                 Voor de middag bezoek ontvangen?
               </span>
-              <InputSwitch
-                checked={(form.afternoon_amount || 0) > 0}
-                onChange={(e) => {
-                  const on = e.value;
-                  setForm(f => {
-                    if (on) {
-                      return { ...f, afternoon_amount: 2, afternoon_from: f.afternoon_from || '12:00', afternoon_to: f.afternoon_to || '18:00' };
-                    }
-                    return { ...f, afternoon_amount: 0 };
-                  });
-                }}
+              <Controller
+                name="afternoon_amount"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <InputSwitch
+                    checked={(value || 0) > 0}
+                    onChange={(e) => onChange(e.value ? 2 : 0)}
+                  />
+                )}
               />
             </div>
-            {(form.afternoon_amount || 0) > 0 && (
+            {(afternoon_amount || 0) > 0 && (
               <div className="grid md:grid-cols-3 gap-4 pt-4 pl-4 border-l-2 border-rose-100" style={{ marginTop: '-15px' }}>
                 <div className="flex flex-col gap-1">
                   <label
@@ -473,16 +529,21 @@ export default function CreatePageForm() {
                   >
                     Middag van
                   </label>
-                  <Calendar
-                    id="afternoon_from"
-                    value={toTimeValue(form.afternoon_from)}
-                    onChange={(e) =>
-                      update('afternoon_from', fromTimeValue(e.value))
-                    }
-                    timeOnly
-                    stepMinute={15}
-                    hourFormat="24"
-                    className="p-inputtext-sm"
+                  <Controller
+                    name="afternoon_from"
+                    control={control}
+                    rules={{ required: 'Vereist' }}
+                    render={({ field: { value, onChange } }) => (
+                      <Calendar
+                        id="afternoon_from"
+                        value={toTimeValue(value)}
+                        onChange={(e) => onChange(fromTimeValue(e.value))}
+                        timeOnly
+                        stepMinute={15}
+                        hourFormat="24"
+                        className={`p-inputtext-sm ${invalid('afternoon_from')}`}
+                      />
+                    )}
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -492,16 +553,21 @@ export default function CreatePageForm() {
                   >
                     Middag tot
                   </label>
-                  <Calendar
-                    id="afternoon_to"
-                    value={toTimeValue(form.afternoon_to)}
-                    onChange={(e) =>
-                      update('afternoon_to', fromTimeValue(e.value))
-                    }
-                    timeOnly
-                    stepMinute={15}
-                    hourFormat="24"
-                    className="p-inputtext-sm"
+                  <Controller
+                    name="afternoon_to"
+                    control={control}
+                    rules={{ required: 'Vereist' }}
+                    render={({ field: { value, onChange } }) => (
+                      <Calendar
+                        id="afternoon_to"
+                        value={toTimeValue(value)}
+                        onChange={(e) => onChange(fromTimeValue(e.value))}
+                        timeOnly
+                        stepMinute={15}
+                        hourFormat="24"
+                        className={`p-inputtext-sm ${invalid('afternoon_to')}`}
+                      />
+                    )}
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -511,13 +577,13 @@ export default function CreatePageForm() {
                   >
                     Max bezoeken
                   </label>
-                  <InputNumber
-                    id="afternoon_amount"
-                    value={form.afternoon_amount || undefined}
-                    onValueChange={(e) =>
-                      update('afternoon_amount', e.value ?? null)
-                    }
-                    className="w-full p-inputtext-sm"
+                  <Controller
+                    name="afternoon_amount"
+                    control={control}
+                    rules={{ required: 'Vereist', min: { value: 1, message: 'Min 1' } }}
+                    render={({ field: { value, onChange } }) => (
+                      <InputNumber id="afternoon_amount" value={value ?? undefined} onValueChange={(e) => onChange(e.value ?? null)} className={`w-full p-inputtext-sm ${invalid('afternoon_amount')}`} />
+                    )}
                   />
                 </div>
               </div>
@@ -527,52 +593,60 @@ export default function CreatePageForm() {
               <span className="text-sm text-rose-700">
                 Voor de avond bezoek ontvangen?
               </span>
-              <InputSwitch
-                checked={(form.evening_amount || 0) > 0}
-                onChange={(e) => {
-                  const on = e.value;
-                  setForm(f => {
-                    if (on) {
-                      return { ...f, evening_amount: 1, evening_from: f.evening_from || '18:00', evening_to: f.evening_to || '21:00' };
-                    }
-                    return { ...f, evening_amount: 0 };
-                  });
-                }}
+              <Controller
+                name="evening_amount"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <InputSwitch
+                    checked={(value || 0) > 0}
+                    onChange={(e) => onChange(e.value ? 1 : 0)}
+                  />
+                )}
               />
             </div>
 
-            {(form.evening_amount || 0) > 0 && (
+            {(evening_amount || 0) > 0 && (
               <div className="grid md:grid-cols-3 gap-4 pt-4 pl-4 border-l-2 border-rose-100" style={{ marginTop: '-15px' }}>
                 <div className="flex flex-col gap-1">
                   <label htmlFor="evening_from" className="text-sm font-medium text-rose-700">
                     Avond van
                   </label>
-                  <Calendar
-                    id="evening_from"
-                    value={toTimeValue(form.evening_from)}
-                    onChange={(e) =>
-                      update('evening_from', fromTimeValue(e.value))
-                    }
-                    timeOnly
-                    stepMinute={15}
-                    hourFormat="24"
-                    className="w-full p-inputtext-sm"
+                  <Controller
+                    name="evening_from"
+                    control={control}
+                    rules={{ required: 'Vereist' }}
+                    render={({ field: { value, onChange } }) => (
+                      <Calendar
+                        id="evening_from"
+                        value={toTimeValue(value)}
+                        onChange={(e) => onChange(fromTimeValue(e.value))}
+                        timeOnly
+                        stepMinute={15}
+                        hourFormat="24"
+                        className={`w-full p-inputtext-sm ${invalid('evening_from')}`}
+                      />
+                    )}
                   />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label htmlFor="evening_to" className="text-sm font-medium text-rose-700">
                     Avond tot
                   </label>
-                  <Calendar
-                    id="evening_to"
-                    value={toTimeValue(form.evening_to)}
-                    onChange={(e) =>
-                      update('evening_to', fromTimeValue(e.value))
-                    }
-                    timeOnly
-                    stepMinute={15}
-                    hourFormat="24"
-                    className="w-full p-inputtext-sm"
+                  <Controller
+                    name="evening_to"
+                    control={control}
+                    rules={{ required: 'Vereist' }}
+                    render={({ field: { value, onChange } }) => (
+                      <Calendar
+                        id="evening_to"
+                        value={toTimeValue(value)}
+                        onChange={(e) => onChange(fromTimeValue(e.value))}
+                        timeOnly
+                        stepMinute={15}
+                        hourFormat="24"
+                        className={`w-full p-inputtext-sm ${invalid('evening_to')}`}
+                      />
+                    )}
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -582,13 +656,13 @@ export default function CreatePageForm() {
                   >
                     Max bezoeken
                   </label>
-                  <InputNumber
-                    id="evening_amount"
-                    value={form.evening_amount || undefined}
-                    onValueChange={(e) =>
-                      update('evening_amount', e.value ?? null)
-                    }
-                    className="w-full p-inputtext-sm"
+                  <Controller
+                    name="evening_amount"
+                    control={control}
+                    rules={{ required: 'Vereist', min: { value: 1, message: 'Min 1' } }}
+                    render={({ field: { value, onChange } }) => (
+                      <InputNumber id="evening_amount" value={value ?? undefined} onValueChange={(e) => onChange(e.value ?? null)} className={`w-full p-inputtext-sm ${invalid('evening_amount')}`} />
+                    )}
                   />
                 </div>
               </div>
@@ -609,11 +683,11 @@ export default function CreatePageForm() {
 
       <Button
         label="Pagina aanmaken"
-        onClick={submit}
+        type="submit"
         loading={pending}
         className="mt-2 w-full"
       />
-    </div>
+    </form>
   );
 }
 

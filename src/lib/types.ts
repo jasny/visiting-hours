@@ -11,7 +11,7 @@ export interface Slot {
   time: string;
   name: string;
   duration: number;
-  state: 'disabled' | 'taken';
+  state: SlotState;
 }
 
 export interface Page {

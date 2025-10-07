@@ -19,7 +19,7 @@ export default function NewbornVisitSection({ calendar, reference }: Props) {
   return (
     <div className="flex flex-col gap-2">
       <CalendarView calendar={calendar} onSelect={(date, time) => setSelected({ date, time })} />
-      <VisitForm reference={reference} selected={selected} />
+      <VisitForm reference={reference} selected={selected} calendarDates={[]} timeSlots={[]} />
     </div>
   );
 }
