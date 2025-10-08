@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { getPage } from '@/services/pageService';
 import PageInfo from '@/components/PageInfo';
 import { buildCalendar } from '@/lib/calendar';
-import NewbornVisitSection from '@/components/NewbornVisitSection';
+import VisitSection from '@/components/VisitSection';
 
 export default async function ShowPage({ params }: { params: Promise<{ reference: string }> }) {
   const { reference } = await params;
@@ -16,7 +16,7 @@ export default async function ShowPage({ params }: { params: Promise<{ reference
     <main className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-orange-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto flex flex-col gap-4">
         <PageInfo info={page} />
-        <NewbornVisitSection calendar={calendar} reference={page.reference} />
+        <VisitSection calendar={calendar} reference={page.reference} />
       </div>
     </main>
   );

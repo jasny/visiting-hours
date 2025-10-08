@@ -120,3 +120,19 @@ export function toDate(dateStr: string, hm: string) {
   const d = new Date(dateStr + 'T00:00:00');
   return setMinutes(setHours(d, h), m);
 }
+
+export function isTimeAvailable(cal: Calendar, date: string, timeHM: string): boolean {
+  const minDate = cal.dates[0];
+  const maxDate = cal.dates[cal.dates.length - 1] ?? minDate;
+  if (!minDate || date < minDate || date > maxDate) return false;
+
+  const now = new Date();
+  const nowDateStr = now.toISOString().slice(0, 10);
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  const nowHM = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+  return (date > nowDateStr || (date === nowDateStr && timeHM >= nowHM)) &&
+    isVisitingTime(cal, timeHM) &&
+    !isPeriodFull(cal, date, timeHM) &&
+    !getSlotVisit(cal, date, timeHM);
+}
