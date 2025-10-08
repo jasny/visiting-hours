@@ -129,14 +129,61 @@ function getSlotState(page: Page, visitingTimes: Record<string, { from: string; 
 
 export function buildCalendarDTO(page: Page): Calendar {
   const dates = computeDates(page);
-  const visitingTimes = computeVisitingTimes(page);
-  const times = Object.keys(computeTimeSlots(page, visitingTimes));
-  const states: Calendar['states'] = {};
-  for (const d of dates) {
-    states[d] = {};
-    for (const t of times) {
-      states[d][t] = getSlotState(page, visitingTimes, d, t);
-    }
+  const step = page.duration! < 30 ? 15 : 30;
+  const visits = getVisits(page);
+  const capacities: Calendar['capacities'] = {
+    morning: page.morning_amount,
+    afternoon: page.afternoon_amount,
+    evening: page.evening_amount,
+  };
+  // compute windows and drop periods with zero capacity (ignore dayparts with 0 visits)
+  const rawWindows = computeVisitingTimes(page) as Calendar['windows'];
+  const windows = Object.fromEntries(
+    Object.entries(rawWindows).filter(([key, vt]) => {
+      const cap = capacities[key as keyof Calendar['capacities']];
+      return !!vt && (cap === undefined || cap > 0);
+    })
+  ) as Calendar['windows'];
+  return { dates, step, windows, visits, capacities };
+}
+
+// DTO-based helpers (Option A)
+export function dtoIsVisitingTime(cal: Calendar, timeHM: string): boolean {
+  // ensure slot fits fully within at least one window
+  const timeTo = timeAddMinutes(timeHM, cal.step);
+  for (const vt of Object.values(cal.windows)) {
+    if (vt && timeHM >= vt.from && timeTo <= vt.to) return true;
   }
-  return { dates, times, states };
+  return false;
+}
+
+export function dtoGetSlotVisit(cal: Calendar, date: string, timeHM: string): Slot | null {
+  const [h, m] = timeHM.split(':').map(Number);
+  const formatted = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  for (const visit of cal.visits ?? []) {
+    const until = timeAddMinutes(visit.time, visit.duration);
+    if (visit.date === date && formatted >= visit.time && formatted < until) return visit;
+  }
+  return null;
+}
+
+export function dtoIsPeriodFull(cal: Calendar, date: string, timeHM: string): boolean {
+  // find which period the time belongs to
+  const period = (() => {
+    for (const [key, vt] of Object.entries(cal.windows)) {
+      if (vt && timeHM >= vt.from && timeHM <= vt.to) return key as keyof Calendar['capacities'];
+    }
+    return null;
+  })();
+  if (!period) return true;
+  const capacity = cal.capacities[period];
+  if (!capacity || capacity <= 0) return false;
+  let count = 0;
+  for (const visit of cal.visits ?? []) {
+    const vt = cal.windows[period];
+    if (!vt) continue;
+    if (visit.date !== date) continue;
+    if (visit.time >= vt.from && visit.time <= vt.to) count++;
+  }
+  return count >= capacity;
 }

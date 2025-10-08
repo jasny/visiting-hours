@@ -2,8 +2,10 @@ export type SlotState = 'disabled' | 'taken' | 'full' | 'available';
 
 export interface Calendar {
   dates: string[];
-  times: string[];
-  states: Record<string, Record<string, SlotState>>;
+  step: number; // slot minutes (e.g., 15 or 30)
+  windows: Partial<Record<'morning' | 'afternoon' | 'evening', { from: string; to: string }>>;
+  visits: Slot[];
+  capacities: Partial<Record<'morning' | 'afternoon' | 'evening', number>>;
 }
 
 export interface Slot {
