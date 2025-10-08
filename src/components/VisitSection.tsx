@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import CalendarView from '@/components/CalendarView';
 import VisitForm from '@/components/VisitForm';
-import { Calendar, Page } from "@/lib/types"
+import { Page } from "@/lib/types"
 import { buildCalendar } from "@/lib/calendar"
 
 interface Props {
@@ -11,11 +11,7 @@ interface Props {
 }
 
 export default function VisitSection({ page }: Props) {
-  const [calendar, setCalendar] = useState<Calendar>();
-
-  useEffect(() => {
-    setCalendar(buildCalendar(page));
-  }, [page, page.slots.length]);
+  const calendar = useMemo(() => buildCalendar(page), [page]);
 
   const [selected, setSelected] = useState<{ date: string | null; time: string | null }>({
     date: null,
