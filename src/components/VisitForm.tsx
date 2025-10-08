@@ -13,7 +13,7 @@ interface Props {
   reference: string;
   calendar: CalType;
   visible: boolean;
-  onClose: () => void;
+  onClose: (slot?: Slot) => void;
   selected?: { date: string | null; time: string | null };
 }
 
@@ -47,7 +47,7 @@ export default function VisitForm({ reference, calendar, visible, onClose, selec
     return null;
   }, [selected?.date, selected?.time]);
 
-  const { control, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
     defaultValues: { name: '', dateTime: defaultDate },
     mode: 'onChange',
   });
@@ -79,8 +79,8 @@ export default function VisitForm({ reference, calendar, visible, onClose, selec
       time: timeHM,
     };
     startTransition(async () => {
-      await addVisit(reference, payload);
-      onClose();
+      const slot = await addVisit(reference, payload);
+      onClose(slot);
     });
   };
 
@@ -98,7 +98,7 @@ export default function VisitForm({ reference, calendar, visible, onClose, selec
   );
 
   return (
-    <Dialog header="Bezoek plannen" visible={visible} onHide={onClose} style={{ width: '32rem' }} modal footer={footer}>
+    <Dialog header="Bezoek plannen" visible={visible} onHide={() => onClose()} style={{ width: '32rem' }} modal footer={footer}>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label htmlFor="datetime" className="block text-sm text-gray-700 mb-1">Gekozen datum en tijd</label>

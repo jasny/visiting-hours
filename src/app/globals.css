@@ -29,3 +29,51 @@ textarea::placeholder {
 .p-inputnumber.compact input {
   width: 120px;
 }
+
+.rbc-calendar {
+  background: #ffffff;
+  display: flex !important;
+
+  .rbc-header {
+    color: #111827;
+    background: #ffffff;
+    border-color: #e5e7eb;
+    font-weight: 600;
+  }
+
+  .rbc-time-gutter .rbc-timeslot-group,
+  .rbc-time-gutter .rbc-time-slot,
+  .rbc-label {
+    color: #374151;
+  }
+
+  .rbc-time-content > * + * > * {
+    border-color: #e5e7eb;
+  }
+
+  .rbc-time-content {
+    border-top-color: #e5e7eb;
+  }
+
+  .rbc-today {
+    background-color: inherit;
+  }
+
+  .rbc-event {
+    background-color: #e5e7eb;
+    color: #111827;
+    border: 1px solid #d1d5db;
+  }
+
+  .rbc-allday-cell {
+    display: none;
+  }
+
+  .rbc-day-slot .rbc-events-container {
+    margin: 0;
+  }
+
+  .timeslot-unavailable .rbc-event-label {
+    display: none;
+  }
+}

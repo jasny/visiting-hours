@@ -4,7 +4,7 @@ export interface Calendar {
   dates: string[];
   step: number; // slot minutes (e.g., 15 or 30)
   windows: Partial<Record<'morning' | 'afternoon' | 'evening', { from: string; to: string }>>;
-  visits: Slot[];
+  slots: Slot[];
   capacities: Partial<Record<'morning' | 'afternoon' | 'evening', number>>;
   duration: number; // minutes
 }

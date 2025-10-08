@@ -67,24 +67,23 @@ export function buildCalendar(page: Page): Calendar {
   ) as Calendar['windows'];
   const duration = page.duration;
 
-  return { dates, step, windows, visits, capacities, duration };
+  return { dates, step, windows, slots: visits, capacities, duration };
 }
 
-// DTO-based helpers (Option A)
-export function isVisitingTime(cal: Calendar, timeHM: string): boolean {
+export function isVisitingTime(cal: Calendar, timeHM: string, duration?: number): boolean {
   // ensure selection fits fully within at least one window using visit duration
-  const timeTo = timeAddMinutes(timeHM, cal.duration);
+  const timeTo = timeAddMinutes(timeHM, duration ?? cal.duration);
   for (const vt of Object.values(cal.windows)) {
     if (vt && timeHM >= vt.from && timeTo <= vt.to) return true;
   }
   return false;
 }
 
-export function getSlotVisit(cal: Calendar, date: string, timeHM: string): Slot | null {
+export function getSlotVisit(cal: Calendar, date: string, timeHM: string, duration?: number): Slot | null {
   const [h, m] = timeHM.split(':').map(Number);
   const startHM = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-  const endHM = timeAddMinutes(startHM, cal.duration);
-  for (const visit of cal.visits ?? []) {
+  const endHM = timeAddMinutes(startHM, duration ?? cal.duration);
+  for (const visit of cal.slots ?? []) {
     if (visit.date !== date) continue;
     const visitEnd = timeAddMinutes(visit.time, visit.duration);
     // overlap if not (proposed ends before existing starts OR proposed starts after existing ends)
@@ -106,7 +105,7 @@ export function isPeriodFull(cal: Calendar, date: string, timeHM: string): boole
   const capacity = cal.capacities[period];
   if (!capacity || capacity <= 0) return false;
   let count = 0;
-  for (const visit of cal.visits ?? []) {
+  for (const visit of cal.slots ?? []) {
     const vt = cal.windows[period];
     if (!vt) continue;
     if (visit.date !== date) continue;
@@ -121,7 +120,9 @@ export function toDate(dateStr: string, hm: string) {
   return setMinutes(setHours(d, h), m);
 }
 
-export function isTimeAvailable(cal: Calendar, date: string, timeHM: string): boolean {
+export function isTimeAvailable(cal: Calendar | Page, date: string, timeHM: string): boolean {
+  if (isPage(cal)) cal = buildCalendar(cal);
+
   const minDate = cal.dates[0];
   const maxDate = cal.dates[cal.dates.length - 1] ?? minDate;
   if (!minDate || date < minDate || date > maxDate) return false;
@@ -135,4 +136,8 @@ export function isTimeAvailable(cal: Calendar, date: string, timeHM: string): bo
     isVisitingTime(cal, timeHM) &&
     !isPeriodFull(cal, date, timeHM) &&
     !getSlotVisit(cal, date, timeHM);
+}
+
+function isPage(input: Calendar | Page): input is Page {
+  return 'reference' in input;
 }

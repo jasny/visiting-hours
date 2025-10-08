@@ -26,10 +26,6 @@ const localizer = dateFnsLocalizer({
 
 export default function CalendarView({ calendar, onSelect }: Props) {
   const dates = calendar.dates;
-  const [selected, setSelected] = useState<{ date: string | null; time: string | null }>({
-    date: null,
-    time: null,
-  });
 
   // slot size (minutes) provided by DTO
   const step = calendar.step;
@@ -59,48 +55,17 @@ export default function CalendarView({ calendar, onSelect }: Props) {
     return { min, max };
   }, [dates, calendar.windows]);
 
-  // events for taken visits and full periods (shown as busy) + unavailable gaps
+  // events for existing taken visits only (busy). Unavailable and full timeslots are styled via slotPropGetter
   const busyEvents: RbcEvent[] = useMemo(() => {
+    console.log('recalc busy events')
     const evs: RbcEvent[] = [];
-
-    const dayWindows = Object.values(calendar.windows).filter(Boolean) as { from: string; to: string }[];
-
-    // existing visits as busy blocks spanning their duration
-    for (const v of calendar.visits ?? []) {
+    for (const v of calendar.slots ?? []) {
       const start = toDate(v.date, v.time);
       const end = addMinutes(start, v.duration);
-      evs.push({ title: 'Bezet', start, end, resource: { kind: 'busy' } });
+      evs.push({ start, end, resource: { kind: 'busy' } });
     }
-
-    // Sort visiting windows by start time for gap computation
-    const sortedWindows = [...dayWindows].sort((a, b) => a.from.localeCompare(b.from));
-
-    // per date events
-    for (const date of dates) {
-      // Full periods per date as one continuous busy block
-      for (const [period, vt] of Object.entries(calendar.windows)) {
-        if (!vt) continue;
-        if (isPeriodFull(calendar, date, vt.from)) {
-          const start = toDate(date, vt.from);
-          const end = toDate(date, vt.to);
-          evs.push({ title: 'Vol', start, end, resource: { kind: 'full', period } });
-        }
-      }
-
-      // Unavailable gaps between visiting windows
-      for (let i = 0; i < sortedWindows.length - 1; i++) {
-        const current = sortedWindows[i];
-        const next = sortedWindows[i + 1];
-        const gapStart = toDate(date, current.to);
-        const gapEnd = toDate(date, next.from);
-        if (gapStart < gapEnd) {
-          evs.push({ start: gapStart, end: gapEnd, resource: { kind: 'unavailable' } });
-        }
-      }
-    }
-
     return evs;
-  }, [calendar]);
+  }, [calendar.slots, calendar.slots.length]);
 
   const defaultDate = useMemo(() => new Date(dates[0] ?? new Date()), [dates]);
 
@@ -137,7 +102,6 @@ export default function CalendarView({ calendar, onSelect }: Props) {
 
     const dateStr = dfFormat(start, 'yyyy-MM-dd');
     const timeStr = dfFormat(start, 'HH:mm');
-    setSelected({ date: dateStr, time: timeStr });
     onSelect?.(dateStr, timeStr);
   };
 
@@ -164,7 +128,7 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         },
       };
     }
-    if (kind === 'unavailable') {
+    if (kind === 'unavailable' || kind === 'full') {
       return {
         className: 'timeslot-unavailable',
         style: {
@@ -185,20 +149,30 @@ export default function CalendarView({ calendar, onSelect }: Props) {
     };
   };
 
-  // selected event overlay
-  const selectedEvents: RbcEvent[] = useMemo(() => {
-    if (!selected.date || !selected.time) return [];
-    const start = toDate(selected.date, selected.time);
-    const end = addMinutes(start, calendar.duration);
-    return [{ start, end, resource: { kind: 'selected' } }];
-  }, [selected, calendar.duration]);
-
   // gray out days outside the allowed date range (before min or after max)
   const dayPropGetter = (date: Date) => {
     const dateStr = dfFormat(date, 'yyyy-MM-dd');
     if (dateStr < minDateStr || dateStr > maxDateStr) {
       return {
         className: '',
+        style: { backgroundColor: '#f3f4f6' }, // gray-100
+      };
+    }
+    return {};
+  };
+
+  // style individual time slots: gray out anything that can't be selected (unavailable/full/past)
+  const slotPropGetter = (date: Date) => {
+    const dateStr = dfFormat(date, 'yyyy-MM-dd');
+    const timeHM = dfFormat(date, 'HH:mm');
+    // Only apply inside our overall date range; out-of-range days already styled by dayPropGetter
+    const selectable = withinDateRange(dateStr)
+      && isVisitingTime(calendar, timeHM, calendar.step)
+      && !getSlotVisit(calendar, dateStr, timeHM, calendar.step)
+      && !isPeriodFull(calendar, dateStr, timeHM);
+    if (!selectable) {
+      return {
+        className: 'timeslot-disabled',
         style: { backgroundColor: '#f3f4f6' }, // gray-100
       };
     }
@@ -221,54 +195,16 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         selectable
         onSelectSlot={handleSelectSlot}
         onSelecting={canSelect}
-        events={[...busyEvents, ...selectedEvents]}
+        events={busyEvents}
         eventPropGetter={eventPropGetter}
         dayPropGetter={dayPropGetter}
+        slotPropGetter={slotPropGetter}
         popup={false}
         toolbar={true}
         allDayMaxRows={0}
         style={{ height: 720, background: 'white', borderRadius: 12, padding: 8 }}
         components={{ toolbar: CalendarToolbar }}
       />
-      <style jsx global>{`
-        .rbc-calendar {
-          background: #ffffff;
-        }
-        .rbc-header {
-          color: #111827;
-          background: #ffffff;
-          border-color: #e5e7eb;
-          font-weight: 600;
-        }
-        .rbc-time-gutter .rbc-timeslot-group,
-        .rbc-time-gutter .rbc-time-slot,
-        .rbc-label {
-          color: #374151;
-        }
-        .rbc-time-content > * + * > * {
-          border-color: #e5e7eb;
-        }
-        .rbc-time-content {
-          border-top-color: #e5e7eb;
-        }
-        .rbc-today {
-          background-color: inherit;
-        }
-        .rbc-event {
-          background-color: #e5e7eb;
-          color: #111827;
-          border: 1px solid #d1d5db;
-        }
-        .rbc-allday-cell {
-          display: none;
-        }
-        .rbc-day-slot .rbc-events-container {
-          margin: 0;
-        }
-        .timeslot-unavailable .rbc-event-label {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 }

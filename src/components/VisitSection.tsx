@@ -1,16 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CalendarView from '@/components/CalendarView';
 import VisitForm from '@/components/VisitForm';
-import { Calendar } from "@/lib/types"
+import { Calendar, Page } from "@/lib/types"
+import { buildCalendar } from "@/lib/calendar"
 
 interface Props {
-  calendar: Calendar;
-  reference: string;
+  page: Page;
 }
 
-export default function VisitSection({ calendar, reference }: Props) {
+export default function VisitSection({ page }: Props) {
+  const [calendar, setCalendar] = useState<Calendar>();
+
+  useEffect(() => {
+    setCalendar(buildCalendar(page));
+  }, [page, page.slots.length]);
+
   const [selected, setSelected] = useState<{ date: string | null; time: string | null }>({
     date: null,
     time: null,
@@ -22,15 +28,20 @@ export default function VisitSection({ calendar, reference }: Props) {
     setShowForm(true);
   };
 
+  if (!calendar) return <></>;
+
   return (
     <div className="flex flex-col gap-2">
       <CalendarView calendar={calendar} onSelect={handleSelect} />
       <VisitForm
-        reference={reference}
+        reference={page.reference}
         calendar={calendar}
         selected={selected}
         visible={showForm}
-        onClose={() => setShowForm(false)}
+        onClose={(slot) => {
+          if (slot) page.slots.push(slot);
+          setShowForm(false)
+        }}
       />
     </div>
   );
