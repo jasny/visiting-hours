@@ -6,6 +6,7 @@ export interface Calendar {
   windows: Partial<Record<'morning' | 'afternoon' | 'evening', { from: string; to: string }>>;
   visits: Slot[];
   capacities: Partial<Record<'morning' | 'afternoon' | 'evening', number>>;
+  duration: number; // minutes
 }
 
 export interface Slot {
