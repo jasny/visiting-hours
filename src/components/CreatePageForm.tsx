@@ -25,7 +25,7 @@ const toTimeValue = (value?: string | null) =>
 const fromTimeValue = (date: Date | null | undefined) =>
   date ? date.toTimeString().slice(0, 5) : null;
 
-export default function CreatePageForm() {
+export default function CreatePageForm({ values: defaultValues }: { values: Partial<Page> }) {
   const router = useRouter();
   const toast = useRef<Toast | null>(null);
 
@@ -35,29 +35,7 @@ export default function CreatePageForm() {
   const [durationMinutes, setDurationMinutes] = useState(0);
 
   const { control, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormState>({
-    defaultValues: {
-      name: '',
-      parent_name: '',
-      email: '',
-      description: '',
-      gifts: '',
-      date_from: undefined,
-      date_to: undefined,
-      date_of_birth: null,
-      street: '',
-      postalcode: '',
-      city: '',
-      duration: 60,
-      morning_from: '10:00',
-      morning_to: '12:00',
-      morning_amount: 1,
-      afternoon_from: '12:00',
-      afternoon_to: '18:00',
-      afternoon_amount: 2,
-      evening_from: '18:00',
-      evening_to: '21:00',
-      evening_amount: 0,
-    }
+    defaultValues
   });
 
   // keep duration in minutes in the form and update via hours/minutes controls

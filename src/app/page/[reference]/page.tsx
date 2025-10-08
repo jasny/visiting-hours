@@ -10,6 +10,7 @@ export default async function ShowPage({ params }: { params: Promise<{ reference
   const { reference } = await params;
   const page = await getPage(reference);
   if (!page) return notFound();
+
   const calendar = buildCalendar(page);
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-orange-50 p-4 md:p-8">
