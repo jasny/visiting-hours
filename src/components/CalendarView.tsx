@@ -140,11 +140,12 @@ export default function CalendarView({ calendar, onSelect }: Props) {
       };
     }
     return {
-      className: '',
+      className: `timeslot-${kind}`,
       style: {
         backgroundColor: '#e5e7eb',
         borderColor: '#d1d5db',
         color: '#374151',
+        cursor: 'not-allowed'
       },
     };
   };
@@ -176,11 +177,11 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         style: { backgroundColor: '#f3f4f6' }, // gray-100
       };
     }
-    return {};
+    return { className: 'timeslot-available' };
   };
 
   return (
-    <section className="w-full max-w-5xl mx-auto my-6">
+    <section className="w-full max-w-5xl mx-auto my-6 h-[720px] max-h-[80vh]">
       <RBCalendar
         localizer={localizer}
         view={currentView}
@@ -202,7 +203,6 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         popup={false}
         toolbar={true}
         allDayMaxRows={0}
-        style={{ height: 720, background: 'white', borderRadius: 12, padding: 8 }}
         components={{ toolbar: CalendarToolbar }}
       />
     </section>

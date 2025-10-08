@@ -27,8 +27,8 @@ export default function VisitSection({ page }: Props) {
   if (!calendar) return <></>;
 
   return (
-    <div className="flex flex-col gap-2">
-      <CalendarView calendar={calendar} onSelect={handleSelect} />
+    <>
+      <CalendarView calendar={calendar} onSelect={handleSelect}/>
       <VisitForm
         reference={page.reference}
         calendar={calendar}
@@ -39,6 +39,6 @@ export default function VisitSection({ page }: Props) {
           setShowForm(false)
         }}
       />
-    </div>
-  );
+    </>
+  )
 }
