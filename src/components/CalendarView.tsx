@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Calendar as RBCalendar, dateFnsLocalizer, Event as RbcEvent, SlotInfo, Views, } from 'react-big-calendar';
+import { Calendar as RBCalendar, dateFnsLocalizer, Event as RbcEvent, SlotInfo, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { addMinutes, format as dfFormat, getDay, parse as dfParse, setHours, setMinutes, startOfWeek } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -64,8 +64,6 @@ export default function CalendarView({ calendar, onSelect }: Props) {
     const evs: RbcEvent[] = [];
 
     const dayWindows = Object.values(calendar.windows).filter(Boolean) as { from: string; to: string }[];
-    const earliestFrom = dayWindows.length ? dayWindows.map(w => w.from).sort()[0] : null;
-    const latestTo = dayWindows.length ? dayWindows.map(w => w.to).sort().slice(-1)[0] : null;
 
     // existing visits as busy blocks spanning their duration
     for (const v of calendar.visits ?? []) {
@@ -89,15 +87,6 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         }
       }
 
-      // Unavailable before earliest window
-      if (earliestFrom) {
-        const dayMin = setMinutes(setHours(new Date(date + 'T00:00:00'), (minMax.min as Date).getHours()), (minMax.min as Date).getMinutes());
-        const firstStart = toDate(date, earliestFrom);
-        if (dayMin < firstStart) {
-          evs.push({ title: 'Niet beschikbaar', start: dayMin, end: firstStart, resource: { kind: 'unavailable' } });
-        }
-      }
-
       // Unavailable gaps between visiting windows
       for (let i = 0; i < sortedWindows.length - 1; i++) {
         const current = sortedWindows[i];
@@ -105,22 +94,13 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         const gapStart = toDate(date, current.to);
         const gapEnd = toDate(date, next.from);
         if (gapStart < gapEnd) {
-          evs.push({ title: 'Niet beschikbaar', start: gapStart, end: gapEnd, resource: { kind: 'unavailable' } });
-        }
-      }
-
-      // Unavailable after latest window
-      if (latestTo) {
-        const lastEnd = toDate(date, latestTo);
-        const dayMax = setMinutes(setHours(new Date(date + 'T00:00:00'), (minMax.max as Date).getHours()), (minMax.max as Date).getMinutes());
-        if (lastEnd < dayMax) {
-          evs.push({ title: 'Niet beschikbaar', start: lastEnd, end: dayMax, resource: { kind: 'unavailable' } });
+          evs.push({ start: gapStart, end: gapEnd, resource: { kind: 'unavailable' } });
         }
       }
     }
 
     return evs;
-  }, [calendar, dates, minMax.min, minMax.max]);
+  }, [calendar]);
 
   const defaultDate = useMemo(() => new Date(dates[0] ?? new Date()), [dates]);
 
@@ -153,19 +133,15 @@ export default function CalendarView({ calendar, onSelect }: Props) {
 
   const handleSelectSlot = (slot: SlotInfo) => {
     const start = slot.start as Date;
+    if (!canSelect({ start: start })) return;
+
     const dateStr = dfFormat(start, 'yyyy-MM-dd');
     const timeStr = dfFormat(start, 'HH:mm');
-    const canSelect = withinDateRange(dateStr)
-      && notPast(dateStr, timeStr)
-      && isVisitingTime(calendar, timeStr)
-      && !getSlotVisit(calendar, dateStr, timeStr)
-      && !isPeriodFull(calendar, dateStr, timeStr);
-    if (!canSelect) return;
     setSelected({ date: dateStr, time: timeStr });
     onSelect?.(dateStr, timeStr);
   };
 
-  const onSelecting = ({ start }: { start: Date; end: Date }) => {
+  const canSelect = ({ start }: { start: Date; end?: Date }) => {
     const startStrDate = dfFormat(start, 'yyyy-MM-dd');
     const startHM = dfFormat(start, 'HH:mm');
     return withinDateRange(startStrDate)
@@ -180,7 +156,7 @@ export default function CalendarView({ calendar, onSelect }: Props) {
     const kind = event.resource.kind as string | undefined;
     if (kind === 'selected') {
       return {
-        className: '',
+        className: 'timeslot-selected',
         style: {
           backgroundColor: '#bfdbfe', // blue-200
           borderColor: '#60a5fa',
@@ -190,11 +166,12 @@ export default function CalendarView({ calendar, onSelect }: Props) {
     }
     if (kind === 'unavailable') {
       return {
-        className: '',
+        className: 'timeslot-unavailable',
         style: {
           backgroundColor: '#f3f4f6', // gray-100
-          borderColor: '#e5e7eb',
+          borderColor: 'transparent',
           color: '#6b7280',
+          borderRadius: 0,
         },
       };
     }
@@ -234,7 +211,6 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         localizer={localizer}
         view={currentView}
         onView={(v) => setCurrentView(v)}
-        defaultView={Views.WEEK}
         views={availableViews}
         defaultDate={defaultDate}
         culture="nl"
@@ -244,7 +220,7 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         timeslots={timeslots}
         selectable
         onSelectSlot={handleSelectSlot}
-        onSelecting={onSelecting}
+        onSelecting={canSelect}
         events={[...busyEvents, ...selectedEvents]}
         eventPropGetter={eventPropGetter}
         dayPropGetter={dayPropGetter}
@@ -284,6 +260,12 @@ export default function CalendarView({ calendar, onSelect }: Props) {
           border: 1px solid #d1d5db;
         }
         .rbc-allday-cell {
+          display: none;
+        }
+        .rbc-day-slot .rbc-events-container {
+          margin: 0;
+        }
+        .timeslot-unavailable .rbc-event-label {
           display: none;
         }
       `}</style>
