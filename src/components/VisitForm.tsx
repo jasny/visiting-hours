@@ -35,6 +35,7 @@ function formatLocalHM(d: Date): string {
 }
 
 export default function VisitForm({ reference, calendar, visible, onClose, selected }: Props) {
+  const isExample = reference === '';
   const [pending, startTransition] = useTransition();
 
   const defaultDate = useMemo(() => {
@@ -69,16 +70,19 @@ export default function VisitForm({ reference, calendar, visible, onClose, selec
     if (!data.dateTime) return;
     const dateStr = formatLocalDate(data.dateTime);
     const timeHM = formatLocalHM(data.dateTime);
-    // validate availability
-    if (!isTimeAvailable(calendar, dateStr, timeHM)) {
-      return; // errors shown via validation below; extra guard
-    }
-    const payload: Omit<Slot, 'duration' | 'state'> = {
+
+    const payload: Omit<Slot, 'duration' | 'type'> = {
       name: data.name,
       date: dateStr,
       time: timeHM,
     };
+
     startTransition(async () => {
+      if (isExample) {
+        onClose({ ...payload, type: 'taken', duration: 60 });
+        return;
+      }
+
       const slot = await addVisit(reference, payload);
       onClose(slot);
     });

@@ -1,4 +1,4 @@
-export type SlotState = 'disabled' | 'taken' | 'full' | 'available';
+export type SlotType = 'blocked' | 'taken';
 
 export interface Calendar {
   dates: string[];
@@ -14,7 +14,7 @@ export interface Slot {
   time: string;
   name: string;
   duration: number;
-  state: SlotState;
+  type: SlotType;
 }
 
 export interface Page {

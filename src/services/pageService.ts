@@ -30,7 +30,7 @@ export async function savePage(page: Page): Promise<void> {
 
 export async function addVisit(
   reference: string,
-  visit: Omit<Slot, 'duration' | 'state'>
+  visit: Omit<Slot, 'duration' | 'type'>
 ): Promise<Slot | undefined> {
   const page = await getPage(reference);
   if (!page || !page.duration || !isTimeAvailable(page, visit.date, visit.time)) {
@@ -39,7 +39,7 @@ export async function addVisit(
   }
 
   const slots: Slot[] = page.slots ?? [];
-  const newVisit: Slot = { ...visit, duration: page.duration, state: 'taken' };
+  const newVisit: Slot = { ...visit, duration: page.duration, type: 'taken' };
   slots.push(newVisit);
 
   await db.send(

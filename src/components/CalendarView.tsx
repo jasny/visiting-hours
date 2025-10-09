@@ -57,9 +57,9 @@ export default function CalendarView({ calendar, onSelect }: Props) {
 
   // events for existing taken visits only (busy). Unavailable and full timeslots are styled via slotPropGetter
   const busyEvents: RbcEvent[] = useMemo(() => {
-    console.log('recalc busy events')
     const evs: RbcEvent[] = [];
     for (const v of calendar.slots ?? []) {
+      if (v.type !== 'taken') continue;
       const start = toDate(v.date, v.time);
       const end = addMinutes(start, v.duration);
       evs.push({ start, end, resource: { kind: 'busy' } });
