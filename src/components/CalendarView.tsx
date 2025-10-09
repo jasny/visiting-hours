@@ -7,7 +7,7 @@ import { addMinutes, format as dfFormat, getDay, parse as dfParse, setHours, set
 import { nl } from 'date-fns/locale';
 
 import { Calendar } from "@/lib/types";
-import { getSlotVisit, isPeriodFull, isVisitingTime, toDate } from "@/lib/calendar";
+import { futureDate, getSlotVisit, isPeriodFull, isVisitingTime, toDate } from "@/lib/calendar";
 import CalendarToolbar from "@/components/CalendarToolbar"
 
 interface Props {
@@ -67,11 +67,11 @@ export default function CalendarView({ calendar, onSelect }: Props) {
     return evs;
   }, [calendar.slots, calendar.slots.length]);
 
-  const defaultDate = useMemo(() => new Date(dates[0] ?? new Date()), [dates]);
-
   // responsive view switching
   const [currentView, setCurrentView] = useState<typeof Views[keyof typeof Views]>(Views.WEEK);
   const [availableViews, setAvailableViews] = useState<typeof Views[keyof typeof Views][]>([Views.WEEK, Views.DAY]);
+  const [currentDate, setCurrentDate] = useState(() => futureDate(calendar.dates[0]));
+
   useEffect(() => {
     const decide = () => {
       if (typeof window === 'undefined') return;
@@ -187,7 +187,8 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         view={currentView}
         onView={(v) => setCurrentView(v)}
         views={availableViews}
-        defaultDate={defaultDate}
+        date={currentDate}
+        onNavigate={(date) => setCurrentDate(date)}
         culture="nl"
         min={minMax.min}
         max={minMax.max}

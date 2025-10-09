@@ -66,7 +66,7 @@ export async function addVisit(
     })
   );
 
-  if (reference === '') {
+  if (reference !== '') {
     const verification = computeVisitVerification(reference, visit.date, visit.time);
     await setVisitCookie(reference, { ...visit, verification, nonce });
   }

@@ -14,6 +14,8 @@
     "@aws-sdk/lib-dynamodb": "^3.883.0",
     "@aws-sdk/util-dynamodb": "^3.883.0",
     "date-fns": "^4.1.0",
+    "linkify-react": "^4.3.2",
+    "linkifyjs": "^4.3.2",
     "lucide-react": "^0.542.0",
     "next": "15.5.2",
     "primereact": "^10.9.7",

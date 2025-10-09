@@ -120,6 +120,14 @@ export function toDate(dateStr: string, hm: string) {
   return setMinutes(setHours(d, h), m);
 }
 
+export function futureDate(dateStr?: string): Date {
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (!dateStr) return today;
+
+  const first = new Date(dateStr + 'T00:00:00');
+  return today > first ? today : first;
+}
+
 export function isTimeAvailable(cal: Calendar | Page, date: string, timeHM: string): boolean {
   if (isPage(cal)) cal = buildCalendar(cal);
 

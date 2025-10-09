@@ -7,21 +7,32 @@ import { Page, Slot } from "@/lib/types"
 import { buildCalendar } from "@/lib/calendar"
 import { cancelVisit, getVisitFromCookie } from '@/services/pageService';
 import { VisitCard } from "@/components/VisitCard"
+import Linkify from "linkify-react"
+import { Panel } from "primereact/panel"
 
 interface Props {
   page: Page;
 }
 
 export default function VisitSection({ page }: Props) {
-  const calendar = useMemo(() => buildCalendar(page), [page]);
+  const [slots, setSlots] = useState<Slot[]>(page.slots);
   const [visit, setVisit] = useState<{ date: string; time: string; duration?: number } | null>(null);
   const [pending, startTransition] = useTransition();
+  const [loaded, setLoaded] = useState(false);
+
+  const calendar = useMemo(
+    () => buildCalendar({ ...page, slots }),
+    [page, slots]
+  );
 
   useEffect(() => {
     let active = true;
     (async () => {
       const v = await getVisitFromCookie(page.reference);
-      if (active) setVisit(v);
+      if (active) {
+        setVisit(v);
+        setLoaded(true);
+      }
     })();
     return () => { active = false };
   }, [page.reference]);
@@ -39,7 +50,7 @@ export default function VisitSection({ page }: Props) {
 
   const handleForm = (slot?: Slot) => {
     if (slot) {
-      page.slots.push(slot);
+      setSlots((slots) => [...slots, slot]);
       setVisit(slot);
     }
     setShowForm(false);
@@ -59,7 +70,7 @@ export default function VisitSection({ page }: Props) {
     });
   };
 
-  if (!calendar) return <></>;
+  if (!calendar || !loaded) return <></>;
 
   if (!!visit) {
     return (
@@ -72,29 +83,39 @@ export default function VisitSection({ page }: Props) {
           street={page.street}
           postalcode={page.postalcode}
         />
+        <Panel className="text-center mb-12 mt-12" header={<span className="font-bold">Cadeauwensen</span>}
+        >
+          <p className="text-gray-600 max-w-2xl text-left whitespace-pre-line">
+            <Linkify>
+              { page.gifts }
+            </Linkify>
+          </p>
+        </Panel>
       </>
     );
   }
 
-  return (
-    <>
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl text-gray-800 mb-4">Plan je bezoek</h2>
-        <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
-          Kies een moment dat voor jou uitkomt om {page.name} te ontmoeten. We houden de bezoeken kort en gezellig,
-          zodat iedereen kan genieten.
-        </p>
-      </div>
+  if (visit === null) {
+    return (
+      <>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl text-gray-800 mb-4">Plan je bezoek</h2>
+          <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
+            Kies een moment dat voor jou uitkomt om {page.name} te ontmoeten. We houden de bezoeken kort en gezellig,
+            zodat iedereen kan genieten.
+          </p>
+        </div>
 
-      <CalendarView calendar={calendar} onSelect={handleSelect}/>
-      <VisitForm
-        reference={page.reference}
-        calendar={calendar}
-        selected={selected}
-        visible={showForm}
-        onClose={handleForm}
-      />
-    </>
-  )
+        <CalendarView calendar={calendar} onSelect={handleSelect}/>
+        <VisitForm
+          reference={page.reference}
+          calendar={calendar}
+          selected={selected}
+          visible={showForm}
+          onClose={handleForm}
+        />
+      </>
+    )
+  }
 }
 

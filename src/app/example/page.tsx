@@ -60,7 +60,7 @@ export default async function ShowPage() {
     parent_name: 'Sarah & Tom',
     date_of_birth: fmt(today),
     description: 'We zijn zo dankbaar en gelukkig om onze kleine Emma met jullie te mogen delen. Haar komst heeft ons leven met zoveel liefde en vreugde gevuld. We kijken er naar uit jullie allemaal te ontvangen en samen deze bijzondere tijd te vieren.',
-    gifts: 'Cadeautips: maat 56-62 kleertjes, luiers (maat 1-2), of een herinnering. Geen bloemen nodig.',
+    gifts: '* maat 56-62 kleertjes\n* luiers (maat 1-2)\n* of een herinnering\n\nGeen bloemen graag',
     date_from,
     date_to,
     morning_from: '10:00',
@@ -73,9 +73,9 @@ export default async function ShowPage() {
     evening_to: '21:00',
     evening_amount: 0,
     duration,
-    street: null,
-    postalcode: null,
-    city: null,
+    street: 'Nieuwezijds Voorburgwal 147',
+    postalcode: '1012 RJ',
+    city: 'Amsterdam',
     slots: [
       visit(1, '10:00', 'Oma & Opa'),       // deze week
       visit(2, '14:00', 'Tante Lisa'),      // deze week

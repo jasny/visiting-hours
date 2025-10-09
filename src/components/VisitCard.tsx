@@ -1,4 +1,5 @@
 import { Card } from "primereact/card"
+import { MapPin } from "lucide-react";
 
 function formatEndTime(startHM: string, durationMin: number) {
   const [h, m] = startHM.split(':').map(Number);
@@ -51,6 +52,11 @@ export function VisitCard(props: {
           <div className="font-bold">{props.city}</div>
           <div>{props.street}</div>
           <div>{props.postalcode}</div>
+          <div className="mt-4">
+            <a className="text-rose-400" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(props.street!)}+${encodeURIComponent(props.city!)}`} target="_blank">
+              <small><MapPin style={{ display: 'inline-block'}} /> &mdash; Open in Google Maps</small>
+            </a>
+          </div>
         </div>
       )}
     </div>
