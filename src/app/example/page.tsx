@@ -56,10 +56,10 @@ export default async function ShowPage() {
     reference: '',
     nonce: 'example-token',
     email: 'example@visiting-hours.app',
-    name: 'Emma',
-    parent_name: 'Sarah & Tom',
+    name: 'Alex',
+    parent_name: 'Arnold & Aline',
     date_of_birth: fmt(today),
-    description: 'We zijn zo dankbaar en gelukkig om onze kleine Emma met jullie te mogen delen. Haar komst heeft ons leven met zoveel liefde en vreugde gevuld. We kijken er naar uit jullie allemaal te ontvangen en samen deze bijzondere tijd te vieren.',
+    description: 'We zijn zo dankbaar en gelukkig om onze kleine Alex met jullie te mogen delen. Haar komst heeft ons leven met zoveel liefde en vreugde gevuld. We kijken er naar uit jullie allemaal te ontvangen en samen deze bijzondere tijd te vieren.',
     gifts: '* maat 56-62 kleertjes\n* luiers (maat 1-2)\n* of een herinnering\n\nGeen bloemen graag',
     date_from,
     date_to,
@@ -84,6 +84,7 @@ export default async function ShowPage() {
       visit(9, '15:00', 'Collega Eva'),     // volgende week
       ...blockingSlots,
     ],
+    theme: 'pink'
   };
 
   return (
@@ -95,7 +96,7 @@ export default async function ShowPage() {
       </section>
       <section className="bg-gradient-to-br from-gray-200 via-gray-50 to-purple-50 px-6 py-16 md:px-12 md:py-24">
         <div className="max-w-6xl mx-auto">
-          <VisitSection page={page}/>
+          <VisitSection page={page} />
         </div>
       </section>
     </main>

@@ -19,7 +19,7 @@ export default function VisitSection({ page }: Props) {
   const [slots, setSlots] = useState<Slot[]>(page.slots);
   const [visit, setVisit] = useState<{ date: string; time: string; duration?: number } | null>(null);
   const [pending, startTransition] = useTransition();
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(page.reference === '');
 
   const calendar = useMemo(
     () => buildCalendar({ ...page, slots }),
@@ -27,6 +27,8 @@ export default function VisitSection({ page }: Props) {
   );
 
   useEffect(() => {
+    if (loaded) return;
+
     let active = true;
     (async () => {
       const v = await getVisitFromCookie(page.reference);
@@ -36,7 +38,7 @@ export default function VisitSection({ page }: Props) {
       }
     })();
     return () => { active = false };
-  }, [page.reference]);
+  }, [page.reference, loaded]);
 
   const [selected, setSelected] = useState<{ date: string | null; time: string | null }>({
     date: null,
@@ -95,7 +97,7 @@ export default function VisitSection({ page }: Props) {
           street={page.street}
           postalcode={page.postalcode}
         />
-        <Panel className="text-center mb-12 mt-12" header={<span className="font-bold">Cadeauwensen</span>}>
+        <Panel className="text-center mb-12 mt-12" header={<span className="font-bold">Wensenlijst</span>}>
           <p className="text-gray-600 max-w-2xl text-left whitespace-pre-line">
             <Linkify>
               { page.gifts }
