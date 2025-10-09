@@ -19,10 +19,9 @@ export default async function ShowPage() {
   const duration = 60; // standaard 1 uur
 
   // Build some example visits
-  const visit = (offsetDays: number, time: string, name: string): Slot => ({
+  const visit = (offsetDays: number, time: string, _name: string): Slot => ({
     date: fmt(addDays(today, offsetDays)),
     time,
-    name,
     duration,
     type: 'taken' as const,
   });
@@ -54,8 +53,7 @@ export default async function ShowPage() {
 
   const page: Page = {
     reference: '',
-    nonce: 'example-token',
-    email: 'example@visiting-hours.app',
+    email: '',
     name: 'Alex',
     parent_name: 'Arnold & Aline',
     date_of_birth: fmt(today),

@@ -75,6 +75,10 @@ textarea::placeholder {
     display: none;
   }
 
+  .rbc-day-slot .rbc-event-content {
+    font-size: 90%;
+  }
+
   .rbc-day-slot .rbc-events-container {
     margin: 0;
   }

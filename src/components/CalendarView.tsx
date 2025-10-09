@@ -62,7 +62,7 @@ export default function CalendarView({ calendar, onSelect }: Props) {
       if (v.type !== 'taken') continue;
       const start = toDate(v.date, v.time);
       const end = addMinutes(start, v.duration);
-      evs.push({ start, end, resource: { kind: 'busy' } });
+      evs.push({ title: v.name, start, end, resource: { kind: 'busy' } });
     }
     return evs;
   }, [calendar.slots, calendar.slots.length]);

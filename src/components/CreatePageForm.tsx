@@ -10,7 +10,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
 import { Baby, MapPinIcon, CalendarDays, Settings, Clock, Info } from 'lucide-react';
-import { savePage } from '@/services/pageService';
+import { createPage } from '@/services/pageService';
 import { Page } from "@/lib/types";
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -49,9 +49,6 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
   const evening_amount = watch('evening_amount');
 
   const onSubmit: SubmitHandler<FormState> = async (data) => {
-    const genRef = () => Math.random().toString(36).slice(2, 10);
-    const genToken = () => Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
-
     const defaults = !customTimes ? {
       duration: 60,
       morning_from: '10:00', morning_to: '12:00', morning_amount: 1,
@@ -78,9 +75,7 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
     ensureTimeWindow('afternoon_from','afternoon_to','afternoon_amount','12:00','18:00');
     ensureTimeWindow('evening_from','evening_to','evening_amount','18:00','21:00');
 
-    const pagePayload: Page = {
-      reference: normalized.reference || genRef(),
-      nonce: normalized.nonce || genToken(),
+    const pagePayload: Omit<Page, 'reference' | 'nonce' | 'slots'> = {
       email: normalized.email as string,
       name: normalized.name as string,
       parent_name: normalized.parent_name as string,
@@ -102,13 +97,13 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
       street: normalized.street ?? null,
       postalcode: normalized.postalcode ?? null,
       city: normalized.city ?? null,
-      slots: [],
+      theme: normalized.theme as string,
     };
 
-    await savePage(pagePayload);
+    const reference = await createPage(pagePayload);
     toast.current?.show({ severity: 'success', summary: 'Pagina succesvol aangemaakt', life: 2000 });
     setTimeout(() => {
-      router.push(`/page/${pagePayload.reference}`);
+      router.push(`/page/${reference}`);
     }, 800);
   };
 
