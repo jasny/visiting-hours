@@ -9,6 +9,7 @@ import { cancelVisit, getVisitFromCookie } from '@/services/pageService';
 import { VisitCard } from "@/components/VisitCard"
 import Linkify from "linkify-react"
 import { Panel } from "primereact/panel"
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
 
 interface Props {
   page: Page;
@@ -56,17 +57,27 @@ export default function VisitSection({ page }: Props) {
     setShowForm(false);
   };
 
-  const handleCancel = () => {
+  const confirmCancel = () => {
     if (!visit) return;
-    startTransition(async () => {
-      try {
-        await cancelVisit(page.reference);
-      } catch {}
+    confirmDialog({
+      message: 'Weet je zeker dat je je afspraak wilt annuleren?',
+      header: 'Afspraak annuleren',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Ja, annuleren',
+      rejectLabel: 'Nee',
+      acceptClassName: 'p-button-danger',
+      accept: () => {
+        startTransition(async () => {
+          try {
+            await cancelVisit(page.reference);
+          } catch {}
 
-      // remove from local page.slots for UI responsiveness
-      const idx = page.slots.findIndex((s: Slot) => s.date === visit.date && s.time === visit.time);
-      if (idx >= 0) page.slots.splice(idx, 1);
-      setVisit(null);
+          // remove from local page.slots for UI responsiveness
+          const idx = page.slots.findIndex((s: Slot) => s.date === visit.date && s.time === visit.time);
+          if (idx >= 0) page.slots.splice(idx, 1);
+          setVisit(null);
+        });
+      }
     });
   };
 
@@ -75,16 +86,16 @@ export default function VisitSection({ page }: Props) {
   if (!!visit) {
     return (
       <>
+        <ConfirmDialog />
         <VisitCard
-          onClick={handleCancel}
+          onClick={confirmCancel}
           disabled={pending}
           visit={visit}
           city={page.city}
           street={page.street}
           postalcode={page.postalcode}
         />
-        <Panel className="text-center mb-12 mt-12" header={<span className="font-bold">Cadeauwensen</span>}
-        >
+        <Panel className="text-center mb-12 mt-12" header={<span className="font-bold">Cadeauwensen</span>}>
           <p className="text-gray-600 max-w-2xl text-left whitespace-pre-line">
             <Linkify>
               { page.gifts }
@@ -95,27 +106,25 @@ export default function VisitSection({ page }: Props) {
     );
   }
 
-  if (visit === null) {
-    return (
-      <>
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl text-gray-800 mb-4">Plan je bezoek</h2>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
-            Kies een moment dat voor jou uitkomt om {page.name} te ontmoeten. We houden de bezoeken kort en gezellig,
-            zodat iedereen kan genieten.
-          </p>
-        </div>
+  return (
+    <>
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl text-gray-800 mb-4">Plan je bezoek</h2>
+        <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
+          Kies een moment dat voor jou uitkomt om {page.name} te ontmoeten. We houden de bezoeken kort en gezellig,
+          zodat iedereen kan genieten.
+        </p>
+      </div>
 
-        <CalendarView calendar={calendar} onSelect={handleSelect}/>
-        <VisitForm
-          reference={page.reference}
-          calendar={calendar}
-          selected={selected}
-          visible={showForm}
-          onClose={handleForm}
-        />
-      </>
-    )
-  }
+      <CalendarView calendar={calendar} onSelect={handleSelect}/>
+      <VisitForm
+        reference={page.reference}
+        calendar={calendar}
+        selected={selected}
+        visible={showForm}
+        onClose={handleForm}
+      />
+    </>
+  )
 }
 

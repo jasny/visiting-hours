@@ -30,6 +30,10 @@ textarea::placeholder {
   width: 120px;
 }
 
+.p-card-footer {
+  padding-top: 0;
+}
+
 .rbc-calendar {
   background: #ffffff;
   border-radius: 12px;
