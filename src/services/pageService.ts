@@ -3,7 +3,14 @@
 import { GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { db } from '@/lib/dynamodb';
 import { Page, Slot } from "@/lib/types"
-import { buildCalendar, isTimeAvailable } from "@/lib/calendar"
+import { isTimeAvailable } from "@/lib/calendar"
+import crypto from 'crypto';
+import {
+  clearVisitCookie,
+  computeVisitVerification,
+  setVisitCookie,
+  verifyVisitCookie
+} from '@/lib/verification';
 
 const TABLE_NAME = 'VisitingHoursPage';
 
@@ -11,17 +18,24 @@ export async function getPage(reference: string): Promise<Page | null> {
   const res = await db.send(
     new GetCommand({ TableName: TABLE_NAME, Key: { reference } })
   );
-  const raw = res.Item as Record<string, unknown> | undefined;
-  if (!raw) return null;
+  const page = res.Item as Page | undefined;
+  if (!page) return null;
 
-  // Backward-compat: migrate JSON-string visits to Document list on read
-  if (typeof raw.visits === 'string') {
-    try {
-      raw.slots = JSON.parse(raw.visits);
-    } catch {}
+  for (const slot of page.slots) {
+    delete slot.name;
+    delete slot.nonce;
   }
 
-  return raw as unknown as Page;
+  return page;
+}
+
+export async function getVisitFromCookie(reference: string): Promise<Slot | null> {
+  const cookie = await verifyVisitCookie(reference);
+  if (!cookie) return null;
+
+  const { verification: _v, nonce: _n, ...slot } = cookie;
+
+  return { ...slot, type: 'taken' as const };
 }
 
 export async function savePage(page: Page): Promise<void> {
@@ -30,17 +44,18 @@ export async function savePage(page: Page): Promise<void> {
 
 export async function addVisit(
   reference: string,
-  visit: Omit<Slot, 'duration' | 'type'>
+  payload: Omit<Required<Slot>, 'duration' | 'type' | 'nonce'>
 ): Promise<Slot | undefined> {
   const page = await getPage(reference);
-  if (!page || !page.duration || !isTimeAvailable(page, visit.date, visit.time)) {
+  if (!page || !page.duration || !isTimeAvailable(page, payload.date, payload.time)) {
     console.log(`Could not add visit for ${page?.reference ?? 'unknown page'}`)
     return;
   }
 
   const slots: Slot[] = page.slots ?? [];
-  const newVisit: Slot = { ...visit, duration: page.duration, type: 'taken' };
-  slots.push(newVisit);
+  const nonce = crypto.randomBytes(16).toString('hex');
+  const visit: Required<Slot> = { ...payload, duration: page.duration, type: 'taken', nonce };
+  slots.push(visit);
 
   await db.send(
     new UpdateCommand({
@@ -50,31 +65,40 @@ export async function addVisit(
       ExpressionAttributeValues: { ':v': slots },
     })
   );
-  return newVisit;
+
+  if (reference === '') {
+    const verification = computeVisitVerification(reference, visit.date, visit.time);
+    await setVisitCookie(reference, { ...visit, verification, nonce });
+  }
+
+  return { ...visit, nonce: undefined };
 }
 
-export async function cancelVisit(
-  reference: string,
-  visit: Pick<Slot, 'date' | 'time' | 'name'>
-): Promise<boolean> {
+export async function cancelVisit(reference: string): Promise<boolean> {
   const page = await getPage(reference);
   if (!page) return false;
-  const slots: Slot[] = page.slots ?? [];
-  const before = slots.length;
-  const next = slots.filter(
-    (s) => !(s.date === visit.date && s.time === visit.time && s.name === visit.name)
+
+  const cookie = await verifyVisitCookie(reference);
+  if (!cookie) return false;
+
+  const oldSlots: Slot[] = page.slots ?? [];
+
+  const newSlots = oldSlots.filter(
+    (s) => !(s.date === cookie.date && s.time === cookie.time && s.nonce === cookie.nonce)
   );
-  if (next.length === before) {
-    // nothing removed
+  if (oldSlots.length === newSlots.length) {
     return false;
   }
+
   await db.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: { reference },
       UpdateExpression: 'SET slots = :v',
-      ExpressionAttributeValues: { ':v': next },
+      ExpressionAttributeValues: { ':v': newSlots },
     })
   );
+
+  await clearVisitCookie(reference);
   return true;
 }

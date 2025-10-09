@@ -12,9 +12,10 @@ export interface Calendar {
 export interface Slot {
   date: string;
   time: string;
-  name: string;
+  name?: string;
   duration: number;
   type: SlotType;
+  nonce?: string; // server-side only, do not expose in public page
 }
 
 export interface Page {

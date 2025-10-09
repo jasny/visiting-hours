@@ -6,7 +6,7 @@ import { useMemo } from "react"
 
 interface Props {
   info: Page;
-  image?: StaticImageData;
+  image: StaticImageData;
 }
 
 export default function PageInfo({ info, image }: Props) {
@@ -53,14 +53,14 @@ export default function PageInfo({ info, image }: Props) {
         <div className="mb-12 flex justify-center">
           <div className="relative">
             <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-white shadow-xl">
-              <Image src={image} alt="Foto of afbeelding" className="w-full h-full object-cover"/></div>
+              <Image src={image} alt="Foto of afbeelding" className="w-full h-full object-cover bg-rose-100"/></div>
             <div className="absolute -top-2 -right-2 w-6 h-6 bg-rose-300 rounded-full opacity-60"></div>
             <div
               className="absolute -bottom-4 -left-4 w-8 h-8 border-2 border-rose-300 rounded-full opacity-40"></div>
           </div>
         </div>
         <div className="max-w-2xl mx-auto">
-          <p className="text-gray-700 text-lg md:text-xl leading-relaxed font-light italic">&#34;{info.description}&#34;</p>
+          <p className="text-gray-700 text-lg md:text-xl leading-relaxed font-light italic">{info.description}</p>
           <p className="text-rose-600 mt-6 text-lg">— Met veel liefde, {info.parent_name}</p>
         </div>
       </div>

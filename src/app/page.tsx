@@ -121,6 +121,15 @@ export default function Home() {
 
               <div>
                 <h3 className="text-xl text-rose-800 mb-2 font-light">
+                  Moeten bezoekers een account aanmaken?
+                </h3>
+                <p className="text-gray-600 font-light">
+                  Nee, dat is niet nodig. Bezoekers kiezen alleen een tijdstip en vullen hun naam in.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl text-rose-800 mb-2 font-light">
                   Hoe zit het met mijn privacy?
                 </h3>
                 <p className="text-gray-600 font-light">
