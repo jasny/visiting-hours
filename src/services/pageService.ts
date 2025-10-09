@@ -52,3 +52,29 @@ export async function addVisit(
   );
   return newVisit;
 }
+
+export async function cancelVisit(
+  reference: string,
+  visit: Pick<Slot, 'date' | 'time' | 'name'>
+): Promise<boolean> {
+  const page = await getPage(reference);
+  if (!page) return false;
+  const slots: Slot[] = page.slots ?? [];
+  const before = slots.length;
+  const next = slots.filter(
+    (s) => !(s.date === visit.date && s.time === visit.time && s.name === visit.name)
+  );
+  if (next.length === before) {
+    // nothing removed
+    return false;
+  }
+  await db.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { reference },
+      UpdateExpression: 'SET slots = :v',
+      ExpressionAttributeValues: { ':v': next },
+    })
+  );
+  return true;
+}

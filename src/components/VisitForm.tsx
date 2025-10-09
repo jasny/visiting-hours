@@ -8,6 +8,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { addVisit } from '@/services/pageService';
 import { Calendar as CalType, Slot } from "@/lib/types";
 import { isTimeAvailable } from '@/lib/calendar';
+import { useVisitCookie } from '@/hooks/useVisitCookie';
 
 interface Props {
   reference: string;
@@ -37,6 +38,7 @@ function formatLocalHM(d: Date): string {
 export default function VisitForm({ reference, calendar, visible, onClose, selected }: Props) {
   const isExample = reference === '';
   const [pending, startTransition] = useTransition();
+  const { store } = useVisitCookie(reference);
 
   const defaultDate = useMemo(() => {
     if (selected?.date && selected?.time) {
@@ -79,11 +81,17 @@ export default function VisitForm({ reference, calendar, visible, onClose, selec
 
     startTransition(async () => {
       if (isExample) {
-        onClose({ ...payload, type: 'taken', duration: 60 });
+        const slot = { ...payload, type: 'taken', duration: 60 } as Slot;
+        // store cookie for example too
+        store({ date: slot.date, time: slot.time, name: slot.name, duration: slot.duration });
+        onClose(slot);
         return;
       }
 
       const slot = await addVisit(reference, payload);
+      if (slot) {
+        store({ date: slot.date, time: slot.time, name: slot.name, duration: slot.duration });
+      }
       onClose(slot);
     });
   };
