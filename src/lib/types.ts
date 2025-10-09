@@ -20,7 +20,8 @@ export interface Slot {
 
 export interface Page {
   reference: string;
-  email: string;
+  nonce?: string;
+  email?: string;
   name: string;
   date_of_birth: string | null;
   parent_name: string;
@@ -42,5 +43,5 @@ export interface Page {
   evening_amount: number;
   duration: number;
   slots: Slot[];
-  manage_token: string;
+  theme: string;
 }

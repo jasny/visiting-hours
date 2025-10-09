@@ -80,7 +80,7 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
 
     const pagePayload: Page = {
       reference: normalized.reference || genRef(),
-      manage_token: normalized.manage_token || genToken(),
+      nonce: normalized.nonce || genToken(),
       email: normalized.email as string,
       name: normalized.name as string,
       parent_name: normalized.parent_name as string,

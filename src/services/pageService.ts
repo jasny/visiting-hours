@@ -7,19 +7,27 @@ import { isTimeAvailable } from "@/lib/calendar"
 import crypto from 'crypto';
 import {
   clearVisitCookie,
-  computeVisitVerification,
+  getVisitCookie,
   setVisitCookie,
-  verifyVisitCookie
+  verifyVisitCookie, VisitCookie
 } from '@/lib/verification';
 
 const TABLE_NAME = 'VisitingHoursPage';
 
-export async function getPage(reference: string): Promise<Page | null> {
+async function fetchPage(reference: string): Promise<Page | undefined> {
   const res = await db.send(
-    new GetCommand({ TableName: TABLE_NAME, Key: { reference } })
+    new GetCommand({ TableName: TABLE_NAME, Key: { reference }})
   );
-  const page = res.Item as Page | undefined;
+
+  return res.Item as unknown as Page | undefined;
+}
+
+export async function getPage(reference: string): Promise<Page | null> {
+  const page = await fetchPage(reference);
   if (!page) return null;
+
+  delete page.email;
+  delete page.nonce;
 
   for (const slot of page.slots) {
     delete slot.name;
@@ -29,13 +37,27 @@ export async function getPage(reference: string): Promise<Page | null> {
   return page;
 }
 
+function findSlotForCookie(slots: Slot[], cookie: VisitCookie): Slot | undefined {
+  return slots.find(
+    (s) => (s.date === cookie.date && s.time === cookie.time && s.duration === cookie.duration),
+  );
+}
+
 export async function getVisitFromCookie(reference: string): Promise<Slot | null> {
-  const cookie = await verifyVisitCookie(reference);
+  const page = await fetchPage(reference);
+  if (!page) return null;
+
+  const cookie = await getVisitCookie(reference);
   if (!cookie) return null;
 
-  const { verification: _v, nonce: _n, ...slot } = cookie;
+  const { nonce, ...slot } = findSlotForCookie(page.slots, cookie) ?? {};
 
-  return { ...slot, type: 'taken' as const };
+  if (!nonce || !verifyVisitCookie(reference, cookie, nonce)) {
+    console.error(`Failed to verify cookie for ${reference}`, cookie, slot, nonce);
+    return null;
+  }
+
+  return slot as Slot;
 }
 
 export async function savePage(page: Page): Promise<void> {
@@ -46,7 +68,7 @@ export async function addVisit(
   reference: string,
   payload: Omit<Required<Slot>, 'duration' | 'type' | 'nonce'>
 ): Promise<Slot | undefined> {
-  const page = await getPage(reference);
+  const page = await fetchPage(reference);
   if (!page || !page.duration || !isTimeAvailable(page, payload.date, payload.time)) {
     console.log(`Could not add visit for ${page?.reference ?? 'unknown page'}`)
     return;
@@ -55,40 +77,39 @@ export async function addVisit(
   const slots: Slot[] = page.slots ?? [];
   const nonce = crypto.randomBytes(16).toString('hex');
   const visit: Required<Slot> = { ...payload, duration: page.duration, type: 'taken', nonce };
-  slots.push(visit);
 
   await db.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: { reference },
       UpdateExpression: 'SET slots = :v',
-      ExpressionAttributeValues: { ':v': slots },
+      ExpressionAttributeValues: { ':v': [...slots, visit] },
     })
   );
 
   if (reference !== '') {
-    const verification = computeVisitVerification(reference, visit.date, visit.time);
-    await setVisitCookie(reference, { ...visit, verification, nonce });
+    const cookie = { date: visit.date, time: visit.time, duration: visit.duration };
+    await setVisitCookie(reference, cookie, nonce);
   }
 
   return { ...visit, nonce: undefined };
 }
 
 export async function cancelVisit(reference: string): Promise<boolean> {
-  const page = await getPage(reference);
+  const page = await fetchPage(reference);
   if (!page) return false;
 
-  const cookie = await verifyVisitCookie(reference);
+  const cookie = await getVisitCookie(reference);
   if (!cookie) return false;
 
-  const oldSlots: Slot[] = page.slots ?? [];
+  const slot = findSlotForCookie(page.slots, cookie);
 
-  const newSlots = oldSlots.filter(
-    (s) => !(s.date === cookie.date && s.time === cookie.time && s.nonce === cookie.nonce)
-  );
-  if (oldSlots.length === newSlots.length) {
+  if (!slot?.nonce || !verifyVisitCookie(reference, cookie, slot.nonce)) {
+    console.error(`Failed to verify cookie for ${reference}`, cookie, slot);
     return false;
   }
+
+  const newSlots = page.slots.filter((s) => s !== slot);
 
   await db.send(
     new UpdateCommand({

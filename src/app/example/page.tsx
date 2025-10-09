@@ -54,7 +54,7 @@ export default async function ShowPage() {
 
   const page: Page = {
     reference: '',
-    manage_token: 'example-token',
+    nonce: 'example-token',
     email: 'example@visiting-hours.app',
     name: 'Emma',
     parent_name: 'Sarah & Tom',
