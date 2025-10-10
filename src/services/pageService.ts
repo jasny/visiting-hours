@@ -100,28 +100,29 @@ async function generateReference() {
   return reference;
 }
 
-export async function createPage(page: Omit<Page, 'reference' | 'nonce' | 'slots'>): Promise<string> {
-  const reference = await generateReference();
-  const nonce = randomNonce();
+export async function savePage(page: Omit<Page, 'reference' | 'nonce' | 'slots'> & { reference?: string }): Promise<string> {
+  let item: Page;
 
-  const item: Page = { ...page, reference, nonce, slots: [] } as Page;
-  await db.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
+  if (page.reference) {
+    const existing = await fetchPage(page.reference, 'nonce, slots');
+    if (!existing) throw new Error('Failed to update page');
 
-  await setPageCookie(reference, nonce);
+    if (!await getPageTokenForAdmin(existing)) {
+      throw new AccessDeniedError();
+    }
 
-  return reference;
-}
-
-export async function updatePage(page: Omit<Page, 'nonce' | 'slots'>): Promise<void> {
-  const existing = await fetchPage(page.reference, 'nonce, slots');
-  if (!existing) throw new Error('Failed to update page');
-
-  if (!await getPageTokenForAdmin(existing)) {
-    throw new AccessDeniedError();
+    item = { ...page, ...existing };
+  } else {
+    const reference = await generateReference();
+    const nonce = randomNonce();
+    item = { ...page, reference, nonce, slots: [] };
   }
 
-  const item: Page = { ...page, ...existing } as Page;
   await db.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
+
+  await setPageCookie(item.reference, item.nonce!);
+
+  return item.reference;
 }
 
 async function addSlot(page: Pick<Page, 'reference' | 'slots'>, slot: Slot): Promise<void> {

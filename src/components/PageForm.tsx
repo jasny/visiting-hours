@@ -10,7 +10,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
 import { Baby, MapPinIcon, CalendarDays, Settings, Clock, Info } from 'lucide-react';
-import { createPage } from '@/services/pageService';
+import { savePage } from '@/services/pageService';
 import { Page } from "@/lib/types";
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -105,7 +105,7 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
       theme: normalized.theme as string,
     };
 
-    const reference = await createPage(pagePayload);
+    const reference = await savePage({ ...pagePayload, reference: defaultValues.reference as string | undefined });
     toast.current?.show({ severity: 'success', summary: 'Pagina succesvol aangemaakt', life: 2000 });
     setTimeout(() => {
       router.push(`/page/${reference}`);
