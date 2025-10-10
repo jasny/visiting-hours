@@ -8,6 +8,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { addVisit } from '@/services/pageService';
 import { Calendar as CalType, Slot } from "@/lib/types";
 import { isTimeAvailable } from '@/lib/calendar';
+import { useDutchLocale } from "@/hooks/useLocale"
 
 interface Props {
   reference: string;
@@ -37,6 +38,8 @@ function formatLocalHM(d: Date): string {
 export default function VisitForm({ reference, calendar, visible, onClose, selected }: Props) {
   const isExample = reference === '';
   const [pending, startTransition] = useTransition();
+
+  useDutchLocale();
 
   const defaultDate = useMemo(() => {
     if (selected?.date && selected?.time) {

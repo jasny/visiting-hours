@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import CreatePageForm from '@/components/CreatePageForm';
+import PageForm from '@/components/PageForm';
 
 export default async function CreatePage() {
   const defaultValues = {
@@ -43,7 +43,7 @@ export default async function CreatePage() {
         <p className="mb-8 text-center text-sm font-light text-gray-500">
           Deel je vreugde met familie en vrienden
         </p>
-        <CreatePageForm values={defaultValues} />
+        <PageForm values={defaultValues} />
       </div>
     </main>
   );

@@ -15,6 +15,8 @@ import { Page } from "@/lib/types";
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
+import { useDutchLocale } from "@/hooks/useLocale"
+import { partialMatch } from "@/lib/utils"
 
 // Keep same shape as before but managed by react-hook-form
 type FormState = Partial<Page>;
@@ -25,18 +27,27 @@ const toTimeValue = (value?: string | null) =>
 const fromTimeValue = (date: Date | null | undefined) =>
   date ? date.toTimeString().slice(0, 5) : null;
 
-export default function CreatePageForm({ values: defaultValues }: { values: Partial<Page> }) {
+const defaultTimes = {
+  duration: 60,
+  morning_from: '10:00', morning_to: '12:00', morning_amount: 1,
+  afternoon_from: '12:00', afternoon_to: '18:00', afternoon_amount: 2,
+  evening_from: '18:00', evening_to: '21:00', evening_amount: 0,
+};
+
+export default function PageForm({ values: defaultValues }: { values: Partial<Page> }) {
   const router = useRouter();
   const toast = useRef<Toast | null>(null);
 
-  const [showAddress, setShowAddress] = useState(false);
-  const [customTimes, setCustomTimes] = useState(false);
+  const [showAddress, setShowAddress] = useState(!!defaultValues.street);
+  const [customTimes, setCustomTimes] = useState(!partialMatch(defaultValues, defaultTimes));
   const [durationHours, setDurationHours] = useState(1);
   const [durationMinutes, setDurationMinutes] = useState(0);
 
   const { control, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormState>({
     defaultValues
   });
+
+  useDutchLocale();
 
   // keep duration in minutes in the form and update via hours/minutes controls
   useEffect(() => {
@@ -49,13 +60,7 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
   const evening_amount = watch('evening_amount');
 
   const onSubmit: SubmitHandler<FormState> = async (data) => {
-    const defaults = !customTimes ? {
-      duration: 60,
-      morning_from: '10:00', morning_to: '12:00', morning_amount: 1,
-      afternoon_from: '12:00', afternoon_to: '18:00', afternoon_amount: 2,
-      evening_from: '18:00', evening_to: '21:00', evening_amount: 0,
-    } : {};
-
+    const defaults = !customTimes ? defaultTimes : {};
     const normalized = { ...defaults, ...data } as Partial<Page>;
 
     const ensureTimeWindow = (

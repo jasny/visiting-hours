@@ -1,6 +1,6 @@
 import { addLocale, locale } from "primereact/api"
 
-export function useDutch() {
+export function useDutchLocale() {
   addLocale('nl', {
     firstDayOfWeek: 1, // monday
     dayNames: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'],

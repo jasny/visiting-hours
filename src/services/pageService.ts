@@ -91,7 +91,7 @@ async function generateReference() {
 
   for (let i = 5; i >= 0; i--) {
     reference = randomString(8);
-    const existing = await fetchPage(reference, 'reference');
+    const existing = await fetchPage(reference, 'nonce');
     if (!existing) break;
   }
 
@@ -104,7 +104,7 @@ export async function createPage(page: Omit<Page, 'reference' | 'nonce' | 'slots
   const reference = await generateReference();
   const nonce = randomNonce();
 
-  const item: Page = { ...page, reference, nonce } as Page;
+  const item: Page = { ...page, reference, nonce, slots: [] } as Page;
   await db.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
 
   await setPageCookie(reference, nonce);
