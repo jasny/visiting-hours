@@ -1,0 +1,61 @@
+{% macro style(font_size, margin) %}
+    style="font-size:{{ font_size|default('14px') }}; line-height:1.5; margin:{{ margin|default('0 0 10px 0') }}; font-family:Helvetica,Arial,sans-serif;"
+{% endmacro %}
+<html>
+    <head>
+        <style type="text/css">
+            body {
+                font-family:Helvetica,Arial,sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            a {
+                color: #428bca;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            
+            @media (max-width: 620px) {
+                .visible-desktop {
+                    display: none;
+                }
+                
+                .border-desktop {
+                    border: none !important;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <table style="width: 100%;" cellpadding="0" cellspacing="0">
+            <tr class="visible-desktop">
+                <td></td>
+                <td>&nbsp;</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="visible-desktop"></td>
+                <td class="border-desktop" width="600" style="border: 1px solid #ccc;">
+                    <table style="width: 100%;" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="3"><img width="100%" height="60" src="http://www.opkraambezoek.nl/img/bg-beschuit-small.jpg"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="20"></td>
+                        <td width="560">{% block content %}{% endblock %}</td>
+                        <td width="20"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+                </td>
+                <td class="visible-desktop"></td>
+            </tr>
+        </table>
+    </body>
+</html>
