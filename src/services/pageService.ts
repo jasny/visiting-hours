@@ -107,7 +107,7 @@ export async function savePage(page: Omit<Page, 'reference' | 'nonce' | 'slots'>
     const existing = await fetchPage(page.reference, 'nonce, slots, theme, image');
     if (!existing) throw new Error('Failed to update page');
 
-    if (!await getPageTokenForAdmin(existing)) {
+    if (!await getPageTokenForAdmin({ ...existing, reference: page.reference })) {
       throw new AccessDeniedError();
     }
 
@@ -140,7 +140,7 @@ export async function updatePage(reference: string, payload: Partial<Omit<Page, 
   );
 }
 
-async function addSlot(page: Pick<Page, 'reference' | 'slots'>, slot: Slot): Promise<void> {
+async function _addSlot(page: Pick<Page, 'reference' | 'slots'>, slot: Slot): Promise<void> {
   const slots: Slot[] = page.slots ?? [];
 
   await db.send(
@@ -167,7 +167,7 @@ export async function addVisit(
   const nonce = randomNonce();
   const visit: Slot = { ...payload, duration: page.duration, type: 'taken', nonce };
 
-  await addSlot(page, visit);
+  await _addSlot(page, visit);
 
   if (reference !== '') {
     const cookie = { date: visit.date, time: visit.time, duration: visit.duration };
@@ -210,11 +210,11 @@ export async function cancelVisit(reference: string): Promise<boolean> {
   return true;
 }
 
-export async function addBlocked(
+export async function addSlot(
   reference: string,
-  payload: Omit<Required<Slot>, 'type' | 'nonce'>
+  payload: Omit<Required<Slot>, 'nonce'>
 ): Promise<void> {
-  const page = await fetchPage(reference, 'slots, duration, nonce');
+  const page = await fetchPage(reference, 'slots, nonce');
   if (!page) {
     console.log(`Could not add visit for ${reference}`)
     return;
@@ -224,5 +224,5 @@ export async function addBlocked(
     throw new AccessDeniedError();
   }
 
-  await addSlot(page, { ...payload, type: 'blocked' });
+  await _addSlot(page, payload);
 }

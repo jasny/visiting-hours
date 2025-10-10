@@ -9,7 +9,7 @@ import { notFound } from "next/navigation"
 export default async function EditPage({ params }: { params: Promise<{ reference: string }> }) {
   const { reference } = await params;
   const page = await getPage(reference);
-  if (!page) return notFound();
+  if (!page?.manage_token) return notFound();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-6">

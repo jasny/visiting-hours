@@ -37,6 +37,7 @@ const defaultTimes = {
 export default function PageForm({ values: defaultValues }: { values: Partial<Page> }) {
   const router = useRouter();
   const toast = useRef<Toast | null>(null);
+  const pageExists = !!defaultValues.reference;
 
   const [showAddress, setShowAddress] = useState(!!defaultValues.street);
   const [customTimes, setCustomTimes] = useState(!partialMatch(defaultValues, defaultTimes));
@@ -102,11 +103,11 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
       street: normalized.street ?? null,
       postalcode: normalized.postalcode ?? null,
       city: normalized.city ?? null,
-      theme: normalized.theme as string,
+      theme: normalized.theme as Page['theme'],
     };
 
     const reference = await savePage({ ...pagePayload, reference: defaultValues.reference as string | undefined });
-    toast.current?.show({ severity: 'success', summary: 'Pagina succesvol aangemaakt', life: 2000 });
+    toast.current?.show({ severity: 'success', summary: 'Pagina succesvol opgeslagen', life: 2000 });
     setTimeout(() => {
       router.push(`/page/${reference}`);
     }, 800);
@@ -213,7 +214,6 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
             <Controller
               name="gifts"
               control={control}
-              rules={{ required: 'Vereist' }}
               render={({ field }) => (
                 <InputTextarea id="gifts" {...field} rows={3} className={`p-inputtext-sm ${invalid('gifts')}`} />
               )}
@@ -667,7 +667,7 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
       </Card>
 
       <Button
-        label="Pagina aanmaken"
+        label={pageExists ? 'Pagina aanpassen' : 'Pagina aanmaken'}
         type="submit"
         loading={isSubmitting}
         className="mt-2 w-full"
