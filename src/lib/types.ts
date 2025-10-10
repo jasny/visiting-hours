@@ -43,5 +43,5 @@ export interface Page {
   evening_amount: number;
   duration: number;
   slots: Slot[];
-  theme: string;
+  theme: 'pink' | 'blue' | 'green';
 }

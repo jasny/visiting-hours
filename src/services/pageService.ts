@@ -1,7 +1,7 @@
 'use server';
 
 import { GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
-import { db } from '@/lib/dynamodb';
+import { buildUpdateExpression, db } from '@/lib/dynamodb';
 import { Page, Slot } from "@/lib/types"
 import { isTimeAvailable } from "@/lib/calendar"
 import { randomNonce, randomString } from '@/lib/crypto';
@@ -104,7 +104,7 @@ export async function savePage(page: Omit<Page, 'reference' | 'nonce' | 'slots'>
   let item: Page;
 
   if (page.reference) {
-    const existing = await fetchPage(page.reference, 'nonce, slots');
+    const existing = await fetchPage(page.reference, 'nonce, slots, theme, image');
     if (!existing) throw new Error('Failed to update page');
 
     if (!await getPageTokenForAdmin(existing)) {
@@ -125,6 +125,21 @@ export async function savePage(page: Omit<Page, 'reference' | 'nonce' | 'slots'>
   return item.reference;
 }
 
+export async function updatePage(reference: string, payload: Partial<Omit<Page, 'reference' | 'slots'>>) {
+  if (!await isAdmin(reference)) throw new AccessDeniedError();
+
+  const update = buildUpdateExpression(payload);
+
+  await db.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { reference },
+      ...update,
+      ReturnValues: "NONE",
+    })
+  );
+}
+
 async function addSlot(page: Pick<Page, 'reference' | 'slots'>, slot: Slot): Promise<void> {
   const slots: Slot[] = page.slots ?? [];
 
@@ -134,6 +149,7 @@ async function addSlot(page: Pick<Page, 'reference' | 'slots'>, slot: Slot): Pro
       Key: { reference: page.reference },
       UpdateExpression: 'SET slots = :v',
       ExpressionAttributeValues: { ':v': [...slots, slot] },
+      ReturnValues: "NONE",
     })
   );
 }

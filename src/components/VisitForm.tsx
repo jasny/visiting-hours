@@ -4,6 +4,7 @@ import { useEffect, useMemo, useTransition } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Calendar as PCalendar } from 'primereact/calendar';
 import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
 import { Controller, useForm } from 'react-hook-form';
 import { addVisit } from '@/services/pageService';
 import { Calendar as CalType, Slot } from "@/lib/types";
@@ -93,14 +94,13 @@ export default function VisitForm({ reference, calendar, visible, onClose, selec
 
   const footer = (
     <div className="flex items-center justify-end gap-3 w-full">
-      <button
+      <Button
         type="button"
         onClick={handleSubmit(onSubmit)}
-        className={`px-4 py-2 rounded-lg ${pending ? 'bg-pink-300' : 'bg-pink-500 hover:bg-pink-600'} text-white`}
+        label="Bevestig je bezoek"
         disabled={pending || isSubmitting}
-      >
-        Bevestig je bezoek
-      </button>
+        loading={pending || isSubmitting}
+      />
     </div>
   );
 

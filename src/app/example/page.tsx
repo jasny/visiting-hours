@@ -4,6 +4,7 @@ import PageInfo from '@/components/PageInfo';
 import VisitSection from '@/components/VisitSection';
 import ExampleBaby from "@/assets/example-baby.jpg";
 import { Page, Slot } from "@/lib/types"
+import ThemeSwitcher from "@/components/ThemeSwitcher"
 
 export default async function ShowPage() {
   // helper to format YYYY-MM-DD
@@ -82,16 +83,19 @@ export default async function ShowPage() {
       visit(9, '15:00', 'Collega Eva'),     // volgende week
       ...blockingSlots,
     ],
-    theme: 'pink'
+    theme: 'pink' as const,
   };
 
   return (
-    <main>
-      <section className="bg-gradient-to-br from-pink-50 via-rose-50 to-orange-50 p-4 md:p-8">
+    <main data-visit-theme={page.theme}>
+      <ThemeSwitcher isAdmin={true} theme={page.theme} />
+
+      <section className="bg-gradient-to-br from-[var(--hero-from)] via-[var(--hero-via)] to-[var(--hero-to)] p-4 md:p-8">
         <div className="max-w-6xl mx-auto flex flex-col gap-4">
           <PageInfo info={page} image={ExampleBaby} />
         </div>
       </section>
+
       <section className="bg-gradient-to-br from-gray-200 via-gray-50 to-purple-50 px-6 py-16 md:px-12 md:py-24">
         <div className="max-w-6xl mx-auto">
           <VisitSection page={page} />

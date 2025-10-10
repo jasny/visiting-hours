@@ -22,6 +22,58 @@ body {
   color: var(--foreground);
 }
 
+@layer theme {
+  /* Default: Pink theme (scoped to visit page only) */
+  [data-visit-theme="pink"] {
+    /* Hero gradient */
+    --hero-from: theme(colors.pink.50);
+    --hero-via: theme(colors.rose.50);
+    --hero-to: theme(colors.orange.50);
+    /* Text and dividers */
+    --theme-800: theme(colors.rose.800);
+    --theme-700: theme(colors.rose.700);
+    --theme-600: theme(colors.rose.600);
+    --theme-500: theme(colors.rose.500);
+    --theme-400: theme(colors.rose.400);
+    --theme-300: theme(colors.rose.300);
+    --theme-200: theme(colors.rose.200);
+    --theme-100: theme(colors.rose.100);
+    --theme-50: theme(colors.rose.50);
+  }
+
+  /* Blue theme */
+  [data-visit-theme="blue"] {
+    --hero-from: theme(colors.sky.50);
+    --hero-via: theme(colors.blue.50);
+    --hero-to: theme(colors.cyan.50);
+    --theme-800: theme(colors.sky.800);
+    --theme-700: theme(colors.sky.700);
+    --theme-600: theme(colors.sky.600);
+    --theme-500: theme(colors.sky.500);
+    --theme-400: theme(colors.sky.400);
+    --theme-300: theme(colors.sky.300);
+    --theme-200: theme(colors.sky.200);
+    --theme-100: theme(colors.sky.100);
+    --theme-50: theme(colors.sky.50);
+  }
+
+  /* Green theme (soft pastels, all 50s) */
+  [data-visit-theme="green"] {
+    --hero-from: theme(colors.teal.50);
+    --hero-via: theme(colors.emerald.50);
+    --hero-to: theme(colors.green.50);
+    --theme-800: theme(colors.teal.800);
+    --theme-700: theme(colors.teal.700);
+    --theme-600: theme(colors.teal.600);
+    --theme-500: theme(colors.teal.500);
+    --theme-400: theme(colors.teal.400);
+    --theme-300: theme(colors.teal.300);
+    --theme-200: theme(colors.teal.200);
+    --theme-100: theme(colors.teal.100);
+    --theme-50: theme(colors.teal.50);
+  }
+}
+
 textarea::placeholder {
   color: #b8b8b8;
 }
