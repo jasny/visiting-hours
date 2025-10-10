@@ -10,7 +10,7 @@ export interface VisitCookie {
 
 const HMAC_SECRET = process.env.VISIT_HMAC_SECRET ?? '';
 
-function cookieName(prefix: string, reference: string) {
+export function cookieName(prefix: string, reference: string) {
   return `vh_${prefix}_${reference}`;
 }
 
@@ -19,7 +19,7 @@ export function getPageToken(reference: string, nonce: string) {
   return crypto.createHmac('sha256', HMAC_SECRET).update(data).digest('hex');
 }
 
-export function verifyPageCookie(reference: string, token: string, nonce: string): boolean {
+export function verifyPageToken(reference: string, token: string, nonce: string): boolean {
   return token === getPageToken(reference, nonce);
 }
 
@@ -27,7 +27,7 @@ export async function getPageCookie(reference: string): Promise<string | null> {
   const store = await cookies();
 
   try {
-    return store.get(cookieName('visit', reference))?.value ?? null;
+    return store.get(cookieName('manage', reference))?.value ?? null;
   } catch {}
 
   return null;
@@ -37,7 +37,7 @@ export async function setPageCookie(reference: string, nonce: string): Promise<v
   const token = getPageToken(reference, nonce);
 
   const store = await cookies();
-  store.set(cookieName('visit', reference), token, {
+  store.set(cookieName('manage', reference), token, {
     httpOnly: true,
     secure: true,
     sameSite: 'lax',
@@ -47,7 +47,7 @@ export async function setPageCookie(reference: string, nonce: string): Promise<v
 
 export async function clearPageCookie(reference: string): Promise<void> {
   const store = await cookies();
-  store.delete(cookieName('visit', reference));
+  store.delete(cookieName('manage', reference));
 }
 
 export function computeVisitVerification(reference: string, date: string, time: string, nonce: string) {

@@ -10,7 +10,7 @@ import {
   getPageCookie,
   getVisitCookie,
   setVisitCookie,
-  verifyPageCookie,
+  verifyPageToken,
   verifyVisitCookie,
   VisitCookie,
   setPageCookie
@@ -50,7 +50,7 @@ async function getPageTokenForAdmin(page: Pick<Page, 'reference' | 'nonce'>): Pr
   }
 
   const token = await getPageCookie(page.reference);
-  return token && verifyPageCookie(page.reference, token, page.nonce!) ? token : null;
+  return token && verifyPageToken(page.reference, token, page.nonce!) ? token : null;
 }
 
 export async function isAdmin(reference: string): Promise<boolean> {
@@ -60,7 +60,14 @@ export async function isAdmin(reference: string): Promise<boolean> {
   const page = await fetchPage(reference, 'nonce');
   if (!page) return false;
 
-  return verifyPageCookie(reference, token, page.nonce!);
+  return verifyPageToken(reference, token, page.nonce!);
+}
+
+export async function acceptManageToken(reference: string, token: string): Promise<boolean> {
+  const page = await fetchPage(reference, 'nonce');
+  if (!page || !page.nonce) return false;
+
+  return verifyPageToken(reference, token, page.nonce);
 }
 
 function findSlotForCookie(slots: Slot[], cookie: VisitCookie): Slot | undefined {

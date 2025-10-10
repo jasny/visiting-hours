@@ -1,6 +1,6 @@
 'use server';
 
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getPage } from '@/services/pageService';
 import PageInfo from '@/components/PageInfo';
@@ -9,8 +9,14 @@ import defaultBaby from '@/assets/default-baby.webp';
 import { Pencil } from 'lucide-react';
 import ThemeSwitcher, { type VisitTheme } from '@/components/ThemeSwitcher';
 
-export default async function ShowPage({ params }: { params: Promise<{ reference: string }> }) {
-  const { reference } = await params;
+export default async function ShowPage({ params, searchParams }: { params: Promise<{ reference: string }>, searchParams: Promise<{ manage?: string }> }) {
+  const [{ reference }, { manage }] = await Promise.all([params, searchParams]);
+
+  // Backwards compatibility
+  if (manage) {
+    return redirect(`/page/${reference}/manage?token=${manage}`);
+  }
+
   const page = await getPage(reference);
   if (!page) return notFound();
 
