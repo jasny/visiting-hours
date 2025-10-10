@@ -10,11 +10,14 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
 import { Baby, MapPinIcon, CalendarDays, Settings, Clock, Info } from 'lucide-react';
-import { createPage } from '@/services/pageService';
+import { savePage } from '@/services/pageService';
 import { Page } from "@/lib/types";
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
+import { useDutchLocale } from "@/hooks/useLocale"
+import { partialMatch } from "@/lib/utils"
+import { toDate, toDateString } from "@/lib/calendar"
 
 // Keep same shape as before but managed by react-hook-form
 type FormState = Partial<Page>;
@@ -25,18 +28,28 @@ const toTimeValue = (value?: string | null) =>
 const fromTimeValue = (date: Date | null | undefined) =>
   date ? date.toTimeString().slice(0, 5) : null;
 
-export default function CreatePageForm({ values: defaultValues }: { values: Partial<Page> }) {
+const defaultTimes = {
+  duration: 60,
+  morning_from: '10:00', morning_to: '12:00', morning_amount: 1,
+  afternoon_from: '12:00', afternoon_to: '18:00', afternoon_amount: 2,
+  evening_from: '18:00', evening_to: '21:00', evening_amount: 0,
+};
+
+export default function PageForm({ values: defaultValues }: { values: Partial<Page> }) {
   const router = useRouter();
   const toast = useRef<Toast | null>(null);
+  const pageExists = !!defaultValues.reference;
 
-  const [showAddress, setShowAddress] = useState(false);
-  const [customTimes, setCustomTimes] = useState(false);
+  const [showAddress, setShowAddress] = useState(!!defaultValues.street);
+  const [customTimes, setCustomTimes] = useState(!partialMatch(defaultValues, defaultTimes));
   const [durationHours, setDurationHours] = useState(1);
   const [durationMinutes, setDurationMinutes] = useState(0);
 
   const { control, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormState>({
     defaultValues
   });
+
+  useDutchLocale();
 
   // keep duration in minutes in the form and update via hours/minutes controls
   useEffect(() => {
@@ -49,13 +62,7 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
   const evening_amount = watch('evening_amount');
 
   const onSubmit: SubmitHandler<FormState> = async (data) => {
-    const defaults = !customTimes ? {
-      duration: 60,
-      morning_from: '10:00', morning_to: '12:00', morning_amount: 1,
-      afternoon_from: '12:00', afternoon_to: '18:00', afternoon_amount: 2,
-      evening_from: '18:00', evening_to: '21:00', evening_amount: 0,
-    } : {};
-
+    const defaults = !customTimes ? defaultTimes : {};
     const normalized = { ...defaults, ...data } as Partial<Page>;
 
     const ensureTimeWindow = (
@@ -97,11 +104,11 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
       street: normalized.street ?? null,
       postalcode: normalized.postalcode ?? null,
       city: normalized.city ?? null,
-      theme: normalized.theme as string,
+      theme: normalized.theme as Page['theme'],
     };
 
-    const reference = await createPage(pagePayload);
-    toast.current?.show({ severity: 'success', summary: 'Pagina succesvol aangemaakt', life: 2000 });
+    const reference = await savePage({ ...pagePayload, reference: defaultValues.reference as string | undefined });
+    toast.current?.show({ severity: 'success', summary: 'Pagina succesvol opgeslagen', life: 2000 });
     setTimeout(() => {
       router.push(`/page/${reference}`);
     }, 800);
@@ -114,7 +121,6 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
   return (
     <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
       <Toast ref={toast} />
-      {/* Baby & ouder informatie */}
       <Card title={
         <div className="flex items-center gap-4 mb-6">
           <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center">
@@ -134,7 +140,6 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Vereist' }}
               render={({ field }) => (
                 <InputText id="name" {...field} className={`p-inputtext-sm ${invalid('name')}`} />
               )}
@@ -152,7 +157,7 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
                 <Calendar
                   id="date_of_birth"
                   value={value ? new Date(value) : undefined}
-                  onChange={(e) => onChange(e.value ? (e.value as Date).toISOString() : null)}
+                  onChange={(e) => onChange(e.value ? toDateString(e.value as Date) : null)}
                   dateFormat="dd-mm-yy"
                   className="p-inputtext-sm"
                 />
@@ -208,7 +213,6 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
             <Controller
               name="gifts"
               control={control}
-              rules={{ required: 'Vereist' }}
               render={({ field }) => (
                 <InputTextarea id="gifts" {...field} rows={3} className={`p-inputtext-sm ${invalid('gifts')}`} />
               )}
@@ -312,7 +316,7 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
                 <Calendar
                   id="date_from"
                   value={value ? new Date(value) : undefined}
-                  onChange={(e) => onChange((e.value as Date | undefined)?.toISOString())}
+                  onChange={(e) => onChange(e.value ? toDateString(e.value) : undefined)}
                   dateFormat="dd-mm-yy"
                   className={`p-inputtext-sm ${invalid('date_from')}`}
                 />
@@ -332,7 +336,7 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
                 <Calendar
                   id="date_to"
                   value={value ? new Date(value) : undefined}
-                  onChange={(e) => onChange((e.value as Date | undefined)?.toISOString())}
+                  onChange={(e) => onChange(e.value ? toDateString(e.value) : undefined)}
                   dateFormat="dd-mm-yy"
                   className={`p-inputtext-sm ${invalid('date_to')}`}
                 />
@@ -662,7 +666,7 @@ export default function CreatePageForm({ values: defaultValues }: { values: Part
       </Card>
 
       <Button
-        label="Pagina aanmaken"
+        label={pageExists ? 'Pagina aanpassen' : 'Pagina aanmaken'}
         type="submit"
         loading={isSubmitting}
         className="mt-2 w-full"

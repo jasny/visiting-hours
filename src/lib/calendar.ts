@@ -120,6 +120,13 @@ export function toDate(dateStr: string, hm: string) {
   return setMinutes(setHours(d, h), m);
 }
 
+export function toDateString(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function futureDate(dateStr?: string): Date {
   const today = new Date(); today.setHours(0,0,0,0);
   if (!dateStr) return today;

@@ -21,4 +21,28 @@ const client = new DynamoDBClient({
 
 export const db = DynamoDBDocumentClient.from(client);
 
+export function buildUpdateExpression(payload: Record<string, unknown>) {
+  const entries = Object.entries(payload).filter(([, v]) => v !== undefined);
+  if (entries.length === 0) return;
+
+  const names: Record<string, string> = { "#ref": "reference" };
+  const values: Record<string, unknown> = {};
+  const sets: string[] = [];
+
+  entries.forEach(([k, v], i) => {
+    const nk = `#k${i}`;
+    const vk = `:v${i}`;
+    names[nk] = k;
+    values[vk] = v;          // null wordt gewoon gezet als null
+    sets.push(`${nk} = ${vk}`);
+  });
+
+  return {
+    UpdateExpression: `SET ${sets.join(", ")}`,
+    ExpressionAttributeNames: names,
+    ExpressionAttributeValues: values,
+    ConditionExpression: "attribute_exists(#ref)",
+  }
+}
+
 export default db;

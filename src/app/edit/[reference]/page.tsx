@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import CreatePageForm from '@/components/CreatePageForm';
+import PageForm from '@/components/PageForm';
 import { getPage } from "@/services/pageService"
 import { notFound } from "next/navigation"
 
 export default async function EditPage({ params }: { params: Promise<{ reference: string }> }) {
   const { reference } = await params;
   const page = await getPage(reference);
-  if (!page) return notFound();
+  if (!page?.manage_token) return notFound();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-6">
@@ -25,7 +25,7 @@ export default async function EditPage({ params }: { params: Promise<{ reference
         <p className="mb-8 text-center text-sm font-light text-gray-500">
           Deel je vreugde met familie en vrienden
         </p>
-        <CreatePageForm values={page} />
+        <PageForm values={page} />
       </div>
     </main>
   );

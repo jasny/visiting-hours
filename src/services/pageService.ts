@@ -1,7 +1,7 @@
 'use server';
 
 import { GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
-import { db } from '@/lib/dynamodb';
+import { buildUpdateExpression, db } from '@/lib/dynamodb';
 import { Page, Slot } from "@/lib/types"
 import { isTimeAvailable } from "@/lib/calendar"
 import { randomNonce, randomString } from '@/lib/crypto';
@@ -10,7 +10,7 @@ import {
   getPageCookie,
   getVisitCookie,
   setVisitCookie,
-  verifyPageCookie,
+  verifyPageToken,
   verifyVisitCookie,
   VisitCookie,
   setPageCookie
@@ -55,7 +55,7 @@ async function getPageTokenForAdmin(page: Pick<Page, 'reference' | 'nonce'>): Pr
   }
 
   const token = await getPageCookie(page.reference);
-  return token && verifyPageCookie(page.reference, token, page.nonce!) ? token : null;
+  return token && verifyPageToken(page.reference, token, page.nonce!) ? token : null;
 }
 
 export async function isAdmin(reference: string): Promise<boolean> {
@@ -65,7 +65,14 @@ export async function isAdmin(reference: string): Promise<boolean> {
   const page = await fetchPage(reference, 'nonce');
   if (!page) return false;
 
-  return verifyPageCookie(reference, token, page.nonce!);
+  return verifyPageToken(reference, token, page.nonce!);
+}
+
+export async function acceptManageToken(reference: string, token: string): Promise<boolean> {
+  const page = await fetchPage(reference, 'nonce');
+  if (!page || !page.nonce) return false;
+
+  return verifyPageToken(reference, token, page.nonce);
 }
 
 function findSlotForCookie(slots: Slot[], cookie: VisitCookie): Slot | undefined {
@@ -96,7 +103,7 @@ async function generateReference() {
 
   for (let i = 5; i >= 0; i--) {
     reference = randomString(8);
-    const existing = await fetchPage(reference, 'reference');
+    const existing = await fetchPage(reference, 'nonce');
     if (!existing) break;
   }
 
@@ -105,33 +112,48 @@ async function generateReference() {
   return reference;
 }
 
-export async function createPage(page: Omit<Page, 'reference' | 'nonce' | 'slots'>): Promise<string> {
-  const reference = await generateReference();
-  const nonce = randomNonce();
+export async function savePage(page: Omit<Page, 'reference' | 'nonce' | 'slots'> & { reference?: string }): Promise<string> {
+  let item: Page;
 
-  const item: Page = { ...page, reference, nonce } as Page;
-  await db.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
+  if (page.reference) {
+    const existing = await fetchPage(page.reference, 'nonce, slots, theme, image');
+    if (!existing) throw new Error('Failed to update page');
 
-  await setPageCookie(reference, nonce);
+    if (!await getPageTokenForAdmin({ ...existing, reference: page.reference })) {
+      throw new AccessDeniedError();
+    }
 
-  await sendRegisterEmail(item);
-
-  return reference;
-}
-
-export async function updatePage(page: Omit<Page, 'nonce' | 'slots'>): Promise<void> {
-  const existing = await fetchPage(page.reference, 'nonce, slots');
-  if (!existing) throw new Error('Failed to update page');
-
-  if (!await getPageTokenForAdmin(existing)) {
-    throw new AccessDeniedError();
+    item = { ...page, ...existing };
+  } else {
+    const reference = await generateReference();
+    const nonce = randomNonce();
+    item = { ...page, reference, nonce, slots: [] };
   }
 
-  const item: Page = { ...page, ...existing } as Page;
   await db.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
+
+  await setPageCookie(item.reference, item.nonce!);
+  await sendRegisterEmail(item);
+
+  return item.reference;
 }
 
-async function addSlot(page: Pick<Page, 'reference' | 'slots'>, slot: Slot): Promise<void> {
+export async function updatePage(reference: string, payload: Partial<Omit<Page, 'reference' | 'slots'>>) {
+  if (!await isAdmin(reference)) throw new AccessDeniedError();
+
+  const update = buildUpdateExpression(payload);
+
+  await db.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { reference },
+      ...update,
+      ReturnValues: "NONE",
+    })
+  );
+}
+
+async function _addSlot(page: Pick<Page, 'reference' | 'slots'>, slot: Slot): Promise<void> {
   const slots: Slot[] = page.slots ?? [];
 
   await db.send(
@@ -140,6 +162,7 @@ async function addSlot(page: Pick<Page, 'reference' | 'slots'>, slot: Slot): Pro
       Key: { reference: page.reference },
       UpdateExpression: 'SET slots = :v',
       ExpressionAttributeValues: { ':v': [...slots, slot] },
+      ReturnValues: "NONE",
     })
   );
 }
@@ -157,7 +180,7 @@ export async function addVisit(
   const nonce = randomNonce();
   const visit: Slot = { ...payload, duration: page.duration, type: 'taken', nonce };
 
-  await addSlot(page, visit);
+  await _addSlot(page, visit);
 
   if (reference !== '') {
     const cookie = { date: visit.date, time: visit.time, duration: visit.duration };
@@ -206,11 +229,11 @@ export async function cancelVisit(reference: string): Promise<boolean> {
   return true;
 }
 
-export async function addBlocked(
+export async function addSlot(
   reference: string,
-  payload: Omit<Required<Slot>, 'type' | 'nonce'>
+  payload: Omit<Required<Slot>, 'nonce'>
 ): Promise<void> {
-  const page = await fetchPage(reference, 'slots, duration, nonce');
+  const page = await fetchPage(reference, 'slots, nonce');
   if (!page) {
     console.log(`Could not add visit for ${reference}`)
     return;
@@ -220,5 +243,5 @@ export async function addBlocked(
     throw new AccessDeniedError();
   }
 
-  await addSlot(page, { ...payload, type: 'blocked' });
+  await _addSlot(page, payload);
 }
