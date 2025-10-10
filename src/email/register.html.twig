@@ -1,6 +1,5 @@
 {% extends "email/base.html.twig" %}
 {% import "email/base.html.twig" as my %}
-{% do email.setSubject("De kraambezoekpagina van "~info.name) %}
 
 {% block content %}
     <p {{ my.style }}>Hoi {{ info.parent_name }},</p>
