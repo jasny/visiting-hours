@@ -109,8 +109,8 @@ function buildInfo(page: Page) {
   return {
     parent_name: page.parent_name,
     name: page.name,
-    manage_token: manageToken,
     link,
+    manage_link: `${link}/manage?token=${manageToken}`,
   };
 }
 
