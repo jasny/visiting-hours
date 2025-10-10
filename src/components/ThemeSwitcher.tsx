@@ -56,6 +56,21 @@ export default function ThemeSwitcher({ reference, theme, isAdmin = false }: Pro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, changeTheme]);
 
+  // Restore the original PrimeReact theme on unmount
+  useEffect(() => {
+    return () => {
+      const original = "lara-light-pink";
+      if (typeof changeTheme === "function" && currentRef.current !== original) {
+        try {
+          changeTheme(currentRef.current, original, "theme-link", () => {
+            currentRef.current = original;
+          });
+        } catch {}
+      }
+    };
+    // Only depend on changeTheme to avoid re-registering unnecessarily
+  }, [changeTheme]);
+
   // Options for SelectButton with color-only swatches
   const options = useMemo<VisitTheme[]>(() => ["pink", "blue", "green"], []);
 
