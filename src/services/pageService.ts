@@ -16,6 +16,11 @@ import {
   setPageCookie
 } from '@/lib/verification';
 import { AccessDeniedError } from "@/lib/errors"
+import {
+  sendCancelVisitEmail,
+  sendNewVisitEmail,
+  sendRegisterEmail,
+} from '@/services/emailService';
 
 const TABLE_NAME = 'VisitingHoursPage';
 
@@ -109,6 +114,8 @@ export async function createPage(page: Omit<Page, 'reference' | 'nonce' | 'slots
 
   await setPageCookie(reference, nonce);
 
+  await sendRegisterEmail(item);
+
   return reference;
 }
 
@@ -141,7 +148,7 @@ export async function addVisit(
   reference: string,
   payload: Omit<Slot, 'duration' | 'type' | 'nonce'>
 ): Promise<Slot | undefined> {
-  const page = await fetchPage(reference, 'slots, duration');
+  const page = await fetchPage(reference);
   if (!page || !page.duration || !isTimeAvailable(page, payload.date, payload.time)) {
     console.log(`Could not add visit for ${reference}`)
     return;
@@ -157,11 +164,15 @@ export async function addVisit(
     await setVisitCookie(reference, cookie, nonce);
   }
 
+  if (page.nonce) {
+    await sendNewVisitEmail(page, visit);
+  }
+
   return { ...visit, nonce: undefined };
 }
 
 export async function cancelVisit(reference: string): Promise<boolean> {
-  const page = await fetchPage(reference, 'slots');
+  const page = await fetchPage(reference);
   if (!page) return false;
 
   const cookie = await getVisitCookie(reference);
@@ -190,6 +201,10 @@ export async function cancelVisit(reference: string): Promise<boolean> {
   );
 
   await clearVisitCookie(reference);
+
+  if (slot && page.nonce) {
+    await sendCancelVisitEmail(page, slot);
+  }
   return true;
 }
 
