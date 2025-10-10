@@ -16,6 +16,11 @@ import {
   setPageCookie
 } from '@/lib/verification';
 import { AccessDeniedError } from "@/lib/errors"
+import {
+  sendCancelVisitEmail,
+  sendNewVisitEmail,
+  sendRegisterEmail,
+} from '@/lib/email';
 
 const TABLE_NAME = 'VisitingHoursPage';
 
@@ -128,6 +133,7 @@ export async function savePage(page: Omit<Page, 'reference' | 'nonce' | 'slots'>
   await db.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
 
   await setPageCookie(item.reference, item.nonce!);
+  await sendRegisterEmail(item);
 
   return item.reference;
 }
@@ -165,7 +171,7 @@ export async function addVisit(
   reference: string,
   payload: Omit<Slot, 'duration' | 'type' | 'nonce'>
 ): Promise<Slot | undefined> {
-  const page = await fetchPage(reference, 'slots, duration');
+  const page = await fetchPage(reference);
   if (!page || !page.duration || !isTimeAvailable(page, payload.date, payload.time)) {
     console.log(`Could not add visit for ${reference}`)
     return;
@@ -181,11 +187,13 @@ export async function addVisit(
     await setVisitCookie(reference, cookie, nonce);
   }
 
+  await sendNewVisitEmail(page, visit);
+
   return { ...visit, nonce: undefined };
 }
 
 export async function cancelVisit(reference: string): Promise<boolean> {
-  const page = await fetchPage(reference, 'slots');
+  const page = await fetchPage(reference);
   if (!page) return false;
 
   const cookie = await getVisitCookie(reference);
@@ -214,6 +222,10 @@ export async function cancelVisit(reference: string): Promise<boolean> {
   );
 
   await clearVisitCookie(reference);
+
+  if (slot) {
+    await sendCancelVisitEmail(page, slot);
+  }
   return true;
 }
 
