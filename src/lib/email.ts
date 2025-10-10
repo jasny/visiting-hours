@@ -1,11 +1,12 @@
 import path from 'node:path';
 import nodemailer from 'nodemailer';
 import { convert } from 'html-to-text';
-import { SESClient, SendRawEmailCommand } from '@aws-sdk/client-ses';
+import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
 import { fromTokenFile } from '@aws-sdk/credential-providers';
 import { createEnvironment, createFilter, createFilesystemLoader } from 'twing';
 import { getPageToken } from '@/lib/verification';
 import type { Page, Slot } from '@/lib/types';
+import * as fs from "fs";
 
 type TemplateName = 'register' | 'new-visit' | 'cancel-visit';
 
@@ -13,7 +14,7 @@ const EMAIL_FROM = process.env.EMAIL_FROM || 'info@opkraambezoek.nl';
 const BASE_URL =
   process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
 
-const loader = createFilesystemLoader();
+const loader = createFilesystemLoader(fs);
 loader.addPath(path.join(process.cwd(), 'src'));
 
 const twing = createEnvironment(loader);
@@ -60,8 +61,6 @@ function compilePattern(pattern: string): RegExp {
 const pregMatchFilter = createFilter(
   'preg_match',
   async (_context, value: string, pattern: string): Promise<boolean> => {
-    if (typeof value !== 'string' || typeof pattern !== 'string') return false;
-
     try {
       return compilePattern(pattern).test(value);
     } catch {
@@ -88,14 +87,13 @@ const credentials =
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
       };
 
-const sesClient = new SESClient({
+const sesClient = new SESv2Client({
   region: process.env.AWS_REGION || 'eu-west-1',
   credentials,
 });
 
-const transporter = nodemailer.createTransport({
-  SES: { ses: sesClient, aws: { SendRawEmailCommand } },
-});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const transporter = nodemailer.createTransport({ SES: { sesClient, SendEmailCommand }} as any);
 
 function buildInfo(page: Page) {
   const manageToken = getPageToken(page.reference, page.nonce!);

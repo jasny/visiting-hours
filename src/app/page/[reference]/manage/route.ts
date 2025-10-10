@@ -2,8 +2,8 @@ import { NextResponse, NextRequest } from 'next/server';
 import { acceptManageToken } from '@/services/pageService';
 import { cookieName } from "@/lib/verification"
 
-export async function GET(request: NextRequest, { params }: { params: { reference: string } }) {
-  const { reference } = params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ reference: string }> }) {
+  const { reference } = await params;
   const token = request.nextUrl.searchParams.get('token') ?? '';
 
   // Always redirect back to the clean page URL
