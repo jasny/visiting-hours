@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { getPage } from '@/services/pageService';
 import PageInfo from '@/components/PageInfo';
 import VisitSection from '@/components/VisitSection';
-import defaultBaby from '@/assets/default-baby.png';
+import defaultBaby from '@/assets/default-baby.webp';
 import { Pencil } from 'lucide-react';
 import ThemeSwitcher, { type VisitTheme } from '@/components/ThemeSwitcher';
 
@@ -34,7 +34,7 @@ export default async function ShowPage({ params }: { params: Promise<{ reference
 
       <section className="bg-gradient-to-br from-[var(--hero-from)] via-[var(--hero-via)] to-[var(--hero-to)] p-4 md:p-8">
         <div className="max-w-6xl mx-auto flex flex-col gap-4 relative">
-          <PageInfo info={page} image={defaultBaby} />
+          <PageInfo info={page} image={defaultBaby} editable={isAdmin} />
         </div>
       </section>
 

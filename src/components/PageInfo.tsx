@@ -1,15 +1,19 @@
+'use client'
+
 import { Page } from "@/lib/types"
-import Image, { StaticImageData } from "next/image"
+import { type StaticImageData } from "next/image"
 import { format as dfFormat, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { useMemo } from "react"
+import PageImage from "@/components/PageImage";
 
 interface Props {
   info: Page;
-  image: StaticImageData;
+  image: StaticImageData | string;
+  editable?: boolean;
 }
 
-export default function PageInfo({ info, image }: Props) {
+export default function PageInfo({ info, image, editable }: Props) {
   const formattedDob = useMemo(() => {
     if (!info.date_of_birth) return null;
 
@@ -50,13 +54,7 @@ export default function PageInfo({ info, image }: Props) {
           </div>
         </div>
         <div className="mb-12 flex justify-center">
-          <div className="relative">
-            <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-white shadow-xl">
-              <Image src={image} alt="Foto of afbeelding" className="w-full h-full object-cover bg-[var(--theme-100)]"/></div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-[var(--theme-300)] rounded-full opacity-60"></div>
-            <div
-              className="absolute -bottom-4 -left-4 w-8 h-8 border-2 border-[var(--theme-300)] rounded-full opacity-40"></div>
-          </div>
+          <PageImage info={info} image={image} editable={editable} />
         </div>
         <div className="max-w-2xl mx-auto">
           <p className="text-[var(--theme-700)] text-lg md:text-xl leading-relaxed font-light italic">{info.description}</p>

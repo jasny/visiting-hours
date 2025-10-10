@@ -44,4 +44,5 @@ export interface Page {
   duration: number;
   slots: Slot[];
   theme: 'pink' | 'blue' | 'green';
+  image?: string | null;
 }

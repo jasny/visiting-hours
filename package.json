@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.883.0",
+    "@aws-sdk/client-s3": "^3.907.0",
     "@aws-sdk/client-ses": "^3.907.0",
     "@aws-sdk/credential-provider-node": "^3.907.0",
     "@aws-sdk/credential-providers": "^3.883.0",
@@ -27,6 +28,7 @@
     "react-big-calendar": "^1.19.4",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.64.0",
+    "sharp": "^0.34.4",
     "twing": "^7.2.1"
   },
   "devDependencies": {
