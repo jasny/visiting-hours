@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import { useDutchLocale } from "@/hooks/useLocale"
 import { partialMatch } from "@/lib/utils"
+import { toDate, toDateString } from "@/lib/calendar"
 
 // Keep same shape as before but managed by react-hook-form
 type FormState = Partial<Page>;
@@ -120,7 +121,6 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
   return (
     <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
       <Toast ref={toast} />
-      {/* Baby & ouder informatie */}
       <Card title={
         <div className="flex items-center gap-4 mb-6">
           <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center">
@@ -140,7 +140,6 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Vereist' }}
               render={({ field }) => (
                 <InputText id="name" {...field} className={`p-inputtext-sm ${invalid('name')}`} />
               )}
@@ -158,7 +157,7 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
                 <Calendar
                   id="date_of_birth"
                   value={value ? new Date(value) : undefined}
-                  onChange={(e) => onChange(e.value ? (e.value as Date).toISOString() : null)}
+                  onChange={(e) => onChange(e.value ? toDateString(e.value as Date) : null)}
                   dateFormat="dd-mm-yy"
                   className="p-inputtext-sm"
                 />
@@ -317,7 +316,7 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
                 <Calendar
                   id="date_from"
                   value={value ? new Date(value) : undefined}
-                  onChange={(e) => onChange((e.value as Date | undefined)?.toISOString())}
+                  onChange={(e) => onChange(e.value ? toDateString(e.value) : undefined)}
                   dateFormat="dd-mm-yy"
                   className={`p-inputtext-sm ${invalid('date_from')}`}
                 />
@@ -337,7 +336,7 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
                 <Calendar
                   id="date_to"
                   value={value ? new Date(value) : undefined}
-                  onChange={(e) => onChange((e.value as Date | undefined)?.toISOString())}
+                  onChange={(e) => onChange(e.value ? toDateString(e.value) : undefined)}
                   dateFormat="dd-mm-yy"
                   className={`p-inputtext-sm ${invalid('date_to')}`}
                 />
