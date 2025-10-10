@@ -20,7 +20,7 @@ import {
   sendCancelVisitEmail,
   sendNewVisitEmail,
   sendRegisterEmail,
-} from '@/services/emailService';
+} from '@/lib/email';
 
 const TABLE_NAME = 'VisitingHoursPage';
 
@@ -164,9 +164,7 @@ export async function addVisit(
     await setVisitCookie(reference, cookie, nonce);
   }
 
-  if (page.nonce) {
-    await sendNewVisitEmail(page, visit);
-  }
+  await sendNewVisitEmail(page, visit);
 
   return { ...visit, nonce: undefined };
 }
@@ -202,7 +200,7 @@ export async function cancelVisit(reference: string): Promise<boolean> {
 
   await clearVisitCookie(reference);
 
-  if (slot && page.nonce) {
+  if (slot) {
     await sendCancelVisitEmail(page, slot);
   }
   return true;
