@@ -40,41 +40,24 @@ const localDateFilter = createFilter(
     return formatter.format(date);
   },
   [
-    { name: 'value' },
     { name: 'style', defaultValue: 'long' },
   ],
 );
 
-function compilePattern(pattern: string): RegExp {
-  if (pattern.startsWith('/')) {
-    const lastSlash = pattern.lastIndexOf('/');
-    if (lastSlash > 0) {
-      const body = pattern.slice(1, lastSlash);
-      const flags = pattern.slice(lastSlash + 1);
-      return new RegExp(body, flags);
-    }
-  }
-
-  return new RegExp(pattern);
-}
-
-const pregMatchFilter = createFilter(
-  'preg_match',
-  async (_context, value: string, pattern: string): Promise<boolean> => {
+const multiplePeopleFilter = createFilter(
+  'multiple_people',
+  async (_context, value: string): Promise<boolean> => {
     try {
-      return compilePattern(pattern).test(value);
+      return !!value.match(/&|\\ben\\b/i);
     } catch {
       return false;
     }
   },
-  [
-    { name: 'value' },
-    { name: 'pattern' },
-  ],
+  [],
 );
 
 twing.addFilter(localDateFilter);
-twing.addFilter(pregMatchFilter);
+twing.addFilter(multiplePeopleFilter);
 
 const credentials =
   process.env.NODE_ENV === 'production'
@@ -96,7 +79,6 @@ const sesClient = new SESv2Client({
 const transporter = nodemailer.createTransport({ SES: { sesClient, SendEmailCommand }} as any);
 
 function buildInfo(page: Page) {
-  const manageToken = getPageToken(page.reference, page.nonce!);
   let link: string;
 
   try {
@@ -105,6 +87,8 @@ function buildInfo(page: Page) {
     const base = BASE_URL.replace(/\/$/, '');
     link = `${base}/page/${page.reference}`;
   }
+
+  const manageToken = getPageToken(page.reference, page.nonce!);
 
   return {
     parent_name: page.parent_name,
