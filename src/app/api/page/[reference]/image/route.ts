@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { updatePage } from '@/services/pageService';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { cropAndResizeToWebp } from "@/lib/image"
-import { awsCredentialsProvider } from "@vercel/oidc-aws-credentials-provider"
+import { credentials } from "@/lib/aws"
 
 export const runtime = 'nodejs';
 
@@ -23,13 +23,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ ref
     if (!bucket) {
       return NextResponse.json({ error: 'Server not configured for S3 upload' }, { status: 500 });
     }
-
-    const credentials = process.env.AWS_ROLE_ARN
-      ? awsCredentialsProvider({ roleArn: process.env.AWS_ROLE_ARN! })
-      : {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || "local",
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "local",
-      };
 
     const s3 = new S3Client({ region, credentials });
 

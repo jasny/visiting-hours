@@ -1,13 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { awsCredentialsProvider } from "@vercel/oidc-aws-credentials-provider";
-
-const credentials = process.env.AWS_ROLE_ARN
-  ? awsCredentialsProvider({ roleArn: process.env.AWS_ROLE_ARN })
-  : {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "local",
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "local",
-  };
+import { credentials } from "@/lib/aws"
 
 const client = new DynamoDBClient({
   region: process.env.AWS_REGION || "eu-west-1",

@@ -2,11 +2,11 @@ import path from 'node:path';
 import nodemailer from 'nodemailer';
 import { convert } from 'html-to-text';
 import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
-import { fromTokenFile } from '@aws-sdk/credential-providers';
 import { createEnvironment, createFilter, createFilesystemLoader } from 'twing';
 import { getPageToken } from '@/lib/verification';
 import type { Page, Slot } from '@/lib/types';
 import * as fs from "fs";
+import { credentials } from "@/lib/aws"
 
 type TemplateName = 'register' | 'new-visit' | 'cancel-visit';
 
@@ -58,17 +58,6 @@ const multiplePeopleFilter = createFilter(
 
 twing.addFilter(localDateFilter);
 twing.addFilter(multiplePeopleFilter);
-
-const credentials =
-  process.env.NODE_ENV === 'production'
-    ? fromTokenFile({
-        roleArn: process.env.AWS_ROLE_ARN!,
-        webIdentityTokenFile: process.env.AWS_WEB_IDENTITY_TOKEN_FILE!,
-      })
-    : {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
-      };
 
 const sesClient = new SESv2Client({
   region: process.env.AWS_REGION || 'eu-west-1',
