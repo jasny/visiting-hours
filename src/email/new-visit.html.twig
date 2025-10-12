@@ -1,0 +1,21 @@
+{% extends "email/base.html.twig" %}
+{% import "email/base.html.twig" as my %}
+
+{% block content %}
+    <p {{ my.style }}>Hoi {{ info.parent_name }},</p>
+
+    <p {{ my.style }}>
+        Op <strong>{{ visit.date|localdate }}</strong> {{ visit.name|multiple_people ? 'willen' : 'wil' }} {{ visit.name }} graag langskomen op kraambezoek van <strong>{{ visit.time }}</strong>
+        tot {{ visit.time_until }}.
+    </p>
+
+    <p {{ my.style('14px', '20px 0 20px 0') }}>
+        <a href="{{ info.manage_link }}">&raquo; Beheer uw pagina</a>
+    </p>
+
+    <p {{ my.style }}>
+        Met vriendelijke groet,<br>
+        Aline &amp; Arnold<br>
+        &mdash; opkraambezoek.nl
+    </p>
+{% endblock %}

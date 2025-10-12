@@ -1,0 +1,26 @@
+{% extends "email/base.html.twig" %}
+{% import "email/base.html.twig" as my %}
+
+{% block content %}
+    <p {{ my.style }}>Hoi {{ info.parent_name }},</p>
+    <p {{ my.style('18px') }}>Gefeliciteerd met de geboorte van {{ info.name }}!</p>
+
+    <div {{ my.style }}>
+        Deel de link naar de kraambezoekpagina met familie en vrienden:<br/>
+        <div style="font-size: 14px; line-height: 1.5; font-weight: bold; display: block; padding: 5px 5px; text-align: center; background-color: #eee; border: 1px solid #ccc;">{{ info.link }}</div>
+    </div>
+
+    <p {{ my.style }}>
+        Op deze pagina kunnen genodigden zelf een afspraak inplannen om op kraambezoek te komen. Voor ieder gepland bezoek ontvang je een e-mail.
+    </p>
+
+    <p {{ my.style }}>
+        Met vriendelijke groet,<br>
+        Aline &amp; Arnold<br>
+        &mdash; opkraambezoek.nl
+    </p>
+
+    <p {{ my.style('14px', '20px 0 0 0') }}>
+        <a href="{{ info.manage_link }}">&raquo; Beheer uw pagina</a>
+    </p>
+{% endblock %}
