@@ -4,6 +4,11 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { PrimeReactContext } from "primereact/api";
 import { SelectButton } from "primereact/selectbutton";
 import { updatePage } from "@/services/pageService"
+import Arrow from "@/assets/theme-arrow.svg";
+import Image from "next/image"
+import { Single_Day } from "next/font/google";
+
+const singleDay = Single_Day({ weight: "400" });
 
 export type VisitTheme = "pink" | "blue" | "green";
 
@@ -97,7 +102,7 @@ export default function ThemeSwitcher({ reference, theme, isAdmin = false }: Pro
   // Render selector only for admins; otherwise render nothing
   if (!isAdmin) return null;
 
-  return (
+  return <>
     <div className="absolute top-2 left-2 md:top-4 md:left-4 z-50">
       <SelectButton
         value={value}
@@ -111,5 +116,9 @@ export default function ThemeSwitcher({ reference, theme, isAdmin = false }: Pro
         }}
       />
     </div>
-  );
+    <div className={`absolute top-20 left-20 z-0 text-gray-800 items-center gap-2 ${singleDay.className} text-2xl hidden md:flex`}>
+      <Image src={Arrow} width={128} height={87} alt="Arrow" className="w-[48px]" />
+      <span className="relative top-3">in 3 kleuren</span>
+    </div>
+  </>;
 }
