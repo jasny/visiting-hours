@@ -4067,6 +4067,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vercel/analytics@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@vercel/analytics@npm:1.5.0"
+  peerDependencies:
+    "@remix-run/react": ^2
+    "@sveltejs/kit": ^1 || ^2
+    next: ">= 13"
+    react: ^18 || ^19 || ^19.0.0-rc
+    svelte: ">= 4"
+    vue: ^3
+    vue-router: ^4
+  peerDependenciesMeta:
+    "@remix-run/react":
+      optional: true
+    "@sveltejs/kit":
+      optional: true
+    next:
+      optional: true
+    react:
+      optional: true
+    svelte:
+      optional: true
+    vue:
+      optional: true
+    vue-router:
+      optional: true
+  checksum: 10c0/43d33ea83b32f5203fec21b7f43c399e398f0c37d2dd341d522969e0e6ee23fd652a2766a4203a3ce573f711beee5ee1ab7d36316f767a4901160e3e96ee31e5
+  languageName: node
+  linkType: hard
+
 "@vercel/oidc-aws-credentials-provider@npm:^3.0.2":
   version: 3.0.2
   resolution: "@vercel/oidc-aws-credentials-provider@npm:3.0.2"
@@ -4081,6 +4111,33 @@ __metadata:
   version: 3.0.2
   resolution: "@vercel/oidc@npm:3.0.2"
   checksum: 10c0/8d4c8553baa5aed339ab7614d775139bc124a6d443b76877ab17e98c156daa4dbeb3cf2f3bf21fabfae2ac0dd3ff462ab43b9398708e02483e5923d302a1c4c8
+  languageName: node
+  linkType: hard
+
+"@vercel/speed-insights@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@vercel/speed-insights@npm:1.2.0"
+  peerDependencies:
+    "@sveltejs/kit": ^1 || ^2
+    next: ">= 13"
+    react: ^18 || ^19 || ^19.0.0-rc
+    svelte: ">= 4"
+    vue: ^3
+    vue-router: ^4
+  peerDependenciesMeta:
+    "@sveltejs/kit":
+      optional: true
+    next:
+      optional: true
+    react:
+      optional: true
+    svelte:
+      optional: true
+    vue:
+      optional: true
+    vue-router:
+      optional: true
+  checksum: 10c0/2fb4c4a46330949182d6f63691c51310b636fc3cc464bde3c0f24f100b712c3c4ec57a9fedcd6dc3cc75951064b3295b3cb616c80ff7179fbe310cd4314fffaa
   languageName: node
   linkType: hard
 
@@ -7926,7 +7983,9 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-big-calendar": "npm:^1"
     "@types/react-dom": "npm:^19"
+    "@vercel/analytics": "npm:^1.5.0"
     "@vercel/oidc-aws-credentials-provider": "npm:^3.0.2"
+    "@vercel/speed-insights": "npm:^1.2.0"
     date-fns: "npm:^4.1.0"
     eslint: "npm:^9"
     eslint-config-next: "npm:15.5.2"
