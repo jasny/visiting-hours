@@ -103,7 +103,7 @@ export default function ThemeSwitcher({ reference, theme, isAdmin = false }: Pro
   if (!isAdmin) return null;
 
   return <>
-    <div className="absolute top-2 left-2 md:top-4 md:left-4 z-50">
+    <div className="absolute top-2 left-2 md:top-4 md:left-4 z-50 print:hidden">
       <SelectButton
         value={value}
         onChange={(e) => handleChange(e.value as VisitTheme)}

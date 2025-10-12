@@ -129,6 +129,7 @@ export default function VisitForm({ reference, calendar, visible, onClose, selec
                 onChange={(e) => field.onChange(e.value)}
                 showIcon
                 showTime
+                dateFormat="dd-mm-yy"
                 hourFormat="24"
                 stepMinute={stepMinute}
                 minDate={minDate}

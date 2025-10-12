@@ -29,7 +29,10 @@ async function fetchPage(reference: string, projection?: string): Promise<Page |
     new GetCommand({ TableName: TABLE_NAME, Key: { reference }, ProjectionExpression: projection})
   );
 
-  return res.Item as unknown as Page | undefined;
+  const data = res.Item;
+  if (data && !('reference' in data)) data.reference = reference;
+
+  return data as unknown as Page | undefined;
 }
 
 export async function getPage(reference: string): Promise<Page & { manage_token?: string } | null> {
@@ -119,7 +122,7 @@ export async function savePage(page: Omit<Page, 'reference' | 'nonce' | 'slots'>
     const existing = await fetchPage(page.reference, 'nonce, slots, theme, image');
     if (!existing) throw new Error('Failed to update page');
 
-    if (!await getPageTokenForAdmin({ ...existing, reference: page.reference })) {
+    if (!await getPageTokenForAdmin(existing)) {
       throw new AccessDeniedError();
     }
 

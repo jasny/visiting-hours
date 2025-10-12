@@ -21,10 +21,10 @@ export function VisitCard(props: {
 }) {
   const hasAddress = !!props.street;
   return <Card
-    className="shadow-sm text-center"
+    className="shadow-sm text-center page-break"
     title={<span className="font-bold">Jouw afspraak</span>}
     footer={
-      <div className="flex justify-end">
+      <div className="flex justify-end print:hidden">
         <button type="button" className="p-button p-button-text" onClick={props.onClick} disabled={props.disabled}>
           Afspraak annuleren
         </button>
@@ -34,11 +34,11 @@ export function VisitCard(props: {
     <div
       className={
         hasAddress
-          ? "flex flex-col md:flex-row items-stretch md:divide-x divide-y md:divide-y-0 divide-gray-200"
+          ? "flex flex-col md:flex-row print:flex-row items-stretch md:divide-x print:divide-x divide-y md:divide-y-0 print:divide-y-0 divide-gray-200"
           : "flex flex-col items-center"
       }
     >
-      <div className={hasAddress ? "flex-1 md:basis-1/2 px-6 py-4 flex flex-col items-center justify-center text-center" : "text-center min-w-[120px] mx-auto py-2"}>
+      <div className={hasAddress ? "flex-1 basis-1/2 px-6 py-4 flex flex-col items-center justify-center text-center" : "text-center min-w-[120px] mx-auto py-2"}>
         <div
           className="uppercase">{new Date(`${props.visit!.date}T00:00:00`).toLocaleDateString("nl-NL", { weekday: "short" })}</div>
         <div className="font-bold text-4xl leading-tight">{new Date(`${props.visit!.date}T00:00:00`).getDate()}</div>
@@ -48,11 +48,11 @@ export function VisitCard(props: {
         </div>
       </div>
       {hasAddress && (
-        <div className="flex-1 md:basis-1/2 px-6 py-4 md:text-left text-center">
+        <div className="flex-1 basis-1/2 px-6 py-4 md:text-left text-center">
           <div className="font-bold">{props.city}</div>
           <div>{props.street}</div>
           <div>{props.postalcode}</div>
-          <div className="mt-4">
+          <div className="mt-4 print:hidden">
             <a className="text-rose-400" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(props.street!)}+${encodeURIComponent(props.city!)}`} target="_blank">
               <small><MapPin style={{ display: 'inline-block'}} /> &mdash; Open in Google Maps</small>
             </a>

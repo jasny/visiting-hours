@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import CalendarView from '@/components/CalendarView';
 import VisitForm from '@/components/VisitForm';
+import SlotForm from '@/components/SlotForm';
 import { Page, Slot } from "@/lib/types"
 import { buildCalendar } from "@/lib/calendar"
 import { cancelVisit, getVisitFromCookie } from '@/services/pageService';
@@ -13,9 +14,10 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
 
 interface Props {
   page: Page;
+  isAdmin?: boolean
 }
 
-export default function VisitSection({ page }: Props) {
+export default function VisitSection({ page, isAdmin }: Props) {
   const [slots, setSlots] = useState<Slot[]>(page.slots);
   const [visit, setVisit] = useState<{ date: string; time: string; duration?: number } | null>(null);
   const [pending, startTransition] = useTransition();
@@ -40,22 +42,22 @@ export default function VisitSection({ page }: Props) {
     return () => { active = false };
   }, [page.reference, loaded]);
 
-  const [selected, setSelected] = useState<{ date: string | null; time: string | null }>({
+  const [selected, setSelected] = useState<{ date: string | null; time: string | null; to?: string | null }>({
     date: null,
     time: null,
+    to: null,
   });
   const [showForm, setShowForm] = useState(false);
 
-  const handleSelect = (date: string, time: string) => {
-    setSelected({ date, time });
+  const handleSelect = (date: string, time: string, to?: string) => {
+    setSelected({ date, time, to: to ?? null });
     setShowForm(true);
   };
 
   const handleForm = (slot?: Slot) => {
-    if (slot) {
-      setSlots((slots) => [...slots, slot]);
-      setVisit(slot);
-    }
+    if (slot) setSlots((slots) => [...slots, slot]);
+    if (slot && !isAdmin) setVisit(slot);
+
     setShowForm(false);
   };
 
@@ -119,13 +121,23 @@ export default function VisitSection({ page }: Props) {
       </div>
 
       <CalendarView calendar={calendar} onSelect={handleSelect}/>
-      <VisitForm
-        reference={page.reference}
-        calendar={calendar}
-        selected={selected}
-        visible={showForm}
-        onClose={handleForm}
-      />
+      {isAdmin ? (
+        <SlotForm
+          reference={page.reference}
+          calendar={calendar}
+          selected={selected}
+          visible={showForm}
+          onClose={handleForm}
+        />
+      ) : (
+        <VisitForm
+          reference={page.reference}
+          calendar={calendar}
+          selected={{ date: selected.date, time: selected.time }}
+          visible={showForm}
+          onClose={handleForm}
+        />
+      )}
     </>
   )
 }

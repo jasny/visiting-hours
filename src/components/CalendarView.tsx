@@ -12,7 +12,7 @@ import CalendarToolbar from "@/components/CalendarToolbar"
 
 interface Props {
   calendar: Calendar;
-  onSelect?: (date: string, time: string) => void;
+  onSelect?: (date: string, time: string, to?: string) => void;
 }
 
 const locales = { nl } as const;
@@ -102,7 +102,13 @@ export default function CalendarView({ calendar, onSelect }: Props) {
 
     const dateStr = dfFormat(start, 'yyyy-MM-dd');
     const timeStr = dfFormat(start, 'HH:mm');
-    onSelect?.(dateStr, timeStr);
+    let toStr: string | undefined;
+    const end = slot.end as Date | undefined;
+    // Only pass an explicit end when user drag-selects a range
+    if ((slot as any).action === 'select' && end && end > start) {
+      toStr = dfFormat(end, 'HH:mm');
+    }
+    onSelect?.(dateStr, timeStr, toStr);
   };
 
   const canSelect = ({ start }: { start: Date; end?: Date }) => {

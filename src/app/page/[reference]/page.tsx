@@ -44,9 +44,9 @@ export default async function ShowPage({ params, searchParams }: { params: Promi
         </div>
       </section>
 
-      <section className="bg-gradient-to-br from-gray-200 via-gray-50 to-purple-50 px-6 py-16 md:px-12 md:py-24">
+      <section className="bg-gradient-to-br from-gray-200 via-gray-50 to-purple-50 px-6 py-16 md:px-12 md:py-24" style={{ breakBefore: 'page' }}>
         <div className="max-w-6xl mx-auto">
-          <VisitSection page={page}/>
+          <VisitSection page={page} isAdmin={isAdmin} />
         </div>
       </section>
     </main>

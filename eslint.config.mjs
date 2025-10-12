@@ -18,6 +18,7 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "tailwind.config.ts"
     ],
     rules: {
       "@typescript-eslint/no-unused-vars": [
