@@ -4,6 +4,8 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { cropAndResizeToWebp } from "@/lib/image"
 import { awsCredentialsProvider } from "@vercel/oidc-aws-credentials-provider"
 
+export const runtime = 'nodejs';
+
 export async function POST(request: Request, { params }: { params: Promise<{ reference: string }> }) {
   try {
     const { reference } = await params;
