@@ -97,7 +97,7 @@ export function isPeriodFull(cal: Calendar, date: string, timeHM: string): boole
   // find which period the time belongs to
   const period = (() => {
     for (const [key, vt] of Object.entries(cal.windows)) {
-      if (vt && timeHM >= vt.from && timeHM <= vt.to) return key as keyof Calendar['capacities'];
+      if (vt && timeHM >= vt.from && timeHM < vt.to) return key as keyof Calendar['capacities'];
     }
     return null;
   })();
@@ -107,7 +107,7 @@ export function isPeriodFull(cal: Calendar, date: string, timeHM: string): boole
   let count = 0;
   for (const visit of cal.slots ?? []) {
     const vt = cal.windows[period];
-    if (vt && visit.type === "taken" && visit.date === date && visit.time >= vt.from && visit.time <= vt.to) {
+    if (vt && visit.type === "taken" && visit.date === date && visit.time >= vt.from && visit.time < vt.to) {
       count++;
     }
   }
