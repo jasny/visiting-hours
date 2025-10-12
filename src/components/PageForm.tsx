@@ -164,6 +164,9 @@ export default function PageForm({ values: defaultValues }: { values: Partial<Pa
               )}
             />
           </div>
+          <div className="text-gray-600 font-light text-xs mb-6 md:col-span-2">
+            De naam en geboortedatum kunnen ook later worden ingevuld of aangepast.
+          </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="parent_name" className="text-sm font-medium text-rose-700">
               Wat is jouw/jullie naam?

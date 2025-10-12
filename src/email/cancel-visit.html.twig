@@ -10,7 +10,7 @@
     </p>
 
     <p {{ my.style('14px', '20px 0 20px 0') }}>
-        <a href="{{ info.manage_link }}">&raquo; Beheer uw pagina</a>
+        <a href="{{ info.manage_link }}">&raquo; Beheer {{ info.parent_name|multiple_people ? 'jullie' : 'jouw' }} pagina</a>
     </p>
 
     <p {{ my.style }}>

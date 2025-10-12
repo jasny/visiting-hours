@@ -90,9 +90,13 @@ function buildInfo(page: Page) {
 
   const manageToken = getPageToken(page.reference, page.nonce!);
 
+  const birthDate = page.date_of_birth ? new Date(page.date_of_birth) : undefined;
+  const is_born = birthDate ? birthDate.getTime() <= Date.now() : false;
+
   return {
     parent_name: page.parent_name,
     name: page.name,
+    is_born,
     link,
     manage_link: `${link}/manage?token=${manageToken}`,
   };
@@ -150,7 +154,9 @@ async function sendTemplate(
 }
 
 export async function sendRegisterEmail(page: Page) {
-  await sendTemplate('register', page.email, `De kraambezoekpagina van ${page.name}`, {
+  const name = page.name || (page.parent_name.match(/&|\\ben\\b/i) ? 'jullie kindje' : 'jouw kindje');
+
+  await sendTemplate('register', page.email, `De kraambezoekpagina van ${name}`, {
     info: buildInfo(page),
   });
 }
