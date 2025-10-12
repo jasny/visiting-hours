@@ -13,9 +13,15 @@ export default async function ShowPage() {
   const fmt = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const addDays = (d: Date, days: number) => new Date(d.getTime() + days * 24 * 3600 * 1000);
 
-  // date range: this week through next week (14 days)
-  const date_from = fmt(today);
-  const date_to = fmt(addDays(today, 13));
+  // determine start period: first Tuesday from now (today if Tuesday)
+  const dayOfWeek = today.getDay(); // 0=Sun .. 6=Sat
+  const daysUntil = (target: number) => (target - dayOfWeek + 7) % 7;
+  const startTuesdayOffset = daysUntil(1);
+  const startDate = addDays(today, startTuesdayOffset);
+
+  // date range: start on first Tuesday and cover 14 days
+  const date_from = fmt(startDate);
+  const date_to = fmt(addDays(startDate, 13));
 
   const duration = 60; // standaard 1 uur
 
@@ -28,8 +34,6 @@ export default async function ShowPage() {
   });
 
   // Find the upcoming Sunday within range and the next Tuesday
-  const dayOfWeek = today.getDay(); // 0=Sun .. 6=Sat
-  const daysUntil = (target: number) => (target - dayOfWeek + 7) % 7;
   const nextSundayOffset = daysUntil(0);
   const nextTuesdayOffset = daysUntil(2);
 
