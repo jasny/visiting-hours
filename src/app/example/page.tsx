@@ -59,7 +59,7 @@ export default async function ShowPage() {
   const page: Page = {
     reference: '',
     email: '',
-    name: 'Alex',
+    name: 'Alix',
     parent_name: 'Arnold & Aline',
     date_of_birth: fmt(today),
     description: 'We zijn zo dankbaar en gelukkig om onze kleine Alex met jullie te mogen delen. Haar komst heeft ons leven met zoveel liefde en vreugde gevuld. We kijken er naar uit jullie allemaal te ontvangen en samen deze bijzondere tijd te vieren.',
