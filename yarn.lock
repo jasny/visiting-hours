@@ -904,7 +904,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/credential-provider-web-identity@npm:3.908.0":
+"@aws-sdk/credential-provider-web-identity@npm:3.908.0, @aws-sdk/credential-provider-web-identity@npm:^3.609.0":
   version: 3.908.0
   resolution: "@aws-sdk/credential-provider-web-identity@npm:3.908.0"
   dependencies:
@@ -4064,6 +4064,23 @@ __metadata:
   version: 1.11.1
   resolution: "@unrs/resolver-binding-win32-x64-msvc@npm:1.11.1"
   conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@vercel/oidc-aws-credentials-provider@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@vercel/oidc-aws-credentials-provider@npm:3.0.2"
+  dependencies:
+    "@aws-sdk/credential-provider-web-identity": "npm:^3.609.0"
+    "@vercel/oidc": "npm:3.0.2"
+  checksum: 10c0/9554777477409d874bfad31b0194003cd66f69102a72875788219f20cfe00f256ae6689eee3edbcb8690c98149867aa73e184063bf27c23b56654cd373ccf2c6
+  languageName: node
+  linkType: hard
+
+"@vercel/oidc@npm:3.0.2":
+  version: 3.0.2
+  resolution: "@vercel/oidc@npm:3.0.2"
+  checksum: 10c0/8d4c8553baa5aed339ab7614d775139bc124a6d443b76877ab17e98c156daa4dbeb3cf2f3bf21fabfae2ac0dd3ff462ab43b9398708e02483e5923d302a1c4c8
   languageName: node
   linkType: hard
 
@@ -7909,6 +7926,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-big-calendar": "npm:^1"
     "@types/react-dom": "npm:^19"
+    "@vercel/oidc-aws-credentials-provider": "npm:^3.0.2"
     date-fns: "npm:^4.1.0"
     eslint: "npm:^9"
     eslint-config-next: "npm:15.5.2"

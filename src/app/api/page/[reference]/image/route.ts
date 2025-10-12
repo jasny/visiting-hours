@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { updatePage } from '@/services/pageService';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { fromTokenFile } from '@aws-sdk/credential-providers';
 import { cropAndResizeToWebp } from "@/lib/image"
+import { awsCredentialsProvider } from "@vercel/oidc-aws-credentials-provider"
 
 export async function POST(request: Request, { params }: { params: Promise<{ reference: string }> }) {
   try {
@@ -22,17 +22,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ ref
       return NextResponse.json({ error: 'Server not configured for S3 upload' }, { status: 500 });
     }
 
-    const credentials =
-      process.env.NODE_ENV === 'production'
-        ? fromTokenFile({
-            roleArn: process.env.AWS_ROLE_ARN!,
-            webIdentityTokenFile: process.env.AWS_WEB_IDENTITY_TOKEN_FILE!,
-          })
-        : {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
-            sessionToken: process.env.AWS_SESSION_TOKEN,
-          };
+    const credentials = process.env.AWS_ROLE_ARN
+      ? awsCredentialsProvider({ roleArn: process.env.AWS_ROLE_ARN! })
+      : {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID || "local",
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "local",
+      };
 
     const s3 = new S3Client({ region, credentials });
 

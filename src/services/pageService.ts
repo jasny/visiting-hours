@@ -22,7 +22,7 @@ import {
   sendRegisterEmail,
 } from '@/lib/email';
 
-const TABLE_NAME = 'VisitingHoursPage';
+const TABLE_NAME = process.env.DYNAMODB_TABLE || 'VisitingHoursPage';
 
 async function fetchPage(reference: string, projection?: string): Promise<Page | undefined> {
   const res = await db.send(

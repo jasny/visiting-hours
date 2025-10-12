@@ -16,6 +16,7 @@
     "@aws-sdk/credential-providers": "^3.883.0",
     "@aws-sdk/lib-dynamodb": "^3.883.0",
     "@aws-sdk/util-dynamodb": "^3.883.0",
+    "@vercel/oidc-aws-credentials-provider": "^3.0.2",
     "date-fns": "^4.1.0",
     "html-to-text": "^9.0.5",
     "linkify-react": "^4.3.2",
