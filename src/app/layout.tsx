@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "primereact/resources/themes/lara-light-pink/theme.css";
 import { PrimeReactProvider } from "primereact/api"
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -17,6 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <title>Gratis kraambezoek plannen | OpKraambezoek.nl</title>
+        {/* eslint-disable-next-line @next/next/no-css-tags */}
+        <link id="theme-link" rel="stylesheet" href="/themes/lara-light-pink/theme.css" />
+      </head>
       <body
         className={`antialiased`}
       >
