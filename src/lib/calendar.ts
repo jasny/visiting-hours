@@ -107,9 +107,9 @@ export function isPeriodFull(cal: Calendar, date: string, timeHM: string): boole
   let count = 0;
   for (const visit of cal.slots ?? []) {
     const vt = cal.windows[period];
-    if (!vt) continue;
-    if (visit.date !== date) continue;
-    if (visit.time >= vt.from && visit.time <= vt.to) count++;
+    if (vt && visit.type === "taken" && visit.date === date && visit.time >= vt.from && visit.time <= vt.to) {
+      count++;
+    }
   }
   return count >= capacity;
 }
