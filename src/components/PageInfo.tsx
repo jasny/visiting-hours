@@ -46,10 +46,10 @@ export default function PageInfo({ info, image, editable }: Props) {
       <div className="relative z-10 max-w-4xl mx-auto text-center">
         <div className="mb-8"><p className="text-[var(--theme-600)] italic text-lg md:text-xl mb-2 font-light">Jij bent zo welkom!</p></div>
         <div className="mb-6"><h1
-          className="text-4xl md:text-6xl lg:text-7xl font-light tracking-wide text-[var(--theme-800)] mb-4 uppercase">{info.name}</h1>
+          className="text-4xl md:text-6xl lg:text-7xl font-light tracking-wide text-[var(--theme-800)] mb-4 uppercase">{info.name || '[naam]'}</h1>
           <div className="flex items-center justify-center gap-4 text-[var(--theme-600)]">
             <div className="flex-1 h-px bg-[var(--theme-200)]"></div>
-            <p className="text-lg md:text-xl px-4">{formattedDob ?? info.date_of_birth ?? ''}</p>
+            <p className="text-lg md:text-xl px-4">{formattedDob || '[geboortedatum]'}</p>
             <div className="flex-1 h-px bg-[var(--theme-200)]"></div>
           </div>
         </div>

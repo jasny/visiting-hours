@@ -7,17 +7,20 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { SelectButton } from "primereact/selectbutton";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { addSlot } from "@/services/pageService";
+import { addSlot, removeSlot } from "@/services/pageService";
 import { Calendar as CalType, Slot, SlotType } from "@/lib/types";
 import { getTakenOverlap } from "@/lib/calendar";
 import { useDutchLocale } from "@/hooks/useLocale";
+
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 interface Props {
   reference: string;
   calendar: CalType;
   visible: boolean;
-  onClose: (slot?: Slot) => void;
+  onClose: (slot?: Slot | null) => void;
   selected?: { date: string | null; time: string | null; to?: string | null };
+  existing?: Slot | null; // edit mode when provided
 }
 
 type FormValues = {
@@ -41,13 +44,19 @@ function addMinutes(date: Date, minutes: number): Date {
   return new Date(date.getTime() + minutes * 60000);
 }
 
-export default function SlotForm({ reference, calendar, visible, onClose, selected }: Props) {
+export default function SlotForm({ reference, calendar, visible, onClose, selected, existing }: Props) {
   const isExample = reference === "";
   const [pending, startTransition] = useTransition();
 
   useDutchLocale();
 
   const defaultFrom = useMemo(() => {
+    if (existing) {
+      const d = new Date(`${existing.date}T00:00:00`);
+      const [h, m] = existing.time.split(":").map(Number);
+      d.setHours(h, m, 0, 0);
+      return d;
+    }
     if (selected?.date && selected?.time) {
       const [h, m] = selected.time.split(":").map(Number);
       const d = new Date(`${selected.date}T00:00:00`);
@@ -55,9 +64,13 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
       return d;
     }
     return null;
-  }, [selected?.date, selected?.time]);
+  }, [existing, selected?.date, selected?.time]);
 
   const defaultTo = useMemo(() => {
+    if (existing) {
+      const from = new Date(`${existing.date}T${existing.time}:00`);
+      return addMinutes(from, existing.duration);
+    }
     if (selected?.date && selected?.to) {
       const [h, m] = selected.to.split(":").map(Number);
       const d = new Date(`${selected.date}T00:00:00`);
@@ -65,18 +78,22 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
       return d;
     }
     return null;
-  }, [selected?.date, selected?.to]);
+  }, [existing, selected?.date, selected?.to]);
 
   const { control, handleSubmit, reset, setValue, trigger, formState: { errors, isSubmitting } } = useForm<FormValues>({
-    defaultValues: { type: "blocked", name: "", range: defaultFrom ? [defaultFrom, (defaultTo ?? addMinutes(defaultFrom, calendar.duration))] : null },
+    defaultValues: {
+      type: existing?.type ?? "blocked",
+      name: existing?.name ?? "",
+      range: defaultFrom ? [defaultFrom, (defaultTo ?? addMinutes(defaultFrom, calendar.duration))] : null
+    },
     mode: "onChange",
   });
 
   // When dialog opens or selection changes, prefill
   useEffect(() => {
     const range = defaultFrom ? [defaultFrom, (defaultTo ?? addMinutes(defaultFrom, calendar.duration))] : null;
-    reset({ type: "blocked", name: "", range });
-  }, [defaultFrom, defaultTo, calendar.duration, reset, visible]);
+    reset({ type: existing?.type ?? "blocked", name: existing?.name ?? "", range });
+  }, [existing, defaultFrom, defaultTo, calendar.duration, reset, visible]);
 
   const minDate = useMemo(() => (calendar.dates[0] ? new Date(calendar.dates[0] + "T00:00:00") : undefined), [calendar.dates]);
   const maxDate = useMemo(() => {
@@ -95,6 +112,8 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
       setValue("range", [rangeWatch[0], end], { shouldValidate: true });
     }
   }, [rangeWatch, calendar.duration, setValue]);
+
+  const isEdit = !!existing;
 
   const onSubmit = async (data: FormValues) => {
     const r = data.range;
@@ -120,6 +139,11 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
       }
 
       try {
+        if (isEdit && existing) {
+          // enforce type not switching
+          payload.type = existing.type;
+          await removeSlot(reference, { date: existing.date, time: existing.time, duration: existing.duration, type: existing.type, name: existing.name });
+        }
         await addSlot(reference, payload as Required<Slot>);
         onClose(payload as Slot);
       } catch {
@@ -146,6 +170,9 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
 
     // Overlap only matters for visits (type 'taken'). Blocking may overlap anything.
     if (watchedType === "taken") {
+      if (existing && existing.type === 'taken' && existing.date === dateStr && existing.time === timeHM && existing.duration === duration) {
+        return true;
+      }
       const overlap = getTakenOverlap(calendar, dateStr, timeHM, duration);
       if (overlap) return "Deze periode overlapt met een bestaande bezoekafspraak";
     }
@@ -160,27 +187,66 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
   }, [watchedType, trigger]);
 
   const footer = (
-    <div className="flex items-center justify-end gap-3 w-full">
-      <Button
-        type="button"
-        onClick={handleSubmit(onSubmit)}
-        label="Opslaan"
-        disabled={pending || isSubmitting}
-        loading={pending || isSubmitting}
-      />
+    <div className="flex items-center justify-between gap-3 w-full">
+      <div>
+        {isEdit && (
+          <Button
+            type="button"
+            label="Verwijderen"
+            className="p-button-text"
+            severity="danger"
+            onClick={() => {
+              if (!existing) return;
+              confirmDialog({
+                message: 'Weet je zeker dat je deze afspraak wilt verwijderen?',
+                header: 'Afspraak verwijderen',
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Ja, verwijderen',
+                rejectLabel: 'Nee',
+                acceptClassName: 'p-button-danger',
+                accept: () => {
+                  if (isExample) {
+                    onClose();
+                    return;
+                  }
+                  startTransition(async () => {
+                    try {
+                      await removeSlot(reference, { date: existing.date, time: existing.time, duration: existing.duration, type: existing.type, name: existing.name });
+                      onClose();
+                    } catch {
+                      onClose();
+                    }
+                  });
+                }
+              });
+            }}
+          />
+        )}
+      </div>
+      <div>
+        <Button
+          type="button"
+          onClick={handleSubmit(onSubmit)}
+          label="Opslaan"
+          disabled={pending || isSubmitting}
+          loading={pending || isSubmitting}
+        />
+      </div>
     </div>
   );
 
   return (
-    <Dialog header="Afspraak toevoegen" visible={visible} onHide={() => onClose()} style={{ width: "36rem" }} modal footer={footer}>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex gap-3 items-center mb-3">
+    <>
+      <ConfirmDialog />
+      <Dialog header={isEdit ? "Afspraak bewerken" : "Afspraak toevoegen"} visible={visible} onHide={() => onClose(null)} style={{ width: "36rem" }} modal footer={footer}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex gap-3 items-center mb-3">
           <Controller
             name="type"
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
-              <SelectButton id="type" {...field} options={typeOptions} optionLabel="label" optionValue="value" />
+              <SelectButton id="type" {...field} options={typeOptions} optionLabel="label" optionValue="value" disabled={isEdit} />
             )}
           />
         </div>
@@ -297,5 +363,6 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
         )}
       </form>
     </Dialog>
+    </>
   );
 }

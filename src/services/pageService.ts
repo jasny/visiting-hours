@@ -248,3 +248,39 @@ export async function addSlot(
 
   await _addSlot(page, payload);
 }
+
+export async function removeSlot(
+  reference: string,
+  slot: Omit<Slot, 'nonce'>
+): Promise<boolean> {
+  const page = await fetchPage(reference, 'slots, nonce');
+  if (!page) return false;
+
+  if (!await getPageTokenForAdmin(page)) {
+    throw new AccessDeniedError();
+  }
+
+  const newSlots = (page.slots ?? []).filter((s) => !(
+    s.date === slot.date &&
+    s.time === slot.time &&
+    s.duration === slot.duration &&
+    s.type === slot.type
+  ));
+
+  if (newSlots.length === (page.slots ?? []).length) {
+    // nothing removed
+    return false;
+  }
+
+  await db.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { reference },
+      UpdateExpression: 'SET slots = :v',
+      ExpressionAttributeValues: { ':v': newSlots },
+      ReturnValues: 'NONE',
+    })
+  );
+
+  return true;
+}

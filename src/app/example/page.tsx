@@ -62,7 +62,7 @@ export default async function ShowPage() {
     name: 'Alix',
     parent_name: 'Arnold & Aline',
     date_of_birth: fmt(today),
-    description: 'We zijn zo dankbaar en gelukkig om onze kleine Alex met jullie te mogen delen. Haar komst heeft ons leven met zoveel liefde en vreugde gevuld. We kijken er naar uit jullie allemaal te ontvangen en samen deze bijzondere tijd te vieren.',
+    description: 'We zijn zo dankbaar en gelukkig om onze kleine Alix met jullie te mogen delen. Haar komst heeft ons leven met zoveel liefde en vreugde gevuld. We kijken er naar uit jullie allemaal te ontvangen en samen deze bijzondere tijd te vieren.',
     gifts: '* maat 56-62 kleertjes\n* luiers (maat 1-2)\n* of een herinnering\n\nGeen bloemen graag',
     date_from,
     date_to,

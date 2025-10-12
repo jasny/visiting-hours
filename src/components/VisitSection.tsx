@@ -48,15 +48,33 @@ export default function VisitSection({ page, isAdmin }: Props) {
     to: null,
   });
   const [showForm, setShowForm] = useState(false);
+  const [editingSlot, setEditingSlot] = useState<Slot | null>(null);
 
   const handleSelect = (date: string, time: string, to?: string) => {
+    if (isAdmin) {
+      const existing = slots.find((s) => s.date === date && s.time === time) || null;
+      setEditingSlot(existing);
+    }
     setSelected({ date, time, to: to ?? null });
     setShowForm(true);
   };
 
-  const handleForm = (slot?: Slot) => {
-    if (slot) setSlots((slots) => [...slots, slot]);
-    if (slot && !isAdmin) setVisit(slot);
+  const handleForm = (slot?: Slot | null) => {
+    if (editingSlot) {
+      // edit flow
+      if (slot === undefined) {
+        // deletion confirmed
+        setSlots((prev) => prev.filter((s) => s !== editingSlot));
+      } else if (slot) {
+        // saved changes
+        setSlots((prev) => prev.map((s) => (s === editingSlot ? slot : s)));
+      } // else slot === null => cancel: do nothing
+      setEditingSlot(null);
+    } else if (slot) {
+      // create flow
+      setSlots((slots) => [...slots, slot]);
+      if (!isAdmin) setVisit(slot);
+    }
 
     setShowForm(false);
   };
@@ -121,12 +139,13 @@ export default function VisitSection({ page, isAdmin }: Props) {
         </p>
       </div>
 
-      <CalendarView calendar={calendar} onSelect={handleSelect}/>
+      <CalendarView calendar={calendar} onSelect={handleSelect} selectBlocked={isAdmin} />
       {isAdmin ? (
         <SlotForm
           reference={page.reference}
           calendar={calendar}
           selected={selected}
+          existing={editingSlot}
           visible={showForm}
           onClose={handleForm}
         />

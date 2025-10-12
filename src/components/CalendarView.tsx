@@ -13,6 +13,7 @@ import CalendarToolbar from "@/components/CalendarToolbar"
 interface Props {
   calendar: Calendar;
   onSelect?: (date: string, time: string, to?: string) => void;
+  selectBlocked?: boolean; // admin-only: allow selecting blocked/visit events for editing
 }
 
 const locales = { nl } as const;
@@ -24,7 +25,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-export default function CalendarView({ calendar, onSelect }: Props) {
+export default function CalendarView({ calendar, onSelect, selectBlocked }: Props) {
   const dates = calendar.dates;
 
   // slot size (minutes) provided by DTO
@@ -55,17 +56,29 @@ export default function CalendarView({ calendar, onSelect }: Props) {
     return { min, max };
   }, [dates, calendar.windows]);
 
-  // events for existing taken visits only (busy). Unavailable and full timeslots are styled via slotPropGetter
-  const busyEvents: RbcEvent[] = useMemo(() => {
+  // events for visits (always) and blocked (admin when selectBlocked)
+  const visitEvents: RbcEvent[] = useMemo(() => {
     const evs: RbcEvent[] = [];
     for (const v of calendar.slots ?? []) {
       if (v.type !== 'taken') continue;
       const start = toDate(v.date, v.time);
       const end = addMinutes(start, v.duration);
-      evs.push({ title: v.name, start, end, resource: { kind: 'busy' } });
+      evs.push({ title: v.name, start, end, resource: { kind: 'taken', slot: v } });
     }
     return evs;
   }, [calendar.slots]);
+
+  const blockedEvents: RbcEvent[] = useMemo(() => {
+    if (!selectBlocked) return [];
+    const evs: RbcEvent[] = [];
+    for (const v of calendar.slots ?? []) {
+      if (v.type !== 'blocked') continue;
+      const start = toDate(v.date, v.time);
+      const end = addMinutes(start, v.duration);
+      evs.push({ start, end, resource: { kind: 'blocked', slot: v } });
+    }
+    return evs;
+  }, [calendar.slots, selectBlocked]);
 
   // responsive view switching
   const [currentView, setCurrentView] = useState<typeof Views[keyof typeof Views]>(Views.WEEK);
@@ -121,39 +134,31 @@ export default function CalendarView({ calendar, onSelect }: Props) {
       && !isPeriodFull(calendar, startStrDate, startHM);
   };
 
-  // helper to style events and selected slot marker
+  // helper to style events
   const eventPropGetter = (event: RbcEvent) => {
-    const kind = event.resource.kind as string | undefined;
-    if (kind === 'selected') {
+    const kind = event.resource?.kind as string | undefined;
+    if (kind === 'taken') {
+      // visits use theme colors
       return {
-        className: 'timeslot-selected',
+        className: 'event-visit',
         style: {
-          backgroundColor: '#bfdbfe', // blue-200
-          borderColor: '#60a5fa',
-          color: '#1e3a8a',
-        },
-      };
+          backgroundColor: 'var(--theme-50)',
+          borderColor: 'var(--theme-300)',
+          color: 'var(--theme-600)'
+        }
+      }
     }
-    if (kind === 'unavailable' || kind === 'full') {
+    if (kind === 'blocked') {
       return {
-        className: 'timeslot-unavailable',
+        className: 'event-blocked',
         style: {
           backgroundColor: '#f3f4f6', // gray-100
-          borderColor: 'transparent',
-          color: '#6b7280',
-          borderRadius: 0,
-        },
-      };
+          borderColor: '#e5e7eb', // gray-200
+          color: '#6b7280'
+        }
+      }
     }
-    return {
-      className: `timeslot-${kind}`,
-      style: {
-        backgroundColor: '#e5e7eb',
-        borderColor: '#d1d5db',
-        color: '#374151',
-        cursor: 'not-allowed'
-      },
-    };
+    return {};
   };
 
   // gray out days outside the allowed date range (before min or after max)
@@ -203,7 +208,14 @@ export default function CalendarView({ calendar, onSelect }: Props) {
         selectable
         onSelectSlot={handleSelectSlot}
         onSelecting={canSelect}
-        events={busyEvents}
+        events={[...visitEvents, ...blockedEvents]}
+        onSelectEvent={(event) => {
+          if (!selectBlocked) return;
+          const d = event.start as Date;
+          const dateStr = dfFormat(d, 'yyyy-MM-dd');
+          const timeStr = dfFormat(d, 'HH:mm');
+          onSelect?.(dateStr, timeStr);
+        }}
         eventPropGetter={eventPropGetter}
         dayPropGetter={dayPropGetter}
         slotPropGetter={slotPropGetter}
