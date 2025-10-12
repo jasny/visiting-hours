@@ -4,9 +4,9 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { fromTokenFile } from '@aws-sdk/credential-providers';
 import { cropAndResizeToWebp } from "@/lib/image"
 
-export async function POST(request: Request, { params }: { params: { reference: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ reference: string }> }) {
   try {
-    const { reference } = params;
+    const { reference } = await params;
     const formData = await request.formData();
     const file = formData.get('file');
     if (!(file instanceof File)) {
