@@ -113,10 +113,11 @@ export default function VisitSection({ page, isAdmin }: Props) {
   return (
     <>
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl text-gray-800 mb-4">Plan je bezoek</h2>
+        <h2 className="text-3xl md:text-4xl text-gray-800 mb-4">{isAdmin ? 'Beheer bezoeken' : 'Plan je bezoek'}</h2>
         <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
-          Kies een moment dat voor jou uitkomt om {page.name} te ontmoeten. We houden de bezoeken kort en gezellig,
-          zodat iedereen kan genieten.
+          {isAdmin
+            ? 'Beheer de agenda: plan een bezoek voor een gast in of blokkeer tijdvakken wanneer bezoek niet mogelijk is.'
+            : <>Kies een moment dat voor jou uitkomt om {page.name} te ontmoeten. We houden de bezoeken kort en gezellig, zodat iedereen kan genieten.</>}
         </p>
       </div>
 
