@@ -65,7 +65,7 @@ export default function CalendarView({ calendar, onSelect }: Props) {
       evs.push({ title: v.name, start, end, resource: { kind: 'busy' } });
     }
     return evs;
-  }, [calendar.slots, calendar.slots.length]);
+  }, [calendar.slots]);
 
   // responsive view switching
   const [currentView, setCurrentView] = useState<typeof Views[keyof typeof Views]>(Views.WEEK);
@@ -105,7 +105,7 @@ export default function CalendarView({ calendar, onSelect }: Props) {
     let toStr: string | undefined;
     const end = slot.end as Date | undefined;
     // Only pass an explicit end when user drag-selects a range
-    if ((slot as any).action === 'select' && end && end > start) {
+    if ((slot as SlotInfo & { action?: string }).action === 'select' && end && end > start) {
       toStr = dfFormat(end, 'HH:mm');
     }
     onSelect?.(dateStr, timeStr, toStr);

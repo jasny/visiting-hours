@@ -15,9 +15,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link id="theme-link" rel="stylesheet" href="/themes/lara-light-pink/theme.css" />
-      </head>
       <body
         className={`antialiased`}
       >

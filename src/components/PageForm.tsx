@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import { useDutchLocale } from "@/hooks/useLocale"
 import { partialMatch } from "@/lib/utils"
-import { toDate, toDateString } from "@/lib/calendar"
+import { toDateString } from "@/lib/calendar"
 
 // Keep same shape as before but managed by react-hook-form
 type FormState = Partial<Page>;

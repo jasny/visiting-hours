@@ -122,7 +122,7 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
       try {
         await addSlot(reference, payload as Required<Slot>);
         onClose(payload as Slot);
-      } catch (e) {
+      } catch {
         // swallow error; could add toast
         onClose(undefined);
       }
