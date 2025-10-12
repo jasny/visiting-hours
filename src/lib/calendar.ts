@@ -71,12 +71,48 @@ export function buildCalendar(page: Page): Calendar {
 }
 
 export function isVisitingTime(cal: Calendar, timeHM: string, duration?: number): boolean {
-  // ensure selection fits fully within at least one window using visit duration
-  const timeTo = timeAddMinutes(timeHM, duration ?? cal.duration);
+  // Allow within a single window, or spanning multiple consecutive windows
+  // as long as the entire range is covered by windows and every crossed
+  // window has no capacity cap (undefined capacity).
+  const dur = duration ?? cal.duration;
+  const timeTo = timeAddMinutes(timeHM, dur);
+
+  // 1) Fits fully within a single window
   for (const vt of Object.values(cal.windows)) {
     if (vt && timeHM >= vt.from && timeTo <= vt.to) return true;
   }
-  return false;
+
+  // 2) Try chaining adjacent/overlapping windows without caps
+  const toMin = (hm: string) => {
+    const [h, m] = hm.split(":").map(Number);
+    return h * 60 + m;
+  };
+  type WinEntry = { key: keyof Calendar['capacities']; from: number; to: number; hasCap: boolean };
+  const entries: WinEntry[] = Object.entries(cal.windows).map(([key, vt]) => ({
+    key: key as keyof Calendar['capacities'],
+    from: toMin(vt!.from),
+    to: toMin(vt!.to),
+    hasCap: cal.capacities[key as keyof Calendar['capacities']] !== undefined,
+  }));
+  entries.sort((a, b) => a.from - b.from);
+
+  const start = toMin(timeHM);
+  const end = toMin(timeTo);
+
+  // find starting window containing start
+  const current = entries.find(e => start >= e.from && start < e.to);
+  if (!current) return false;
+  if (current.hasCap) return false; // spanning not allowed if first window has cap
+
+  let coveredUntil = Math.min(current.to, end);
+  // progress through windows, ensuring continuous coverage and no caps
+  while (coveredUntil < end) {
+    const next = entries.find(e => e.from <= coveredUntil && e.to > coveredUntil);
+    if (!next) return false; // gap
+    if (next.hasCap) return false; // cannot span into capped window
+    coveredUntil = Math.min(next.to, end);
+  }
+  return true;
 }
 
 export function getSlotVisit(cal: Calendar, date: string, timeHM: string, duration?: number): Slot | null {
@@ -87,6 +123,20 @@ export function getSlotVisit(cal: Calendar, date: string, timeHM: string, durati
     if (visit.date !== date) continue;
     const visitEnd = timeAddMinutes(visit.time, visit.duration);
     // overlap if not (proposed ends before existing starts OR proposed starts after existing ends)
+    const overlaps = !(endHM <= visit.time || startHM >= visitEnd);
+    if (overlaps) return visit;
+  }
+  return null;
+}
+
+export function getTakenOverlap(cal: Calendar, date: string, timeHM: string, duration?: number): Slot | null {
+  const [h, m] = timeHM.split(':').map(Number);
+  const startHM = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  const endHM = timeAddMinutes(startHM, duration ?? cal.duration);
+  for (const visit of cal.slots ?? []) {
+    if (visit.type !== 'taken') continue;
+    if (visit.date !== date) continue;
+    const visitEnd = timeAddMinutes(visit.time, visit.duration);
     const overlaps = !(endHM <= visit.time || startHM >= visitEnd);
     if (overlaps) return visit;
   }

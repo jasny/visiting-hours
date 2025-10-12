@@ -9,7 +9,7 @@ import { SelectButton } from "primereact/selectbutton";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { addSlot } from "@/services/pageService";
 import { Calendar as CalType, Slot, SlotType } from "@/lib/types";
-import { getSlotVisit, isVisitingTime } from "@/lib/calendar";
+import { getTakenOverlap } from "@/lib/calendar";
 import { useDutchLocale } from "@/hooks/useLocale";
 
 interface Props {
@@ -67,7 +67,7 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
     return null;
   }, [selected?.date, selected?.to]);
 
-  const { control, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const { control, handleSubmit, reset, setValue, trigger, formState: { errors, isSubmitting } } = useForm<FormValues>({
     defaultValues: { type: "blocked", name: "", range: defaultFrom ? [defaultFrom, (defaultTo ?? addMinutes(defaultFrom, calendar.duration))] : null },
     mode: "onChange",
   });
@@ -129,18 +129,6 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
     });
   };
 
-  const footer = (
-    <div className="flex items-center justify-end gap-3 w-full">
-      <Button
-        type="button"
-        onClick={handleSubmit(onSubmit)}
-        label="Opslaan"
-        disabled={pending || isSubmitting}
-        loading={pending || isSubmitting}
-      />
-    </div>
-  );
-
   const typeOptions: { label: string; value: SlotType }[] = [
     { label: "Blokkeren", value: "blocked" },
     { label: "Bezoek", value: "taken" },
@@ -156,17 +144,32 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
     const timeHM = formatLocalHM(from);
     const duration = Math.round((to.getTime() - from.getTime()) / 60000);
 
-    // Check within allowed windows
-    if (!isVisitingTime(calendar, timeHM, duration)) return "Tijd buiten bezoektijden";
-
-    // Overlap check
-    const overlap = getSlotVisit(calendar, dateStr, timeHM, duration);
-    if (overlap) return "Deze periode overlapt met een andere afspraak";
+    // Overlap only matters for visits (type 'taken'). Blocking may overlap anything.
+    if (watchedType === "taken") {
+      const overlap = getTakenOverlap(calendar, dateStr, timeHM, duration);
+      if (overlap) return "Deze periode overlapt met een bestaande bezoekafspraak";
+    }
 
     return true;
   }
 
   const watchedType = useWatch({ control, name: "type" });
+
+  useEffect(() => {
+    trigger("range").then();
+  }, [watchedType, trigger]);
+
+  const footer = (
+    <div className="flex items-center justify-end gap-3 w-full">
+      <Button
+        type="button"
+        onClick={handleSubmit(onSubmit)}
+        label="Opslaan"
+        disabled={pending || isSubmitting}
+        loading={pending || isSubmitting}
+      />
+    </div>
+  );
 
   return (
     <Dialog header="Afspraak toevoegen" visible={visible} onHide={() => onClose()} style={{ width: "36rem" }} modal footer={footer}>
