@@ -1,5 +1,6 @@
 'use server';
 
+import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getPage } from '@/services/pageService';
@@ -8,6 +9,41 @@ import VisitSection from '@/components/VisitSection';
 import defaultBaby from '@/assets/default-baby.webp';
 import { Pencil } from 'lucide-react';
 import ThemeSwitcher, { type VisitTheme } from '@/components/ThemeSwitcher';
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ reference: string }> }
+): Promise<Metadata> {
+  const { reference } = await params;
+  const page = await getPage(reference);
+
+  if (!page) {
+    return {};
+  }
+
+  const hostname = process.env.NEXT_PUBLIC_S3_HOSTNAME;
+  const ogImage = hostname && page.image ? `https://${hostname}/${page.image}` : '/bg-stork.jpg';
+
+  const title = `${page.name} — Kraambezoek plannen`;
+  const description = `Plan je kraambezoek voor ${page.name}. Kies eenvoudig een moment en laat weten wanneer je komt.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `/page/${reference}`,
+      type: 'website',
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function ShowPage({ params, searchParams }: { params: Promise<{ reference: string }>, searchParams: Promise<{ manage?: string }> }) {
   const [{ reference }, { manage }] = await Promise.all([params, searchParams]);
