@@ -1,12 +1,8 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Button } from 'primereact/button';
+import Link from 'next/link';
 import { Plus, Eye, Star, Heart } from 'lucide-react';
 
 export default function Home() {
-  const router = useRouter();
   return (
     <main className="flex flex-col min-h-screen">
       <section className="relative bg-gradient-to-br from-pink-100 via-rose-50 to-orange-50 overflow-hidden flex-1">
@@ -30,22 +26,20 @@ export default function Home() {
                 Creëer een persoonlijke pagina om familie en vrienden uit te nodigen voor hun eerste ontmoeting met je pasgeboren kindje.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button
-                  unstyled
-                  onClick={() => router.push('/create')}
+                <Link
+                  href="/create"
                   className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 px-4 py-2 text-lg rounded-xl"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Maak je pagina
-                </Button>
-                <Button
-                  unstyled
-                  onClick={() => router.push('/example')}
+                </Link>
+                <Link
+                  href="/example"
                   className="inline-flex items-center justify-center gap-2 border-2 border-rose-200 text-rose-700 bg-white hover:text-black hover:bg-rose-50 hover:border-rose-300 transition-all duration-300 px-4 py-2 text-lg rounded-xl"
                 >
                   <Eye className="w-5 h-5 mr-2" />
                   Bekijk voorbeeld
-                </Button>
+                </Link>
               </div>
             </div>
             <div className="flex justify-center lg:justify-end">
