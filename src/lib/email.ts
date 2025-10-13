@@ -58,6 +58,7 @@ const multiplePeopleFilter = createFilter(
 
 twing.addFilter(localDateFilter);
 twing.addFilter(multiplePeopleFilter);
+twing.globals.set('base_url', BASE_URL);
 
 const sesClient = new SESv2Client({
   region: process.env.AWS_REGION || 'eu-west-1',
