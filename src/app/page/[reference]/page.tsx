@@ -23,6 +23,8 @@ export default async function ShowPage({ params, searchParams }: { params: Promi
   const isAdmin = !!page.manage_token;
   const theme = (['pink', 'blue', 'green'].includes(page.theme) ? page.theme : 'pink') as VisitTheme;
 
+  const extraPadding = isAdmin ? 'pt-18 md:pt-8' : 'pt-10 md:pt-8';
+
   return (
     <main data-visit-theme={theme}>
       <ThemeSwitcher reference={page.reference} theme={theme} isAdmin={isAdmin} />
@@ -30,7 +32,7 @@ export default async function ShowPage({ params, searchParams }: { params: Promi
       {(isAdmin) && (
         <Link
           href={`/edit/${reference}`}
-          className="absolute top-2 right-2 md:top-4 md:right-4 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur border border-[var(--divider)] px-3 py-2 text-[var(--theme-700)] shadow-sm hover:bg-white hover:text-[var(--theme-800)] z-50"
+          className="absolute top-3 right-3 md:top-4 md:right-4 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur border border-[var(--divider)] px-3 py-2 text-[var(--theme-700)] shadow-sm hover:bg-white hover:text-[var(--theme-800)] z-50"
           aria-label="Pagina bewerken"
         >
           <Pencil className="w-4 h-4" />
@@ -38,7 +40,7 @@ export default async function ShowPage({ params, searchParams }: { params: Promi
         </Link>
       )}
 
-      <section className="bg-gradient-to-br from-[var(--hero-from)] via-[var(--hero-via)] to-[var(--hero-to)] p-4 md:p-8">
+      <section className={`bg-gradient-to-br from-[var(--hero-from)] via-[var(--hero-via)] to-[var(--hero-to)] p-4 md:p-8 ${extraPadding}`}>
         <div className="max-w-6xl mx-auto flex flex-col gap-4 relative">
           <PageInfo info={page} image={defaultBaby} editable={isAdmin} />
         </div>

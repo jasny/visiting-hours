@@ -5,6 +5,8 @@ import VisitSection from '@/components/VisitSection';
 import ExampleBaby from "@/assets/example-baby.webp";
 import { Page, Slot } from "@/lib/types"
 import ThemeSwitcher from "@/components/ThemeSwitcher"
+import { XIcon } from "lucide-react"
+import Link from "next/link"
 
 export default async function ShowPage() {
   // helper to format YYYY-MM-DD
@@ -93,8 +95,15 @@ export default async function ShowPage() {
   return (
     <main data-visit-theme={page.theme}>
       <ThemeSwitcher isAdmin={true} theme={page.theme} />
+      <Link
+        href="/"
+        className="absolute p-2 w-10 h-10 top-3 right-3 md:top-4 md:right-4 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur border border-[var(--divider)] text-[var(--theme-700)] shadow-sm hover:bg-white hover:text-[var(--theme-800)] z-50"
+        aria-label="Terug"
+      >
+        <XIcon />
+      </Link>
 
-      <section className="bg-gradient-to-br from-[var(--hero-from)] via-[var(--hero-via)] to-[var(--hero-to)] p-4 md:p-8">
+      <section className="bg-gradient-to-br from-[var(--hero-from)] via-[var(--hero-via)] to-[var(--hero-to)] p-4 pt-18 md:p-8 md:pt-8">
         <div className="max-w-6xl mx-auto flex flex-col gap-4">
           <PageInfo info={page} image={ExampleBaby} />
         </div>
