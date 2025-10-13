@@ -29,7 +29,7 @@
     "react-big-calendar": "^1.19.4",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.64.0",
-    "sharp": "^0.34.4",
+    "sharp": "^0.32.6",
     "twing": "^7.2.1"
   },
   "devDependencies": {
