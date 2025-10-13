@@ -103,6 +103,8 @@ export default function VisitSection({ page, isAdmin }: Props) {
     });
   };
 
+  const hasGifts = !!page.gifts.trim();
+
   if (!calendar || !loaded) return <></>;
 
   if (!!visit) {
@@ -117,13 +119,16 @@ export default function VisitSection({ page, isAdmin }: Props) {
           street={page.street}
           postalcode={page.postalcode}
         />
-        <Panel className="text-center mb-12 mt-12" header={<span className="font-bold">Wensenlijst</span>}>
-          <p className="text-gray-600 max-w-2xl text-left whitespace-pre-line">
-            <Linkify>
-              { page.gifts }
-            </Linkify>
-          </p>
-        </Panel>
+
+        { hasGifts &&
+          <Panel className="text-center mb-12 mt-12" header={<span className="font-bold">Wensenlijst</span>}>
+            <p className="text-gray-600 max-w-2xl text-left whitespace-pre-line">
+              <Linkify>
+                { page.gifts }
+              </Linkify>
+            </p>
+          </Panel>
+        }
       </>
     );
   }
