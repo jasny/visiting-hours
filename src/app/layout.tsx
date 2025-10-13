@@ -2,11 +2,33 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { PrimeReactProvider } from "primereact/api"
 import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.opkraambezoek.nl"),
   title: "Gratis kraambezoek plannen | OpKraambezoek.nl",
-  description: "",
+  description: "Plan en beheer eenvoudig gratis kraambezoek: deel een link, laat bezoekers zelf een tijdslot kiezen en houd alles overzichtelijk.",
+  openGraph: {
+    title: "Gratis kraambezoek plannen | OpKraambezoek.nl",
+    description: "Plan en beheer eenvoudig gratis kraambezoek: deel een link, laat bezoekers zelf een tijdslot kiezen en houd alles overzichtelijk.",
+    url: "/",
+    siteName: "OpKraambezoek.nl",
+    locale: "nl_NL",
+    type: "website",
+    images: [
+      {
+        url: "/bg-stork.jpg",
+        width: 1200,
+        height: 630,
+        alt: "OpKraambezoek.nl — Gratis kraambezoek plannen",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gratis kraambezoek plannen | OpKraambezoek.nl",
+    description: "Plan en beheer eenvoudig gratis kraambezoek: deel een link, laat bezoekers zelf een tijdslot kiezen en houd alles overzichtelijk.",
+    images: ["/bg-stork.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +50,6 @@ export default function RootLayout({
           {children}
         </PrimeReactProvider>
         <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );
