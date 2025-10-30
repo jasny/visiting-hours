@@ -127,7 +127,7 @@ async function sendTemplate(
   subject: string,
   context: Record<string, unknown>,
 ) {
-  if (!to) return;
+  if (!to || EMAIL_FROM === 'info@example.com') return;
 
   try {
     const { html, text } = await renderTemplate(template, context);
