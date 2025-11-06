@@ -57,7 +57,7 @@ export default function PageInfo({ info, image, editable }: Props) {
           <PageImage info={info} image={image} editable={editable} />
         </div>
         <div className="max-w-2xl mx-auto">
-          <p className="text-[var(--theme-700)] text-lg md:text-xl leading-relaxed font-light italic">{info.description}</p>
+          <p className="text-[var(--theme-700)] text-lg md:text-xl leading-relaxed font-light italic whitespace-pre-line">{info.description}</p>
           <p className="text-[var(--theme-600)] mt-6 text-lg">— Met veel liefde, {info.parent_name}</p>
         </div>
       </div>
