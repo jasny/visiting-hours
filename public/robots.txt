@@ -1,0 +1,10 @@
+# robots.txt to restrict indexing to only the homepage and the example page
+User-agent: *
+# Disallow everything by default
+Disallow: /
+
+# Allow only the exact homepage URL
+Allow: /$
+
+# Allow only the exact example page URL
+Allow: /example$
