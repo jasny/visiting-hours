@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { PrimeReactProvider } from "primereact/api"
 import { Analytics } from '@vercel/analytics/react'
+import { ConfirmDialog } from "primereact/confirmdialog"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.opkraambezoek.nl"),
@@ -48,6 +49,7 @@ export default function RootLayout({
       >
         <PrimeReactProvider>
           {children}
+          <ConfirmDialog />
         </PrimeReactProvider>
         <Analytics />
       </body>

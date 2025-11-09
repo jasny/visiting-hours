@@ -1,6 +1,6 @@
 'use server';
 
-import { GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, PutCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { buildUpdateExpression, db } from '@/lib/dynamodb';
 import { Page, Slot } from "@/lib/types"
 import { isTimeAvailable } from "@/lib/calendar"
@@ -279,6 +279,22 @@ export async function removeSlot(
       UpdateExpression: 'SET slots = :v',
       ExpressionAttributeValues: { ':v': newSlots },
       ReturnValues: 'NONE',
+    })
+  );
+
+  return true;
+}
+
+export async function deletePage(reference: string): Promise<boolean> {
+  // Ensure the user is admin via the page cookie/token
+  if (!await isAdmin(reference)) {
+    throw new AccessDeniedError();
+  }
+
+  await db.send(
+    new DeleteCommand({
+      TableName: TABLE_NAME,
+      Key: { reference },
     })
   );
 

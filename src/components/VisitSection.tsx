@@ -10,7 +10,7 @@ import { cancelVisit, getVisitFromCookie } from '@/services/pageService';
 import { VisitCard } from "@/components/VisitCard"
 import Linkify from "linkify-react"
 import { Panel } from "primereact/panel"
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
+import { confirmDialog } from 'primereact/confirmdialog'
 
 interface Props {
   page: Page;
@@ -110,7 +110,6 @@ export default function VisitSection({ page, isAdmin }: Props) {
   if (!!visit) {
     return (
       <>
-        <ConfirmDialog />
         <VisitCard
           onClick={confirmCancel}
           disabled={pending}

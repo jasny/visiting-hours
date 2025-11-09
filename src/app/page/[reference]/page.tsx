@@ -2,13 +2,12 @@
 
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import Link from 'next/link';
 import { getPage } from '@/services/pageService';
 import PageInfo from '@/components/PageInfo';
 import VisitSection from '@/components/VisitSection';
 import defaultBaby from '@/assets/default-baby.webp';
-import { Pencil } from 'lucide-react';
 import ThemeSwitcher, { type VisitTheme } from '@/components/ThemeSwitcher';
+import AdminActions from '@/components/AdminActions';
 
 export async function generateMetadata(
   { params }: { params: Promise<{ reference: string }> }
@@ -66,14 +65,9 @@ export default async function ShowPage({ params, searchParams }: { params: Promi
       <ThemeSwitcher reference={page.reference} theme={theme} isAdmin={isAdmin} />
 
       {(isAdmin) && (
-        <Link
-          href={`/edit/${reference}`}
-          className="absolute top-3 right-3 md:top-4 md:right-4 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur border border-[var(--divider)] px-3 py-2 text-[var(--theme-700)] shadow-sm hover:bg-white hover:text-[var(--theme-800)] z-50"
-          aria-label="Pagina bewerken"
-        >
-          <Pencil className="w-4 h-4" />
-          <span className="hidden sm:inline">Bewerken</span>
-        </Link>
+        <div className="absolute top-3 right-3 md:top-4 md:right-4">
+          <AdminActions reference={reference} />
+        </div>
       )}
 
       <section className={`bg-gradient-to-br from-[var(--hero-from)] via-[var(--hero-via)] to-[var(--hero-to)] p-4 md:p-8 ${extraPadding}`}>

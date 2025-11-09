@@ -12,7 +12,7 @@ import { Calendar as CalType, Slot, SlotType } from "@/lib/types";
 import { getTakenOverlap } from "@/lib/calendar";
 import { useDutchLocale } from "@/hooks/useLocale";
 
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { confirmDialog } from "primereact/confirmdialog";
 
 interface Props {
   reference: string;
@@ -237,7 +237,6 @@ export default function SlotForm({ reference, calendar, visible, onClose, select
 
   return (
     <>
-      <ConfirmDialog />
       <Dialog header={isEdit ? "Afspraak bewerken" : "Afspraak toevoegen"} visible={visible} onHide={() => onClose(null)} style={{ width: "36rem" }} modal footer={footer}>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex gap-3 items-center mb-3">
