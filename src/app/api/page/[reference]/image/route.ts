@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { updatePage } from '@/services/pageService';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { updatePage, getPage } from '@/services/pageService';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { cropAndResizeToWebp } from "@/lib/image"
 import { credentials } from "@/lib/aws"
 
@@ -14,6 +14,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ ref
     if (!(file instanceof File)) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
+
+    // Fetch current image to delete after successful update
+    const currentPage = await getPage(reference);
+    const oldImage = currentPage?.image;
 
     const { filename, contentType, buffer } = await cropAndResizeToWebp(file, { width: 500, height: 500 });
 
@@ -36,6 +40,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ ref
     );
 
     await updatePage(reference, { image: filename });
+
+    // Best-effort: delete the old image if it exists and differs from the new filename
+    if (oldImage && oldImage !== filename) {
+      try {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: bucket,
+            Key: oldImage,
+          })
+        );
+      } catch (err) {
+        console.error('Failed to delete old image from S3', { reference, oldImage }, err);
+      }
+    }
 
     return NextResponse.json({ image: filename });
   } catch (e) {

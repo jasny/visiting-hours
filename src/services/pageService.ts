@@ -1,6 +1,7 @@
 'use server';
 
 import { GetCommand, PutCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { buildUpdateExpression, db } from '@/lib/dynamodb';
 import { Page, Slot } from "@/lib/types"
 import { isTimeAvailable } from "@/lib/calendar"
@@ -21,6 +22,7 @@ import {
   sendNewVisitEmail,
   sendRegisterEmail,
 } from '@/lib/email';
+import { credentials } from '@/lib/aws';
 
 const TABLE_NAME = process.env.DYNAMODB_TABLE || 'VisitingHoursPage';
 
@@ -291,6 +293,28 @@ export async function deletePage(reference: string): Promise<boolean> {
     throw new AccessDeniedError();
   }
 
+  // Fetch page to know if there is an image to delete
+  const page = await fetchPage(reference, 'image');
+
+  // Attempt to delete the image from S3 first (best-effort)
+  const bucket = process.env.S3_BUCKET as string | undefined;
+  const region = process.env.AWS_REGION || 'eu-west-1';
+  if (bucket && page?.image) {
+    try {
+      const s3 = new S3Client({ region, credentials });
+      await s3.send(
+        new DeleteObjectCommand({
+          Bucket: bucket,
+          Key: page.image,
+        })
+      );
+    } catch (err) {
+      console.error('Failed to delete image from S3 for page', reference, page?.image, err);
+      // continue: we still want to delete the page record
+    }
+  }
+
+  // Delete the page record from DynamoDB
   await db.send(
     new DeleteCommand({
       TableName: TABLE_NAME,
