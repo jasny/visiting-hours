@@ -1,10 +1,10 @@
 # robots.txt to restrict indexing to only the homepage and the example page
 User-agent: *
-# Disallow everything by default
-Disallow: /
 
-# Allow only the exact homepage URL
-Allow: /$
+# Block user-generated content pages
+Disallow: /page/
 
-# Allow only the exact example page URL
-Allow: /example$
+# Block Next image optimizer ONLY when it proxies external images (user uploads)
+Disallow: /_next/image*url=https://*
+Disallow: /_next/image*url=http://*
+

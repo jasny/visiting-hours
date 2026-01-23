@@ -1,0 +1,33 @@
+# Documentation
+README.md
+
+# Node
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build output
+.next
+out
+dist
+
+# Local dev
+.env
+.env.*
+*.local
+
+# OS / editor files
+.DS_Store
+.idea
+.vscode
+*.swp
+
+# Git
+.git
+.gitignore
+
+# Docker self
+Dockerfile
+docker-compose*
+
