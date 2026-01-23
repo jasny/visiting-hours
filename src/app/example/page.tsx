@@ -8,6 +8,9 @@ import ThemeSwitcher from "@/components/ThemeSwitcher"
 import { XIcon } from "lucide-react"
 import Link from "next/link"
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ShowPage() {
   // helper to format YYYY-MM-DD
   const today = new Date();
