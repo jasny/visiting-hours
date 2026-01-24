@@ -1,5 +1,5 @@
-# robots.txt to restrict indexing to only the homepage and the example page
 User-agent: *
+Allow: /
 
 # Block user-generated content pages
 Disallow: /page/
