@@ -1,5 +1,3 @@
-'use server';
-
 import PageInfo from '@/components/PageInfo';
 import VisitSection from '@/components/VisitSection';
 import ExampleBaby from "@/assets/example-baby.webp";
