@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack --hostname localhost",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "rotate-token": "tsx scripts/rotate-token.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.883.0",
@@ -41,9 +42,12 @@
     "@types/react": "^19",
     "@types/react-big-calendar": "^1",
     "@types/react-dom": "^19",
+    "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "tailwindcss": "^4",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
