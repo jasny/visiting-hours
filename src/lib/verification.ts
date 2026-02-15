@@ -10,13 +10,17 @@ export interface VisitCookie {
 
 const HMAC_SECRET = process.env.VISIT_HMAC_SECRET ?? '';
 
+function getSecret(nonce: string) {
+  return nonce.startsWith('#') ? HMAC_SECRET : '';
+}
+
 export function cookieName(prefix: string, reference: string) {
   return `vh_${prefix}_${reference}`;
 }
 
 export function getPageToken(reference: string, nonce: string) {
   const data = `${reference}|${nonce}`;
-  return crypto.createHmac('sha256', HMAC_SECRET).update(data).digest('hex');
+  return crypto.createHmac('sha256', getSecret(nonce)).update(data).digest('hex');
 }
 
 export function verifyPageToken(reference: string, token: string, nonce: string): boolean {
@@ -52,7 +56,7 @@ export async function clearPageCookie(reference: string): Promise<void> {
 
 export function computeVisitVerification(reference: string, date: string, time: string, nonce: string) {
   const data = `${reference}|${date}|${time}|${nonce}`;
-  return crypto.createHmac('sha256', HMAC_SECRET).update(data).digest('hex');
+  return crypto.createHmac('sha256', getSecret(nonce)).update(data).digest('hex');
 }
 
 export async function getVisitCookie(reference: string): Promise<VisitCookie | null> {

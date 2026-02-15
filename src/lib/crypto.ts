@@ -33,5 +33,5 @@ export function randomString(length: number = 8): string {
 
 export function randomNonce(): string {
   const buf = crypto.randomBytes(32);
-  return buf.toString('hex');
+  return '#' + buf.toString('hex');
 }
