@@ -206,7 +206,7 @@ export async function cancelVisit(reference: string): Promise<boolean> {
 
   const slot = findSlotForCookie(page.slots, cookie);
   const isAllowed = Boolean(
-    (slot?.nonce && !verifyVisitCookie(reference, cookie, slot.nonce))
+    (slot?.nonce && verifyVisitCookie(reference, cookie, slot.nonce))
       || await getPageTokenForAdmin(page)
   );
 
