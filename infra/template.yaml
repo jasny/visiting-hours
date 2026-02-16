@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cleanup Lambda for Visiting Hours Pages
+
+Parameters:
+  TableName:
+    Type: String
+    Default: VisitingHoursPage
+  BucketName:
+    Type: String
+    Default: visiting-hours
+
+Resources:
+  CleanupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs20.x
+      CodeUri: ./dist
+      Timeout: 300
+      MemorySize: 128
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref TableName
+          S3_BUCKET: !Ref BucketName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableName
+        - S3ReadPolicy:
+            BucketName: !Ref BucketName
+        - S3CrudPolicy:
+            BucketName: !Ref BucketName
+      Events:
+        DailySchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 day)
+            Name: DailyCleanupSchedule
+            Description: Runs cleanup once a day
+            Enabled: true
