@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="nl">
       <head>
         <title>Gratis kraambezoek plannen | OpKraambezoek.nl</title>
         {/* eslint-disable-next-line @next/next/no-css-tags */}
